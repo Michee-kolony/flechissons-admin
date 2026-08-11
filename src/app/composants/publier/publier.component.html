@@ -1,0 +1,570 @@
+<div class="w-full max-w-5xl mx-auto">
+
+  <!-- EN-TÊTE -->
+  <div class="mb-6">
+    <p class="text-sm font-medium text-orange-600">
+      Administration
+    </p>
+
+    <h1 class="text-2xl sm:text-3xl font-bold text-gray-900 mt-1">
+      Publier dans Fléchissons
+    </h1>
+
+    <p class="text-sm text-gray-500 mt-1">
+      Créez et partagez une nouvelle publication avec les utilisateurs.
+    </p>
+  </div>
+
+
+  <!-- FORMULAIRE -->
+  <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+
+    <!-- BARRE SUPÉRIEURE -->
+    <div class="px-5 sm:px-7 py-5 border-b border-gray-100
+                flex flex-col sm:flex-row sm:items-center
+                sm:justify-between gap-3">
+
+      <div>
+        <h2 class="text-lg font-semibold text-gray-800">
+          Nouvelle publication
+        </h2>
+
+        <p class="text-sm text-gray-500 mt-1">
+          Remplissez les informations ci-dessous.
+        </p>
+      </div>
+
+      <!-- Badge -->
+      <div class="inline-flex items-center gap-2
+                  px-3 py-2 rounded-xl
+                  bg-orange-50 text-orange-700
+                  text-xs font-medium w-fit">
+
+        <span class="w-2 h-2 rounded-full bg-orange-500"></span>
+
+        Publication
+      </div>
+
+    </div>
+
+
+    <!-- CONTENU -->
+    <div class="p-5 sm:p-7">
+
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+
+        <!-- COLONNE PRINCIPALE -->
+        <div class="lg:col-span-2 space-y-6">
+
+
+          <!-- TITRE -->
+          <div>
+
+            <label
+              for="titre"
+              class="block text-sm font-medium text-gray-700 mb-2">
+              Titre
+              <span class="text-red-500">*</span>
+            </label>
+
+            <input
+              id="titre"
+              type="text"
+              placeholder="Ex : Grande rencontre de prière"
+              class="w-full h-12 px-4 rounded-xl
+                     border border-gray-200
+                     bg-gray-50
+                     text-gray-800
+                     placeholder:text-gray-400
+                     outline-none
+                     transition
+                     focus:bg-white
+                     focus:border-orange-500
+                     focus:ring-4
+                     focus:ring-orange-500/10">
+          </div>
+
+
+          <!-- DESCRIPTION -->
+          <div>
+
+            <div class="flex items-center justify-between mb-2">
+
+              <label
+                for="description"
+                class="block text-sm font-medium text-gray-700">
+
+                Description
+                <span class="text-red-500">*</span>
+
+              </label>
+
+              <span class="text-xs text-gray-400">
+                Décrivez votre publication
+              </span>
+
+            </div>
+
+            <textarea
+              id="description"
+              rows="7"
+              placeholder="Écrivez le contenu de votre publication..."
+              class="w-full px-4 py-3 rounded-xl
+                     border border-gray-200
+                     bg-gray-50
+                     text-gray-800
+                     placeholder:text-gray-400
+                     outline-none
+                     resize-none
+                     transition
+                     focus:bg-white
+                     focus:border-orange-500
+                     focus:ring-4
+                     focus:ring-orange-500/10">
+            </textarea>
+
+          </div>
+
+
+          <!-- LIEN YOUTUBE -->
+          <div>
+
+            <label
+              for="youtube"
+              class="block text-sm font-medium text-gray-700 mb-2">
+
+              Vidéo YouTube
+
+              <span class="ml-1 text-xs font-normal text-gray-400">
+                (facultatif)
+              </span>
+
+            </label>
+
+            <div class="relative">
+
+              <div
+                class="absolute left-4 top-1/2 -translate-y-1/2
+                       w-7 h-7 rounded-lg
+                       bg-red-50
+                       flex items-center justify-center">
+
+                <svg
+                  class="w-4 h-4 text-red-600"
+                  viewBox="0 0 24 24"
+                  fill="currentColor">
+
+                  <path
+                    d="M23.498 6.186a2.99 2.99 0 00-2.102-2.115C19.505 3.5 12 3.5 12 3.5s-7.505 0-9.396.571A2.99 2.99 0 00.502 6.186 31.8 31.8 0 000 12a31.8 31.8 0 00.502 5.814 2.99 2.99 0 002.102 2.115C4.495 20.5 12 20.5 12 20.5s7.505 0 9.396-.571a2.99 2.99 0 002.102-2.115A31.8 31.8 0 0024 12a31.8 31.8 0 00-.502-5.814z" />
+
+                  <path
+                    fill="#fff"
+                    d="M9.75 8.5v7l5.75-3.5-5.75-3.5z" />
+
+                </svg>
+
+              </div>
+
+              <input
+                id="youtube"
+                type="url"
+                placeholder="https://www.youtube.com/watch?v=..."
+                class="w-full h-12 pl-14 pr-4 rounded-xl
+                       border border-gray-200
+                       bg-gray-50
+                       text-gray-800
+                       placeholder:text-gray-400
+                       outline-none
+                       transition
+                       focus:bg-white
+                       focus:border-orange-500
+                       focus:ring-4
+                       focus:ring-orange-500/10">
+
+            </div>
+
+            <p class="text-xs text-gray-400 mt-2">
+              Ajoutez le lien d'une vidéo YouTube si votre publication en contient une.
+            </p>
+
+          </div>
+
+
+          <!-- IMAGES -->
+          <div>
+
+            <div class="flex items-center justify-between mb-2">
+
+              <label
+                class="text-sm font-medium text-gray-700">
+
+                Images
+
+                <span class="ml-1 text-xs font-normal text-gray-400">
+                  (facultatif)
+                </span>
+
+              </label>
+
+              <span class="text-xs font-medium text-orange-600">
+                Maximum 4 images
+              </span>
+
+            </div>
+
+
+            <!-- ZONE UPLOAD -->
+            <div
+              class="relative rounded-2xl
+                     border-2 border-dashed border-gray-200
+                     bg-gray-50
+                     hover:bg-orange-50/40
+                     hover:border-orange-300
+                     transition
+                     cursor-pointer">
+
+              <input
+                type="file"
+                accept="image/*"
+                multiple
+                class="absolute inset-0 w-full h-full
+                       opacity-0 cursor-pointer">
+
+              <div class="flex flex-col items-center
+                          justify-center
+                          py-8 px-4 text-center">
+
+                <div
+                  class="w-12 h-12 rounded-2xl
+                         bg-orange-100
+                         flex items-center justify-center
+                         mb-3">
+
+                  <svg
+                    class="w-6 h-6 text-orange-600"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24">
+
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="1.8"
+                      d="M12 16V4m0 0l-4 4m4-4l4 4M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2" />
+
+                  </svg>
+
+                </div>
+
+                <p class="text-sm font-medium text-gray-700">
+                  Cliquez pour ajouter vos images
+                </p>
+
+                <p class="text-xs text-gray-400 mt-1">
+                  PNG, JPG ou WEBP · Maximum 4 images
+                </p>
+
+              </div>
+
+            </div>
+
+          </div>
+
+
+          <!-- LIEN EXTERNE -->
+          <div>
+
+            <label
+              for="lien"
+              class="block text-sm font-medium text-gray-700 mb-2">
+
+              Lien externe
+
+              <span class="ml-1 text-xs font-normal text-gray-400">
+                (facultatif)
+              </span>
+
+            </label>
+
+            <input
+              id="lien"
+              type="url"
+              placeholder="https://exemple.com"
+              class="w-full h-12 px-4 rounded-xl
+                     border border-gray-200
+                     bg-gray-50
+                     text-gray-800
+                     placeholder:text-gray-400
+                     outline-none
+                     transition
+                     focus:bg-white
+                     focus:border-orange-500
+                     focus:ring-4
+                     focus:ring-orange-500/10">
+
+          </div>
+
+        </div>
+
+
+        <!-- COLONNE DROITE -->
+        <div class="space-y-6">
+
+
+          <!-- TYPE -->
+          <div
+            class="p-5 rounded-2xl
+                   bg-gray-50
+                   border border-gray-100">
+
+            <h3 class="text-sm font-semibold text-gray-800 mb-4">
+              Type de publication
+            </h3>
+
+            <div class="space-y-3">
+
+              <!-- ANNONCES -->
+              <label
+                class="flex items-center gap-3 p-3
+                       rounded-xl bg-white
+                       border border-gray-200
+                       cursor-pointer
+                       hover:border-orange-300
+                       transition">
+
+                <input
+                  type="radio"
+                  name="type"
+                  value="annonces"
+                  class="w-4 h-4 accent-orange-600">
+
+                <div>
+                  <p class="text-sm font-medium text-gray-700">
+                    Annonces
+                  </p>
+
+                  <p class="text-xs text-gray-400">
+                    Informations importantes
+                  </p>
+                </div>
+
+              </label>
+
+
+              <!-- PRÉDICATIONS -->
+              <label
+                class="flex items-center gap-3 p-3
+                       rounded-xl bg-white
+                       border border-gray-200
+                       cursor-pointer
+                       hover:border-orange-300
+                       transition">
+
+                <input
+                  type="radio"
+                  name="type"
+                  value="predications"
+                  class="w-4 h-4 accent-orange-600">
+
+                <div>
+                  <p class="text-sm font-medium text-gray-700">
+                    Prédications
+                  </p>
+
+                  <p class="text-xs text-gray-400">
+                    Messages et enseignements
+                  </p>
+                </div>
+
+              </label>
+
+
+              <!-- EXHORTATIONS -->
+              <label
+                class="flex items-center gap-3 p-3
+                       rounded-xl bg-white
+                       border border-gray-200
+                       cursor-pointer
+                       hover:border-orange-300
+                       transition">
+
+                <input
+                  type="radio"
+                  name="type"
+                  value="exhortations"
+                  class="w-4 h-4 accent-orange-600">
+
+                <div>
+                  <p class="text-sm font-medium text-gray-700">
+                    Exhortations
+                  </p>
+
+                  <p class="text-xs text-gray-400">
+                    Encouragements et méditations
+                  </p>
+                </div>
+
+              </label>
+
+            </div>
+
+          </div>
+
+
+          <!-- THÈME -->
+          <div
+            class="p-5 rounded-2xl
+                   bg-gray-50
+                   border border-gray-100">
+
+            <label
+              for="theme"
+              class="block text-sm font-semibold text-gray-800 mb-3">
+
+              Thème
+
+              <span class="text-red-500">*</span>
+
+            </label>
+
+            <input
+              id="theme"
+              type="text"
+              placeholder="Ex : Foi, Espérance..."
+              class="w-full h-11 px-3
+                     rounded-xl
+                     border border-gray-200
+                     bg-white
+                     text-sm text-gray-800
+                     placeholder:text-gray-400
+                     outline-none
+                     transition
+                     focus:border-orange-500
+                     focus:ring-4
+                     focus:ring-orange-500/10">
+
+            <p class="text-xs text-gray-400 mt-2">
+              Le thème permet de mieux classer la publication.
+            </p>
+
+          </div>
+
+
+          <!-- APERÇU -->
+          <div
+            class="p-5 rounded-2xl
+                   bg-gradient-to-br
+                   from-orange-500
+                   to-orange-600
+                   text-white">
+
+            <div class="flex items-center gap-3">
+
+              <div
+                class="w-10 h-10 rounded-xl
+                       bg-white/15
+                       flex items-center justify-center">
+
+                <svg
+                  class="w-5 h-5"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24">
+
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="1.8"
+                    d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14v-4zM4 6h7a2 2 0 012 2v8a2 2 0 01-2 2H4a2 2 0 01-2-2V8a2 2 0 012-2z" />
+
+                </svg>
+
+              </div>
+
+              <div>
+
+                <p class="text-sm font-semibold">
+                  Votre publication
+                </p>
+
+                <p class="text-xs text-orange-100 mt-0.5">
+                  Visible dans l'application Fléchissons
+                </p>
+
+              </div>
+
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+
+    <!-- FOOTER -->
+    <div
+      class="px-5 sm:px-7 py-4
+             bg-gray-50
+             border-t border-gray-100
+             flex flex-col-reverse sm:flex-row
+             sm:items-center sm:justify-end
+             gap-3">
+
+      <button
+        type="button"
+        class="w-full sm:w-auto
+               px-5 py-2.5
+               rounded-xl
+               text-sm font-medium
+               text-gray-600
+               bg-white
+               border border-gray-200
+               hover:bg-gray-100
+               transition">
+
+        Annuler
+
+      </button>
+
+      <button
+        type="button"
+        class="w-full sm:w-auto
+               px-6 py-2.5
+               rounded-xl
+               text-sm font-semibold
+               text-white
+               bg-orange-600
+               hover:bg-orange-700
+               active:bg-orange-800
+               shadow-sm
+               shadow-orange-600/20
+               transition
+               flex items-center justify-center gap-2">
+
+        <svg
+          class="w-4 h-4"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24">
+
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M12 19V5m0 0l-6 6m6-6l6 6" />
+
+        </svg>
+
+        Publier
+
+      </button>
+
+    </div>
+
+  </div>
+
+</div>

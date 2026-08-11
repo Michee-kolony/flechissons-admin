@@ -1,0 +1,972 @@
+<div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+
+  <div>
+
+    <h1 class="text-2xl sm:text-3xl font-bold text-gray-800">
+      Gestion des publications
+    </h1>
+
+    <p class="text-gray-500 mt-1">
+      Consultez, recherchez et gérez toutes vos publications.
+    </p>
+
+  </div>
+
+</div>
+
+
+
+<!-- ======================================================= -->
+<!-- RECHERCHE + FILTRES                                      -->
+<!-- ======================================================= -->
+
+<div
+  class="bg-white
+         rounded-2xl
+         border border-gray-100
+         shadow-sm
+         p-4">
+
+  <div class="flex flex-col lg:flex-row gap-3">
+
+    <!-- RECHERCHE -->
+
+    <div class="relative flex-1">
+
+      <i
+        class="fa-solid fa-magnifying-glass
+               absolute left-4 top-1/2
+               -translate-y-1/2
+               text-gray-400">
+      </i>
+
+      <input
+        type="text"
+        placeholder="Rechercher une publication..."
+        class="w-full
+               h-12
+               pl-11 pr-4
+               rounded-xl
+               border border-gray-200
+               bg-gray-50
+               text-gray-800
+               placeholder-gray-400
+               outline-none
+               focus:bg-white
+               focus:border-orange-500
+               focus:ring-4
+               focus:ring-orange-500/10
+               transition">
+
+    </div>
+
+
+
+    <!-- FILTRE STATUT -->
+
+    <select
+      class="h-12
+             px-4
+             rounded-xl
+             border border-gray-200
+             bg-gray-50
+             text-gray-700
+             outline-none
+             focus:bg-white
+             focus:border-orange-500
+             focus:ring-4
+             focus:ring-orange-500/10
+             transition">
+
+      <option value="">
+        Tous les statuts
+      </option>
+
+      <option value="publie">
+        Publiées
+      </option>
+
+      <option value="brouillon">
+        Brouillons
+      </option>
+
+      <option value="archive">
+        Archivées
+      </option>
+
+    </select>
+
+
+
+    <!-- FILTRE CATÉGORIE -->
+
+    <select
+      class="h-12
+             px-4
+             rounded-xl
+             border border-gray-200
+             bg-gray-50
+             text-gray-700
+             outline-none
+             focus:bg-white
+             focus:border-orange-500
+             focus:ring-4
+             focus:ring-orange-500/10
+             transition">
+
+      <option value="">
+        Toutes les catégories
+      </option>
+
+      <option value="actualite">
+        Actualité
+      </option>
+
+      <option value="commerce">
+        Commerce
+      </option>
+
+      <option value="technologie">
+        Technologie
+      </option>
+
+    </select>
+
+  </div>
+
+</div>
+
+
+
+<!-- ======================================================= -->
+<!-- TITRE                                                     -->
+<!-- ======================================================= -->
+
+<div class="flex items-center justify-between">
+
+  <div>
+
+    <h2 class="text-lg font-bold text-gray-800 mt-5">
+      Mes publications
+    </h2>
+
+    <p class="text-sm text-gray-500">
+      128 publications disponibles
+    </p>
+
+  </div>
+
+
+  <button
+    class="hidden sm:flex
+           items-center gap-2
+           text-sm
+           text-gray-500
+           hover:text-orange-600
+           transition">
+
+    <i class="fa-solid fa-arrow-down-wide-short"></i>
+
+    Trier
+
+  </button>
+
+</div>
+
+
+
+<!-- ======================================================= -->
+<!-- LISTE HORIZONTALE DES PUBLICATIONS                       -->
+<!-- ======================================================= -->
+
+<div class="space-y-4">
+
+
+  <!-- ===================================================== -->
+  <!-- PUBLICATION IMAGE                                      -->
+  <!-- ===================================================== -->
+
+  <div
+    class="bg-white
+           rounded-2xl
+           border border-gray-100
+           shadow-sm
+           overflow-hidden
+           hover:shadow-lg
+           transition-all duration-300">
+
+    <div
+      class="flex flex-col md:flex-row
+             min-h-[220px]">
+
+
+      <!-- IMAGE -->
+
+      <div
+        class="relative
+               w-full md:w-72 lg:w-80
+               h-56 md:h-auto
+               flex-shrink-0
+               bg-gray-100
+               overflow-hidden">
+
+        <img
+          src="/images/publication-1.jpg"
+          alt="Publication"
+          class="w-full h-full object-cover
+                 hover:scale-105
+                 transition-transform duration-500">
+
+
+        <!-- TYPE -->
+
+        <span
+          class="absolute top-4 left-4
+                 inline-flex items-center gap-2
+                 px-3 py-1.5
+                 rounded-full
+                 bg-white/90
+                 backdrop-blur-sm
+                 text-orange-600
+                 text-xs
+                 font-semibold">
+
+          <i class="fa-solid fa-image"></i>
+
+          Image
+
+        </span>
+
+
+        <!-- STATUT -->
+
+        <span
+          class="absolute bottom-4 left-4
+                 inline-flex items-center gap-2
+                 px-3 py-1.5
+                 rounded-full
+                 bg-green-500
+                 text-white
+                 text-xs
+                 font-semibold">
+
+          <span
+            class="w-1.5 h-1.5
+                   rounded-full
+                   bg-white">
+          </span>
+
+          Publiée
+
+        </span>
+
+      </div>
+
+
+
+      <!-- CONTENU -->
+
+      <div
+        class="flex-1
+               p-5 md:p-6
+               flex flex-col
+               justify-between">
+
+
+        <div>
+
+          <!-- META -->
+
+          <div
+            class="flex flex-wrap
+                   items-center
+                   gap-2 mb-3">
+
+            <span
+              class="px-2.5 py-1
+                     rounded-lg
+                     bg-orange-50
+                     text-orange-600
+                     text-xs
+                     font-semibold">
+
+              Technologie
+
+            </span>
+
+            <span class="text-xs text-gray-400">
+              10 août 2026
+            </span>
+
+          </div>
+
+
+
+          <!-- TITRE -->
+
+          <h3
+            class="text-xl
+                   font-bold
+                   text-gray-800
+                   line-clamp-2">
+
+            Découvrez nos nouvelles publications
+
+          </h3>
+
+
+
+          <!-- DESCRIPTION -->
+
+          <p
+            class="text-sm
+                   text-gray-500
+                   mt-3
+                   line-clamp-3
+                   max-w-3xl">
+
+            Découvrez les dernières informations et actualités
+            publiées sur votre plateforme.
+
+          </p>
+
+        </div>
+
+
+
+        <!-- BAS -->
+
+        <div
+          class="flex flex-col sm:flex-row
+                 sm:items-center
+                 sm:justify-between
+                 gap-4
+                 mt-6
+                 pt-4
+                 border-t border-gray-100">
+
+
+          <!-- AUTEUR -->
+
+          <div class="flex items-center gap-2">
+
+            <div
+              class="w-9 h-9
+                     rounded-full
+                     bg-orange-100
+                     text-orange-600
+                     flex items-center justify-center">
+
+              <i class="fa-solid fa-user text-xs"></i>
+
+            </div>
+
+            <div>
+
+              <p class="text-xs text-gray-400">
+                Auteur
+              </p>
+
+              <p class="text-sm font-medium text-gray-700">
+                Administrateur
+              </p>
+
+            </div>
+
+          </div>
+
+
+
+          <!-- ACTIONS -->
+
+          <div class="flex items-center gap-2">
+
+            <button
+              class="w-10 h-10
+                     rounded-xl
+                     bg-gray-50
+                     text-gray-500
+                     hover:bg-orange-50
+                     hover:text-orange-600
+                     transition">
+
+              <i class="fa-solid fa-eye"></i>
+
+            </button>
+
+
+            <button
+              class="px-4 py-2.5
+                     rounded-xl
+                     bg-orange-600
+                     text-white
+                     text-sm
+                     font-semibold
+                     hover:bg-orange-700
+                     transition">
+
+              Gérer
+
+            </button>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+
+
+  <!-- ===================================================== -->
+  <!-- PUBLICATION YOUTUBE                                    -->
+  <!-- ===================================================== -->
+
+  <div
+    class="bg-white
+           rounded-2xl
+           border border-gray-100
+           shadow-sm
+           overflow-hidden
+           hover:shadow-lg
+           transition-all duration-300">
+
+    <div
+      class="flex flex-col md:flex-row
+             min-h-[220px]">
+
+
+      <!-- VIDEO -->
+
+      <div
+        class="relative
+               w-full md:w-72 lg:w-80
+               h-56 md:h-auto
+               flex-shrink-0
+               bg-black
+               overflow-hidden">
+
+        <iframe
+          class="absolute inset-0
+                 w-full h-full"
+          src="https://www.youtube.com/embed/VIDEO_ID"
+          title="Vidéo YouTube"
+          frameborder="0"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+          allowfullscreen>
+        </iframe>
+
+
+        <!-- TYPE -->
+
+        <span
+          class="absolute top-4 left-4
+                 inline-flex items-center gap-2
+                 px-3 py-1.5
+                 rounded-full
+                 bg-red-600
+                 text-white
+                 text-xs
+                 font-semibold
+                 z-10">
+
+          <i class="fa-brands fa-youtube"></i>
+
+          YouTube
+
+        </span>
+
+      </div>
+
+
+
+      <!-- CONTENU -->
+
+      <div
+        class="flex-1
+               p-5 md:p-6
+               flex flex-col
+               justify-between">
+
+
+        <div>
+
+          <div
+            class="flex flex-wrap
+                   items-center
+                   gap-2 mb-3">
+
+            <span
+              class="px-2.5 py-1
+                     rounded-lg
+                     bg-blue-50
+                     text-blue-600
+                     text-xs
+                     font-semibold">
+
+              Actualité
+
+            </span>
+
+            <span class="text-xs text-gray-400">
+              9 août 2026
+            </span>
+
+          </div>
+
+
+          <h3
+            class="text-xl
+                   font-bold
+                   text-gray-800
+                   line-clamp-2">
+
+            Les nouveautés de la plateforme
+
+          </h3>
+
+
+          <p
+            class="text-sm
+                   text-gray-500
+                   mt-3
+                   line-clamp-3
+                   max-w-3xl">
+
+            Une présentation des nouveautés disponibles
+            pour les utilisateurs.
+
+          </p>
+
+        </div>
+
+
+
+        <div
+          class="flex flex-col sm:flex-row
+                 sm:items-center
+                 sm:justify-between
+                 gap-4
+                 mt-6
+                 pt-4
+                 border-t border-gray-100">
+
+
+          <div class="flex items-center gap-2">
+
+            <div
+              class="w-9 h-9
+                     rounded-full
+                     bg-blue-100
+                     text-blue-600
+                     flex items-center justify-center">
+
+              <i class="fa-solid fa-user text-xs"></i>
+
+            </div>
+
+            <div>
+
+              <p class="text-xs text-gray-400">
+                Auteur
+              </p>
+
+              <p class="text-sm font-medium text-gray-700">
+                Administrateur
+              </p>
+
+            </div>
+
+          </div>
+
+
+
+          <div class="flex items-center gap-2">
+
+            <button
+              class="w-10 h-10
+                     rounded-xl
+                     bg-gray-50
+                     text-gray-500
+                     hover:bg-orange-50
+                     hover:text-orange-600
+                     transition">
+
+              <i class="fa-solid fa-eye"></i>
+
+            </button>
+
+
+            <button
+              class="px-4 py-2.5
+                     rounded-xl
+                     bg-orange-600
+                     text-white
+                     text-sm
+                     font-semibold
+                     hover:bg-orange-700
+                     transition">
+
+              Gérer
+
+            </button>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+
+
+  <!-- ===================================================== -->
+  <!-- PUBLICATION IMAGE 2                                    -->
+  <!-- ===================================================== -->
+
+  <div
+    class="bg-white
+           rounded-2xl
+           border border-gray-100
+           shadow-sm
+           overflow-hidden
+           hover:shadow-lg
+           transition-all duration-300">
+
+    <div
+      class="flex flex-col md:flex-row
+             min-h-[220px]">
+
+
+      <!-- IMAGE -->
+
+      <div
+        class="relative
+               w-full md:w-72 lg:w-80
+               h-56 md:h-auto
+               flex-shrink-0
+               bg-gray-200
+               overflow-hidden">
+
+        <img
+          src="/images/publication-2.jpg"
+          alt="Publication"
+          class="w-full h-full object-cover
+                 hover:scale-105
+                 transition-transform duration-500">
+
+
+        <span
+          class="absolute top-4 left-4
+                 inline-flex items-center gap-2
+                 px-3 py-1.5
+                 rounded-full
+                 bg-white/90
+                 backdrop-blur-sm
+                 text-purple-600
+                 text-xs
+                 font-semibold">
+
+          <i class="fa-solid fa-image"></i>
+
+          Image
+
+        </span>
+
+
+        <span
+          class="absolute bottom-4 left-4
+                 px-3 py-1.5
+                 rounded-full
+                 bg-gray-600
+                 text-white
+                 text-xs
+                 font-semibold">
+
+          Archivée
+
+        </span>
+
+      </div>
+
+
+
+      <!-- CONTENU -->
+
+      <div
+        class="flex-1
+               p-5 md:p-6
+               flex flex-col
+               justify-between">
+
+
+        <div>
+
+          <div
+            class="flex flex-wrap
+                   items-center
+                   gap-2 mb-3">
+
+            <span
+              class="px-2.5 py-1
+                     rounded-lg
+                     bg-purple-50
+                     text-purple-600
+                     text-xs
+                     font-semibold">
+
+              Commerce
+
+            </span>
+
+            <span class="text-xs text-gray-400">
+              5 août 2026
+            </span>
+
+          </div>
+
+
+          <h3
+            class="text-xl
+                   font-bold
+                   text-gray-800
+                   line-clamp-2">
+
+            Informations commerciales importantes
+
+          </h3>
+
+
+          <p
+            class="text-sm
+                   text-gray-500
+                   mt-3
+                   line-clamp-3
+                   max-w-3xl">
+
+            Retrouvez toutes les informations concernant
+            les activités commerciales de la plateforme.
+
+          </p>
+
+        </div>
+
+
+
+        <div
+          class="flex flex-col sm:flex-row
+                 sm:items-center
+                 sm:justify-between
+                 gap-4
+                 mt-6
+                 pt-4
+                 border-t border-gray-100">
+
+
+          <div class="flex items-center gap-2">
+
+            <div
+              class="w-9 h-9
+                     rounded-full
+                     bg-purple-100
+                     text-purple-600
+                     flex items-center justify-center">
+
+              <i class="fa-solid fa-user text-xs"></i>
+
+            </div>
+
+            <div>
+
+              <p class="text-xs text-gray-400">
+                Auteur
+              </p>
+
+              <p class="text-sm font-medium text-gray-700">
+                Administrateur
+              </p>
+
+            </div>
+
+          </div>
+
+
+          <div class="flex items-center gap-2">
+
+            <button
+              class="w-10 h-10
+                     rounded-xl
+                     bg-gray-50
+                     text-gray-500
+                     hover:bg-orange-50
+                     hover:text-orange-600
+                     transition">
+
+              <i class="fa-solid fa-eye"></i>
+
+            </button>
+
+
+            <button
+              class="px-4 py-2.5
+                     rounded-xl
+                     bg-orange-600
+                     text-white
+                     text-sm
+                     font-semibold
+                     hover:bg-orange-700
+                     transition">
+
+              Gérer
+
+            </button>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
+
+
+
+<!-- ======================================================= -->
+<!-- PAGINATION                                                -->
+<!-- ======================================================= -->
+
+<div
+  class="bg-white
+         rounded-2xl
+         border border-gray-100
+         shadow-sm
+         p-4
+         flex flex-col sm:flex-row
+         items-center
+         justify-between
+         gap-4">
+
+
+  <p class="text-sm text-gray-500">
+
+    Affichage de
+
+    <span class="font-semibold text-gray-800">
+      1 - 12
+    </span>
+
+    sur
+
+    <span class="font-semibold text-gray-800">
+      128
+    </span>
+
+    publications
+
+  </p>
+
+
+
+  <div class="flex items-center gap-2">
+
+    <button
+      class="w-10 h-10
+             rounded-xl
+             border border-gray-200
+             text-gray-400
+             flex items-center justify-center
+             hover:bg-gray-50
+             transition">
+
+      <i class="fa-solid fa-chevron-left"></i>
+
+    </button>
+
+
+    <button
+      class="w-10 h-10
+             rounded-xl
+             bg-orange-600
+             text-white
+             font-semibold
+             flex items-center justify-center">
+
+      1
+
+    </button>
+
+
+    <button
+      class="w-10 h-10
+             rounded-xl
+             border border-gray-200
+             text-gray-600
+             hover:bg-orange-50
+             hover:text-orange-600
+             transition">
+
+      2
+
+    </button>
+
+
+    <button
+      class="w-10 h-10
+             rounded-xl
+             border border-gray-200
+             text-gray-600
+             hover:bg-orange-50
+             hover:text-orange-600
+             transition">
+
+      3
+
+    </button>
+
+
+    <span class="px-1 text-gray-400">
+      ...
+    </span>
+
+
+    <button
+      class="w-10 h-10
+             rounded-xl
+             border border-gray-200
+             text-gray-600
+             hover:bg-orange-50
+             hover:text-orange-600
+             transition">
+
+      11
+
+    </button>
+
+
+    <button
+      class="w-10 h-10
+             rounded-xl
+             border border-gray-200
+             text-gray-600
+             flex items-center justify-center
+             hover:bg-orange-50
+             hover:text-orange-600
+             transition">
+
+      <i class="fa-solid fa-chevron-right"></i>
+
+    </button>
+
+  </div>
+
+</div>
