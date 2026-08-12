@@ -11,6 +11,10 @@ import { ChartComponent } from './composants/chart/chart.component';
 import { GestionComponent } from './composants/gestion/gestion.component';
 import { RequetesComponent } from './composants/requetes/requetes.component';
 
+import { HttpClientModule } from '@angular/common/http';
+import { FormsModule } from '@angular/forms';
+import { DetailsarticlesComponent } from './composants/detailsarticles/detailsarticles.component';
+
 @NgModule({
   declarations: [
     AppComponent,
@@ -20,13 +24,19 @@ import { RequetesComponent } from './composants/requetes/requetes.component';
     LoginComponent,
     ChartComponent,
     GestionComponent,
-    RequetesComponent
+    RequetesComponent,
+    DetailsarticlesComponent
   ],
+
   imports: [
     BrowserModule,
-    AppRoutingModule
+    AppRoutingModule,
+    HttpClientModule,
+    FormsModule
   ],
+
   providers: [],
+
   bootstrap: [AppComponent]
 })
-export class AppModule { }
+export class AppModule {}

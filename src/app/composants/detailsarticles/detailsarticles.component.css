@@ -1,4 +1,4 @@
-/* login.component.css */
+/* detailsarticles.component.css */
 @keyframes progress {
   from {
     width: 100%;
@@ -9,10 +9,22 @@
 }
 
 .animate-progress {
-  animation: progress 3s linear forwards;
+  animation: progress 4s linear forwards;
 }
 
-/* Animation d'entrée du toast */
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-spin {
+  animation: spin 1s linear infinite;
+}
+
 .fixed {
   animation: slideInRight 0.3s ease-out;
 }

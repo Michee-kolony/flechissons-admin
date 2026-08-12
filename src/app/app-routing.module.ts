@@ -6,6 +6,7 @@ import { PublierComponent } from './composants/publier/publier.component';
 import { LoginComponent } from './composants/login/login.component';
 import { GestionComponent } from './composants/gestion/gestion.component';
 import { RequetesComponent } from './composants/requetes/requetes.component';
+import { DetailsarticlesComponent } from './composants/detailsarticles/detailsarticles.component';
 
 const routes: Routes = [
   {path:'', redirectTo: 'login', pathMatch: 'full'},
@@ -16,7 +17,8 @@ const routes: Routes = [
       {path:'dashboard', component: DashboardComponent},
       {path:'publier', component: PublierComponent},
       {path:'gestion', component: GestionComponent},
-      {path:'requetes-de-priere', component: RequetesComponent}
+      {path:'requetes-de-priere', component: RequetesComponent},
+      {path:'detailsarticles/:id', component: DetailsarticlesComponent}
     ]
   }
 ];

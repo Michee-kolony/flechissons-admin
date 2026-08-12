@@ -1,0 +1,288 @@
+<!-- detailsarticles.component.html -->
+<div class="max-w-6xl mx-auto px-4 sm:px-6 py-6">
+
+  <!-- ===================================================== -->
+  <!-- EN-TÊTE                                                -->
+  <!-- ===================================================== -->
+
+  <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+
+    <div>
+      <button (click)="goBack()" class="inline-flex items-center gap-2 text-gray-500 hover:text-orange-600 transition mb-2">
+        <i class="fa-solid fa-arrow-left"></i>
+        Retour à la liste
+      </button>
+      <h1 class="text-2xl sm:text-3xl font-bold text-gray-800">Détails de la publication</h1>
+      <p class="text-gray-500 mt-1">Consultez toutes les informations de votre publication.</p>
+    </div>
+
+    <button *ngIf="article" (click)="editArticle()" class="flex items-center gap-2 px-5 py-2.5 bg-orange-600 text-white rounded-xl hover:bg-orange-700 transition font-semibold shadow-lg shadow-orange-600/20">
+      <i class="fa-solid fa-pen"></i>
+      Modifier
+    </button>
+
+  </div>
+
+  <!-- ===================================================== -->
+  <!-- CHARGEMENT                                             -->
+  <!-- ===================================================== -->
+
+  <div *ngIf="isLoading" class="flex justify-center items-center py-20">
+    <div class="animate-spin rounded-full h-16 w-16 border-4 border-orange-500 border-t-transparent"></div>
+  </div>
+
+  <!-- ===================================================== -->
+  <!-- ERREUR                                                 -->
+  <!-- ===================================================== -->
+
+  <div *ngIf="!isLoading && errorMessage" class="bg-red-50 border border-red-200 rounded-2xl p-8 text-center">
+    <i class="fa-solid fa-circle-exclamation text-4xl text-red-500 mb-3"></i>
+    <h3 class="text-xl font-semibold text-red-700">Erreur</h3>
+    <p class="text-red-600 mt-2">{{ errorMessage }}</p>
+    <button (click)="goBack()" class="mt-4 px-5 py-2.5 bg-orange-600 text-white rounded-xl hover:bg-orange-700 transition font-semibold">
+      Retourner à la liste
+    </button>
+  </div>
+
+  <!-- ===================================================== -->
+  <!-- CONTENU DE L'ARTICLE                                   -->
+  <!-- ===================================================== -->
+
+  <div *ngIf="!isLoading && article && !errorMessage">
+
+    <!-- CARTE PRINCIPALE -->
+    <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+
+      <!-- IMAGE / VIDEO EN TÊTE -->
+      <div class="relative w-full bg-gray-100" style="min-height: 300px; max-height: 500px;">
+
+        <!-- Si une vidéo YouTube est présente -->
+        <div *ngIf="article.youtube; else imageDisplay" class="w-full h-full" style="min-height: 300px;">
+          <iframe [src]="getSafeYoutubeUrl(article.youtube)" class="w-full h-full" style="min-height: 300px;" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+        </div>
+
+        <!-- Affichage des images -->
+        <ng-template #imageDisplay>
+          <div *ngIf="hasImages(); else noImage" class="relative w-full h-full" style="min-height: 300px;">
+            
+            <!-- Image principale -->
+            <img [src]="getCurrentImageUrl()" [alt]="article.titre" (error)="onImageError($event)" class="w-full h-full object-contain">
+            
+            <!-- Bouton précédent -->
+            <button *ngIf="getImageCount() > 1" (click)="prevImage()" class="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-black/50 text-white hover:bg-black/70 transition flex items-center justify-center">
+              <i class="fa-solid fa-chevron-left"></i>
+            </button>
+
+            <!-- Bouton suivant -->
+            <button *ngIf="getImageCount() > 1" (click)="nextImage()" class="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-black/50 text-white hover:bg-black/70 transition flex items-center justify-center">
+              <i class="fa-solid fa-chevron-right"></i>
+            </button>
+
+            <!-- Indicateurs -->
+            <div *ngIf="getImageCount() > 1" class="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2">
+              <button *ngFor="let img of article.images; let i = index" (click)="selectImage(i)" class="w-3 h-3 rounded-full transition" [class.bg-white]="i === currentImageIndex" [class.bg-white-50]="i !== currentImageIndex">
+              </button>
+            </div>
+
+            <!-- Compteur d'images -->
+            <span class="absolute top-4 right-4 inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-black/60 text-white text-xs font-medium backdrop-blur-sm">
+              <i class="fa-solid fa-images"></i>
+              {{ currentImageIndex + 1 }} / {{ getImageCount() }}
+            </span>
+          </div>
+
+          <!-- Aucune image -->
+          <ng-template #noImage>
+            <div class="w-full h-full flex items-center justify-center bg-gradient-to-br from-orange-50 to-gray-100" style="min-height: 300px;">
+              <div class="text-center">
+                <i class="fa-solid fa-image text-6xl text-gray-300 mb-3"></i>
+                <p class="text-gray-400">Aucune image disponible</p>
+              </div>
+            </div>
+          </ng-template>
+        </ng-template>
+
+        <!-- BADGE TYPE -->
+        <span *ngIf="article" class="absolute top-4 left-4 inline-flex items-center gap-2 px-4 py-2 rounded-full text-white text-sm font-semibold z-10 shadow-lg" [ngClass]="{
+          'bg-blue-600': article.type === 'annonces',
+          'bg-purple-600': article.type === 'predications',
+          'bg-green-600': article.type === 'exhortations'
+        }">
+          <i class="fa-solid" [ngClass]="getTypeIcon(article.type)"></i>
+          {{ getTypeLabel(article.type) }}
+        </span>
+      </div>
+
+      <!-- INFORMATIONS -->
+      <div class="p-6 md:p-8">
+
+        <!-- En-tête -->
+        <div class="flex flex-wrap items-start justify-between gap-4 mb-6">
+          <div class="flex-1">
+            <h2 class="text-2xl md:text-3xl font-bold text-gray-900">{{ article.titre }}</h2>
+            <div class="flex flex-wrap items-center gap-3 mt-3">
+              <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium" [ngClass]="getTypeColor(article.type)">
+                <i class="fa-solid" [ngClass]="getTypeIcon(article.type)"></i>
+                {{ getTypeLabel(article.type) }}
+              </span>
+              <span class="text-sm text-gray-500">
+                <i class="fa-regular fa-calendar mr-1"></i>
+                {{ formatDate(article.createdAt) }}
+              </span>
+              <span class="text-sm text-gray-500">
+                <i class="fa-regular fa-clock mr-1"></i>
+                {{ getTimeAgo(article.createdAt) }}
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Thème -->
+        <div class="mb-6 p-4 bg-orange-50 rounded-xl border border-orange-100">
+          <p class="text-sm font-medium text-orange-700">
+            <i class="fa-solid fa-tag mr-2"></i>
+            Thème : {{ article.theme }}
+          </p>
+        </div>
+
+        <!-- Description -->
+        <div class="mb-6">
+          <h3 class="text-sm font-semibold text-gray-700 mb-3">
+            <i class="fa-solid fa-align-left mr-2"></i>
+            Description
+          </h3>
+          <div class="p-4 bg-gray-50 rounded-xl border border-gray-100">
+            <p class="text-gray-700 whitespace-pre-wrap leading-relaxed">{{ article.description }}</p>
+          </div>
+        </div>
+
+        <!-- Liens -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+
+          <!-- Lien YouTube -->
+          <div *ngIf="article.youtube" class="p-4 bg-gray-50 rounded-xl border border-gray-100">
+            <p class="text-xs text-gray-500 font-medium uppercase tracking-wider mb-1">
+              <i class="fa-brands fa-youtube text-red-500 mr-1"></i>
+              YouTube
+            </p>
+            <a [href]="article.youtube" target="_blank" class="text-orange-600 hover:text-orange-700 hover:underline break-all text-sm">{{ article.youtube }}</a>
+          </div>
+
+          <!-- Lien externe -->
+          <div *ngIf="article.lien" class="p-4 bg-gray-50 rounded-xl border border-gray-100">
+            <p class="text-xs text-gray-500 font-medium uppercase tracking-wider mb-1">
+              <i class="fa-solid fa-link text-blue-500 mr-1"></i>
+              Lien externe
+            </p>
+            <a [href]="article.lien" target="_blank" class="text-orange-600 hover:text-orange-700 hover:underline break-all text-sm">{{ article.lien }}</a>
+          </div>
+
+        </div>
+
+        <!-- Statistiques -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 p-4 bg-gray-50 rounded-xl border border-gray-100">
+
+          <div class="text-center">
+            <p class="text-2xl font-bold text-orange-600">{{ article.likes ? article.likes.length : 0 }}</p>
+            <p class="text-xs text-gray-500"><i class="fa-regular fa-heart text-red-400 mr-1"></i>Likes</p>
+          </div>
+
+          <div class="text-center">
+            <p class="text-2xl font-bold text-blue-600">{{ article.commentaires ? article.commentaires.length : 0 }}</p>
+            <p class="text-xs text-gray-500"><i class="fa-regular fa-comment mr-1"></i>Commentaires</p>
+          </div>
+
+          <div class="text-center">
+            <p class="text-2xl font-bold text-green-600">{{ article.images ? article.images.length : 0 }}</p>
+            <p class="text-xs text-gray-500"><i class="fa-regular fa-image mr-1"></i>Images</p>
+          </div>
+
+          <div class="text-center">
+            <p class="text-2xl font-bold text-purple-600">{{ article.youtube ? '✅' : '❌' }}</p>
+            <p class="text-xs text-gray-500"><i class="fa-brands fa-youtube mr-1"></i>Vidéo</p>
+          </div>
+
+        </div>
+
+        <!-- Métadonnées -->
+        <div class="mt-6 pt-6 border-t border-gray-100">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-2 text-sm">
+            <p class="text-gray-500"><span class="font-medium text-gray-700">ID :</span> <span class="text-xs font-mono">{{ article._id }}</span></p>
+            <p class="text-gray-500"><span class="font-medium text-gray-700">Version :</span> v{{ article.__v }}</p>
+            <p class="text-gray-500"><span class="font-medium text-gray-700">Créé le :</span> {{ formatDate(article.createdAt) }}</p>
+            <p class="text-gray-500"><span class="font-medium text-gray-700">Modifié le :</span> {{ formatDate(article.updatedAt) }}</p>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- Liste des images miniatures -->
+    <div *ngIf="hasImages()" class="mt-6">
+      <h3 class="text-sm font-semibold text-gray-700 mb-3">
+        <i class="fa-regular fa-images mr-2"></i>
+        Toutes les images ({{ getImageCount() }})
+      </h3>
+      <div class="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 gap-3">
+        <div *ngFor="let img of article.images; let i = index" (click)="selectImage(i)" class="aspect-square rounded-xl overflow-hidden border-2 cursor-pointer transition hover:scale-105 hover:shadow-md" [class.border-orange-500]="i === currentImageIndex" [class.border-gray-200]="i !== currentImageIndex">
+          <img [src]="img" [alt]="'Image ' + (i + 1)" (error)="onImageError($event)" class="w-full h-full object-cover">
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ===================================================== -->
+  <!-- TOAST                                                  -->
+  <!-- ===================================================== -->
+
+  <div *ngIf="showToast" class="fixed top-4 right-4 z-50 max-w-md w-full transition-all duration-500">
+    
+    <div *ngIf="toastType === 'success'" class="bg-white rounded-lg shadow-2xl overflow-hidden border-l-4 border-green-500">
+      <div class="p-4 flex items-start gap-3">
+        <div class="flex-shrink-0">
+          <div class="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
+            <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+            </svg>
+          </div>
+        </div>
+        <div class="flex-1 min-w-0">
+          <p class="text-sm font-semibold text-gray-900">Succès</p>
+          <p class="text-sm text-gray-600">{{ toastMessage }}</p>
+        </div>
+        <button (click)="hideToast()" class="flex-shrink-0 text-gray-400 hover:text-gray-600 transition-colors">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+          </svg>
+        </button>
+      </div>
+      <div class="h-1 bg-green-500 animate-progress"></div>
+    </div>
+    
+    <div *ngIf="toastType === 'error'" class="bg-white rounded-lg shadow-2xl overflow-hidden border-l-4 border-red-500">
+      <div class="p-4 flex items-start gap-3">
+        <div class="flex-shrink-0">
+          <div class="w-10 h-10 bg-red-100 rounded-full flex items-center justify-center">
+            <svg class="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+            </svg>
+          </div>
+        </div>
+        <div class="flex-1 min-w-0">
+          <p class="text-sm font-semibold text-gray-900">Erreur</p>
+          <p class="text-sm text-gray-600">{{ toastMessage }}</p>
+        </div>
+        <button (click)="hideToast()" class="flex-shrink-0 text-gray-400 hover:text-gray-600 transition-colors">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+          </svg>
+        </button>
+      </div>
+      <div class="h-1 bg-red-500 animate-progress"></div>
+    </div>
+    
+  </div>
+
+</div>

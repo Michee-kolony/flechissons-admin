@@ -1,3 +1,5 @@
+<!-- admin.component.html -->
+
 <!-- ======================================================= -->
 <!-- SIDEBAR                                                  -->
 <!-- ======================================================= -->
@@ -163,9 +165,9 @@
       class="flex items-center gap-4
              px-3 py-3 mb-2
              rounded-xl
-             hover:bg-white/15
              text-decoration-none
              text-white
+             hover:bg-white/15
              transition-all duration-200
              group">
 
@@ -200,9 +202,9 @@
       class="flex items-center gap-4
              px-3 py-3 mb-2
              rounded-xl
-             hover:bg-white/15
              text-decoration-none
              text-white
+             hover:bg-white/15
              transition-all duration-200
              group">
 
@@ -237,9 +239,9 @@
       class="flex items-center gap-4
              px-3 py-3 mb-2
              rounded-xl
-             hover:bg-white/15
              text-decoration-none
              text-white
+             hover:bg-white/15
              transition-all duration-200
              group">
 
@@ -274,9 +276,9 @@
       class="flex items-center gap-4
              px-3 py-3 mb-2
              rounded-xl
-             hover:bg-white/15
              text-decoration-none
              text-white
+             hover:bg-white/15
              transition-all duration-200
              group">
 
@@ -336,9 +338,9 @@
       class="flex items-center gap-4
              px-3 py-3 mb-2
              rounded-xl
-             hover:bg-white/15
              text-decoration-none
              text-white
+             hover:bg-white/15
              transition-all duration-200
              group">
 
@@ -400,11 +402,11 @@
         class="flex-1 overflow-hidden">
 
         <p class="font-semibold text-sm truncate">
-          Administrateur
+          {{ adminName }}
         </p>
 
         <p class="text-xs text-orange-100 truncate">
-          adminexample.com
+          {{ adminEmail }}
         </p>
 
       </div>
@@ -583,11 +585,11 @@
         <div class="hidden md:block">
 
           <p class="text-sm font-semibold text-gray-800">
-            Administrateur
+            {{ adminName }}
           </p>
 
           <p class="text-xs text-gray-500">
-            Compte admin
+            {{ adminEmail }}
           </p>
 
         </div>
