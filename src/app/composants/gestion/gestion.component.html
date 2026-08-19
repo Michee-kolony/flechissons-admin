@@ -132,17 +132,67 @@
     <div class="flex flex-col md:flex-row min-h-[220px]">
 
       <!-- IMAGE ou VIDEO -->
-      <div class="relative w-full md:w-72 lg:w-80 h-56 md:h-auto flex-shrink-0 bg-gray-100 overflow-hidden">
+      <div class="relative w-full md:w-72 lg:w-80 h-56 md:h-auto flex-shrink-0 bg-gray-100 overflow-hidden group">
 
-        <!-- Si une vidéo YouTube est présente -->
-        <div *ngIf="article.youtube; else imageBlock" class="relative w-full h-full">
-          <iframe
-            [src]="getSafeYoutubeUrl(article.youtube)"
-            class="w-full h-full"
-            frameborder="0"
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-            allowfullscreen>
-          </iframe>
+        <!-- Si une vidéo est présente (videoUrl ou youtube) -->
+        <div *ngIf="hasVideo(article); else imageBlock" class="relative w-full h-full bg-black">
+          <video
+            [src]="getVideoUrl(article)"
+            controls
+            controlsList="nodownload noremoteplayback"
+            disablePictureInPicture
+            playsinline
+            preload="metadata"
+            loading="lazy"
+            class="w-full h-full object-contain"
+            (error)="onVideoError($event, article)"
+            #videoPlayer>
+            
+            <p class="text-white text-center p-4">
+              Votre navigateur ne supporte pas la lecture de vidéos.
+            </p>
+          </video>
+          
+          <!-- Overlay avec bouton play central -->
+          <div class="absolute inset-0 flex items-center justify-center bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+               (click)="toggleVideoPlay(videoPlayer)">
+            
+            <!-- Bouton Play/Pause central -->
+            <button 
+              class="w-16 h-16 bg-orange-600 hover:bg-orange-700 text-white rounded-full 
+                     shadow-2xl transform hover:scale-110 transition-all duration-300
+                     flex items-center justify-center">
+              <i class="fa-solid text-2xl" 
+                 [class.fa-play]="videoPlayer?.paused || !videoPlayer?.currentTime"
+                 [class.fa-pause]="!videoPlayer?.paused && (videoPlayer?.currentTime ?? 0) > 0"></i>
+            </button>
+          </div>
+          
+          <!-- Contrôles personnalisés en bas à droite -->
+          <div class="absolute bottom-4 right-4 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+            <button 
+              (click)="toggleVideoPlay(videoPlayer); $event.stopPropagation()"
+              class="bg-black/50 hover:bg-black/70 text-white w-9 h-9 rounded-full backdrop-blur-sm transition-transform hover:scale-110"
+              title="Lecture/Pause">
+              <i class="fa-solid" 
+                 [class.fa-play]="videoPlayer?.paused || !videoPlayer?.currentTime"
+                 [class.fa-pause]="!videoPlayer?.paused && (videoPlayer?.currentTime ?? 0) > 0"></i>
+            </button>
+            
+            <button 
+              (click)="toggleVideoMute(videoPlayer); $event.stopPropagation()"
+              class="bg-black/50 hover:bg-black/70 text-white w-9 h-9 rounded-full backdrop-blur-sm transition-transform hover:scale-110"
+              title="Activer/Désactiver le son">
+              <i class="fa-solid" [class.fa-volume-high]="!videoPlayer?.muted" [class.fa-volume-mute]="videoPlayer?.muted"></i>
+            </button>
+          </div>
+          
+          <!-- Indicateur de progression du chargement -->
+          <div class="absolute bottom-0 left-0 right-0 h-1 bg-gray-800/50">
+            <div class="h-full bg-orange-500 transition-all duration-300" 
+                 [style.width.%]="videoPlayer?.buffered?.length ? (videoPlayer.buffered.end(0) / (videoPlayer.duration || 1) * 100) : 0">
+            </div>
+          </div>
         </div>
 
         <!-- Si une image est présente -->
@@ -152,6 +202,7 @@
             <img
               [src]="getImageUrl(article)"
               [alt]="article.titre"
+              loading="lazy"
               (error)="onImageError($event, article)"
               class="w-full h-full object-cover hover:scale-105 transition-transform duration-500">
           </div>
@@ -186,8 +237,16 @@
 
         </span>
 
+        <!-- INDICATEUR VIDÉO -->
+        <span *ngIf="hasVideo(article)"
+              class="absolute top-4 right-4 inline-flex items-center gap-1 px-3 py-1.5 rounded-full
+                     bg-red-600/90 text-white text-xs font-medium backdrop-blur-sm z-10">
+          <i class="fa-solid fa-video"></i>
+          Vidéo
+        </span>
+
         <!-- NOMBRE D'IMAGES -->
-        <span *ngIf="hasImages(article)"
+        <span *ngIf="hasImages(article) && !hasVideo(article)"
               class="absolute bottom-4 left-4 inline-flex items-center gap-1 px-3 py-1.5 rounded-full
                      bg-black/60 text-white text-xs font-medium backdrop-blur-sm">
           <i class="fa-solid fa-images"></i>

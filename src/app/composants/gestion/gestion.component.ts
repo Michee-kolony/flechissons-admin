@@ -11,6 +11,7 @@ export interface Article {
   type: string;
   theme: string;
   youtube: string | null;
+  videoUrl: string | null;  // NOUVEAU : pour les vidéos
   images: string[];
   lien: string | null;
   likes: string[];
@@ -277,7 +278,7 @@ export class GestionComponent implements OnInit {
   }
 
   // =====================================================
-  // YOUTUBE
+  // YOUTUBE (conservé pour compatibilité)
   // =====================================================
 
   getYoutubeId(url: string | null): string {
@@ -302,6 +303,71 @@ export class GestionComponent implements OnInit {
   getSafeYoutubeUrl(url: string | null): SafeResourceUrl {
     const videoId = this.getYoutubeId(url);
     return this.sanitizer.bypassSecurityTrustResourceUrl(`https://www.youtube.com/embed/${videoId}`);
+  }
+
+  // =====================================================
+  // NOUVEAU : GESTION DES VIDÉOS
+  // =====================================================
+
+  /**
+   * Vérifie si un article a une vidéo (videoUrl ou youtube)
+   */
+  hasVideo(article: Article): boolean {
+    return !!(article.videoUrl || article.youtube);
+  }
+
+  /**
+   * Récupère l'URL de la vidéo (priorité à videoUrl, sinon youtube)
+   */
+  getVideoUrl(article: Article): string | null {
+    return article.videoUrl || article.youtube || null;
+  }
+
+  /**
+   * Gère les erreurs de chargement de vidéo
+   */
+  onVideoError(event: any, article: Article): void {
+    console.error(`❌ Erreur de chargement de la vidéo pour: ${article.titre}`);
+    console.error(`  URL: ${event.target.src}`);
+    
+    // Afficher un message d'erreur à la place de la vidéo
+    const parent = event.target.parentElement;
+    if (parent) {
+      const errorDiv = document.createElement('div');
+      errorDiv.className = 'w-full h-full flex items-center justify-center bg-gray-900 text-white';
+      errorDiv.innerHTML = `
+        <div class="text-center p-4">
+          <i class="fa-solid fa-video-slash text-5xl text-gray-500 mb-3"></i>
+          <p class="text-sm text-gray-400">Vidéo non disponible</p>
+          <p class="text-xs text-gray-500 mt-1">Format non supporté ou fichier introuvable</p>
+        </div>
+      `;
+      parent.appendChild(errorDiv);
+    }
+  }
+
+  /**
+   * Alterne lecture/pause de la vidéo
+   */
+  toggleVideoPlay(videoElement: HTMLVideoElement): void {
+    if (!videoElement) return;
+    
+    if (videoElement.paused) {
+      videoElement.play().catch(error => {
+        console.error('Erreur lors de la lecture de la vidéo:', error);
+        this.showToastMessage('Impossible de lire la vidéo', 'error');
+      });
+    } else {
+      videoElement.pause();
+    }
+  }
+
+  /**
+   * Alterne muet/son de la vidéo
+   */
+  toggleVideoMute(videoElement: HTMLVideoElement): void {
+    if (!videoElement) return;
+    videoElement.muted = !videoElement.muted;
   }
 
   // =====================================================
