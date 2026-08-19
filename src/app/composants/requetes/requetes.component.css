@@ -1,0 +1,42 @@
+/* Animation de chargement */
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-spin {
+  animation: spin 1s linear infinite;
+}
+
+/* Animation d'entrée de la modale */
+@keyframes modalIn {
+  from {
+    opacity: 0;
+    transform: scale(0.9) translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.animate-modal {
+  animation: modalIn 0.25s ease-out forwards;
+}
+
+/* Pour limiter le texte à 2 lignes */
+.line-clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* Amélioration du scrollbar dans la page */
+body.modal-open {
+  overflow: hidden;
+}

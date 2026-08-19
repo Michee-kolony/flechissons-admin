@@ -16,90 +16,44 @@
   </div>
 
   <!-- BARRE DE RECHERCHE + COMPTEUR -->
-  <div
-    class="bg-white border border-gray-100 rounded-2xl p-4 sm:p-5
-           shadow-sm">
+  <div class="bg-white border border-gray-100 rounded-2xl p-4 sm:p-5 shadow-sm">
 
     <div class="flex flex-col sm:flex-row gap-4 sm:items-center sm:justify-between">
 
       <!-- Recherche -->
       <div class="relative w-full sm:max-w-md">
 
-        <div
-          class="absolute inset-y-0 left-0 flex items-center pl-4
-                 pointer-events-none text-gray-400">
-
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            class="w-5 h-5"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-            stroke-width="2">
-
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              d="m21 21-4.35-4.35m1.35-5.4a6.75 6.75 0 1 1-13.5 0 6.75 6.75 0 0 1 13.5 0Z" />
-
+        <div class="absolute inset-y-0 left-0 flex items-center pl-4 pointer-events-none text-gray-400">
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="m21 21-4.35-4.35m1.35-5.4a6.75 6.75 0 1 1-13.5 0 6.75 6.75 0 0 1 13.5 0Z" />
           </svg>
         </div>
 
         <input
           type="text"
           placeholder="Rechercher une requête..."
-          class="w-full pl-11 pr-4 py-3
-                 bg-gray-50 border border-gray-200
-                 rounded-xl
-                 text-sm text-gray-800
-                 placeholder:text-gray-400
-                 outline-none
-                 focus:bg-white
-                 focus:border-orange-400
-                 focus:ring-4 focus:ring-orange-100
-                 transition"
+          [(ngModel)]="termeRecherche"
+          (ngModelChange)="filtrerRequetes()"
+          class="w-full pl-11 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-sm text-gray-800 placeholder:text-gray-400 outline-none focus:bg-white focus:border-orange-400 focus:ring-4 focus:ring-orange-100 transition"
         />
 
       </div>
 
       <!-- Nombre -->
-      <div
-        class="flex items-center gap-3
-               px-4 py-3
-               bg-orange-50
-               rounded-xl
-               w-fit">
+      <div class="flex items-center gap-3 px-4 py-3 bg-orange-50 rounded-xl w-fit">
 
-        <div
-          class="w-9 h-9 rounded-lg
-                 bg-orange-100
-                 text-orange-600
-                 flex items-center justify-center">
-
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            class="w-5 h-5"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-            stroke-width="2">
-
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              d="M8 10h8M8 14h5m7-2a8 8 0 1 1-16 0 8 8 0 0 1 16 0Z" />
-
+        <div class="w-9 h-9 rounded-lg bg-orange-100 text-orange-600 flex items-center justify-center">
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M8 10h8M8 14h5m7-2a8 8 0 1 1-16 0 8 8 0 0 1 16 0Z" />
           </svg>
-
         </div>
 
         <div>
           <p class="text-xs text-gray-500">
             Total
           </p>
-
           <p class="text-sm font-bold text-gray-900">
-            24 requêtes
+            {{ totalRequetes }} requêtes
           </p>
         </div>
 
@@ -109,83 +63,107 @@
 
   </div>
 
+  <!-- ÉTAT DE CHARGEMENT -->
+  <div *ngIf="chargement" class="bg-white border border-gray-100 rounded-2xl shadow-sm p-12 text-center">
+    <div class="flex flex-col items-center justify-center">
+      <div class="w-12 h-12 border-4 border-orange-200 border-t-orange-500 rounded-full animate-spin mb-4"></div>
+      <p class="text-gray-500 text-sm">Chargement des requêtes...</p>
+    </div>
+  </div>
+
+  <!-- MESSAGE D'ERREUR -->
+  <div *ngIf="erreur" class="bg-red-50 border border-red-200 rounded-2xl p-6 text-center">
+    <p class="text-red-600 text-sm font-medium">{{ erreur }}</p>
+    <button
+      (click)="chargerRequetes()"
+      class="mt-3 px-4 py-2 bg-red-600 text-white text-sm font-medium rounded-lg hover:bg-red-700 transition">
+      Réessayer
+    </button>
+  </div>
 
   <!-- LISTE DES REQUÊTES -->
-  <div class="bg-white border border-gray-100 rounded-2xl shadow-sm overflow-hidden">
+  <div *ngIf="!chargement && !erreur" class="bg-white border border-gray-100 rounded-2xl shadow-sm overflow-hidden">
 
     <!-- HEADER -->
-    <div
-      class="px-5 sm:px-6 py-4
-             border-b border-gray-100
-             flex items-center justify-between">
+    <div class="px-5 sm:px-6 py-4 border-b border-gray-100 flex items-center justify-between">
 
       <div>
         <h2 class="text-base font-semibold text-gray-900">
           Dernières requêtes
         </h2>
-
         <p class="text-xs text-gray-500 mt-0.5">
           Les demandes de prière reçues
         </p>
       </div>
 
-      <span
-        class="hidden sm:inline-flex
-               items-center
-               px-3 py-1.5
-               rounded-full
-               bg-gray-100
-               text-xs font-medium
-               text-gray-600">
-
-        24 demandes
-
+      <span class="hidden sm:inline-flex items-center px-3 py-1.5 rounded-full bg-gray-100 text-xs font-medium text-gray-600">
+        {{ totalRequetes }} demandes
       </span>
 
     </div>
 
+    <!-- AUCUNE REQUÊTE -->
+    <div *ngIf="totalRequetes === 0" class="px-5 sm:px-6 py-12 text-center">
+      <div class="flex flex-col items-center">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-16 h-16 text-gray-300 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M8 10h8M8 14h5m7-2a8 8 0 1 1-16 0 8 8 0 0 1 16 0Z" />
+        </svg>
+        <p class="text-gray-500 font-medium">Aucune requête trouvée</p>
+        <p class="text-sm text-gray-400 mt-1">Aucune demande ne correspond à votre recherche.</p>
+      </div>
+    </div>
 
-    <!-- ITEM 1 -->
-    <div
-      class="px-5 sm:px-6 py-5
-             border-b border-gray-100
-             hover:bg-gray-50
-             transition">
+    <!-- ITEMS -->
+    <div *ngFor="let requete of requetesPage; let last = last"
+         [class.border-b]="!last"
+         [class.border-gray-100]="!last"
+         class="px-5 sm:px-6 py-5 hover:bg-gray-50 transition">
 
       <div class="flex gap-4">
 
         <!-- AVATAR -->
-        <div
-          class="flex-shrink-0
-                 w-11 h-11
-                 rounded-full
-                 bg-orange-100
-                 text-orange-600
-                 flex items-center justify-center
-                 font-bold text-sm">
-
-          MK
-
+        <div class="flex-shrink-0 w-11 h-11 rounded-full flex items-center justify-center font-bold text-sm"
+             [class]="getCouleurAvatar(requete.nom)">
+          {{ getInitiales(requete.nom) }}
         </div>
 
         <!-- CONTENU -->
         <div class="min-w-0 flex-1">
 
-          <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1">
+          <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-1">
 
-            <h3 class="text-sm font-semibold text-gray-900">
-              Michée K.
-            </h3>
+            <div class="flex-1">
+              <h3 class="text-sm font-semibold text-gray-900">
+                {{ requete.nom }}
+              </h3>
 
-            <span class="text-xs text-gray-400">
-              Il y a 10 min
-            </span>
+              <p class="text-xs text-gray-400 mt-0.5">
+                {{ requete.sujet }}
+              </p>
+            </div>
+
+            <div class="flex items-center gap-3 flex-shrink-0 mt-1 sm:mt-0">
+
+              <span class="text-xs text-gray-400">
+                {{ getTempsEcoule(requete.createdAt) }}
+              </span>
+
+              <!-- BOUTON SUPPRIMER - TOUJOURS VISIBLE -->
+              <button
+                (click)="ouvrirModalSuppression(requete)"
+                class="p-1.5 rounded-lg hover:bg-red-50 text-gray-400 hover:text-red-600 transition-colors duration-200"
+                title="Supprimer cette requête">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
+                </svg>
+              </button>
+
+            </div>
 
           </div>
 
           <p class="text-sm text-gray-600 leading-6 mt-2">
-            Je demande à Dieu de m'accorder la sagesse et la
-            direction dans les décisions importantes que je dois prendre.
+            {{ requete.message }}
           </p>
 
         </div>
@@ -193,302 +171,129 @@
       </div>
 
     </div>
-
-
-    <!-- ITEM 2 -->
-    <div
-      class="px-5 sm:px-6 py-5
-             border-b border-gray-100
-             hover:bg-gray-50
-             transition">
-
-      <div class="flex gap-4">
-
-        <div
-          class="flex-shrink-0
-                 w-11 h-11
-                 rounded-full
-                 bg-blue-100
-                 text-blue-600
-                 flex items-center justify-center
-                 font-bold text-sm">
-
-          JM
-
-        </div>
-
-        <div class="min-w-0 flex-1">
-
-          <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1">
-
-            <h3 class="text-sm font-semibold text-gray-900">
-              Jonathan M.
-            </h3>
-
-            <span class="text-xs text-gray-400">
-              Il y a 35 min
-            </span>
-
-          </div>
-
-          <p class="text-sm text-gray-600 leading-6 mt-2">
-            Priez pour ma famille afin que Dieu nous garde dans
-            l'unité, la paix et la foi.
-          </p>
-
-        </div>
-
-      </div>
-
-    </div>
-
-
-    <!-- ITEM 3 -->
-    <div
-      class="px-5 sm:px-6 py-5
-             border-b border-gray-100
-             hover:bg-gray-50
-             transition">
-
-      <div class="flex gap-4">
-
-        <div
-          class="flex-shrink-0
-                 w-11 h-11
-                 rounded-full
-                 bg-purple-100
-                 text-purple-600
-                 flex items-center justify-center
-                 font-bold text-sm">
-
-          AN
-
-        </div>
-
-        <div class="min-w-0 flex-1">
-
-          <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1">
-
-            <h3 class="text-sm font-semibold text-gray-900">
-              Anne N.
-            </h3>
-
-            <span class="text-xs text-gray-400">
-              Il y a 1 h
-            </span>
-
-          </div>
-
-          <p class="text-sm text-gray-600 leading-6 mt-2">
-            Je confie mon projet professionnel entre les mains de Dieu.
-            Que sa volonté et sa grâce m'accompagnent.
-          </p>
-
-        </div>
-
-      </div>
-
-    </div>
-
-
-    <!-- ITEM 4 -->
-    <div
-      class="px-5 sm:px-6 py-5
-             border-b border-gray-100
-             hover:bg-gray-50
-             transition">
-
-      <div class="flex gap-4">
-
-        <div
-          class="flex-shrink-0
-                 w-11 h-11
-                 rounded-full
-                 bg-green-100
-                 text-green-600
-                 flex items-center justify-center
-                 font-bold text-sm">
-
-          PD
-
-        </div>
-
-        <div class="min-w-0 flex-1">
-
-          <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1">
-
-            <h3 class="text-sm font-semibold text-gray-900">
-              Patrick D.
-            </h3>
-
-            <span class="text-xs text-gray-400">
-              Il y a 2 h
-            </span>
-
-          </div>
-
-          <p class="text-sm text-gray-600 leading-6 mt-2">
-            Merci de prier pour ma famille et particulièrement pour
-            mes enfants afin que Dieu les protège et les guide.
-          </p>
-
-        </div>
-
-      </div>
-
-    </div>
-
-
-    <!-- ITEM 5 -->
-    <div
-      class="px-5 sm:px-6 py-5
-             hover:bg-gray-50
-             transition">
-
-      <div class="flex gap-4">
-
-        <div
-          class="flex-shrink-0
-                 w-11 h-11
-                 rounded-full
-                 bg-pink-100
-                 text-pink-600
-                 flex items-center justify-center
-                 font-bold text-sm">
-
-          CS
-
-        </div>
-
-        <div class="min-w-0 flex-1">
-
-          <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1">
-
-            <h3 class="text-sm font-semibold text-gray-900">
-              Carole S.
-            </h3>
-
-            <span class="text-xs text-gray-400">
-              Il y a 3 h
-            </span>
-
-          </div>
-
-          <p class="text-sm text-gray-600 leading-6 mt-2">
-            Je demande la prière pour ma vie spirituelle. Que Dieu
-            fortifie ma foi et m'aide à rester proche de lui.
-          </p>
-
-        </div>
-
-      </div>
-
-    </div>
-
 
     <!-- PAGINATION -->
-    <div
-      class="px-5 sm:px-6 py-4
-             border-t border-gray-100
-             flex flex-col sm:flex-row
-             items-center justify-between gap-3">
+    <div *ngIf="totalRequetes > 0" class="px-5 sm:px-6 py-4 border-t border-gray-100 flex flex-col sm:flex-row items-center justify-between gap-3">
 
       <p class="text-xs text-gray-500">
-        Affichage de <span class="font-medium text-gray-700">1–5</span>
-        sur <span class="font-medium text-gray-700">24</span> requêtes
+        Affichage de <span class="font-medium text-gray-700">{{ plageAffichage }}</span>
+        sur <span class="font-medium text-gray-700">{{ totalRequetes }}</span> requêtes
       </p>
 
       <div class="flex items-center gap-2">
 
+        <!-- Précédent -->
         <button
           type="button"
-          class="w-9 h-9 rounded-lg
-                 border border-gray-200
-                 text-gray-400
-                 flex items-center justify-center
-                 hover:bg-gray-50
-                 transition">
+          [disabled]="pageActuelle === 1"
+          (click)="changerPage(pageActuelle - 1)"
+          class="w-9 h-9 rounded-lg border border-gray-200 text-gray-400 flex items-center justify-center hover:bg-gray-50 transition disabled:opacity-50 disabled:cursor-not-allowed">
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="m15 19-7-7 7-7" />
+          </svg>
+        </button>
 
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            class="w-4 h-4"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-            stroke-width="2">
+        <!-- Pages -->
+        <button
+          *ngFor="let page of pages"
+          type="button"
+          (click)="changerPage(page)"
+          class="w-9 h-9 rounded-lg flex items-center justify-center text-sm transition"
+          [class]="page === pageActuelle ? 'bg-orange-500 text-white font-semibold' : 'border border-gray-200 text-gray-600 hover:bg-gray-50'">
+          {{ page }}
+        </button>
 
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              d="m15 19-7-7 7-7" />
+        <!-- Suivant -->
+        <button
+          type="button"
+          [disabled]="pageActuelle === totalPages"
+          (click)="changerPage(pageActuelle + 1)"
+          class="w-9 h-9 rounded-lg border border-gray-200 text-gray-400 flex items-center justify-center hover:bg-gray-50 transition disabled:opacity-50 disabled:cursor-not-allowed">
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="m9 5 7 7-7 7" />
+          </svg>
+        </button>
 
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
+
+<!-- ============================================ -->
+<!-- MODALE DE CONFIRMATION DE SUPPRESSION        -->
+<!-- ============================================ -->
+<div *ngIf="modalSuppressionOuverte"
+     class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm"
+     (click)="!suppressionEnCours && fermerModalSuppression()">
+
+  <!-- MODALE -->
+  <div class="bg-white rounded-2xl max-w-md w-full shadow-2xl transform transition-all duration-300 animate-modal"
+       (click)="$event.stopPropagation()">
+
+    <!-- CONTENU DE LA MODALE -->
+    <div class="p-6">
+
+      <!-- ICONE -->
+      <div class="flex justify-center mb-4">
+        <div class="w-16 h-16 rounded-full bg-red-100 flex items-center justify-center">
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-8 h-8 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" />
+          </svg>
+        </div>
+      </div>
+
+      <!-- TITRE -->
+      <h3 class="text-xl font-bold text-gray-900 text-center mb-2">
+        Confirmer la suppression
+      </h3>
+
+      <!-- MESSAGE -->
+      <p class="text-sm text-gray-600 text-center mb-6">
+        Êtes-vous sûr de vouloir supprimer la requête de
+        <span class="font-semibold text-gray-900">{{ requeteASupprimer?.nom }}</span> ?
+        <br>
+        <span class="text-gray-500 text-xs">Cette action est irréversible.</span>
+      </p>
+
+      <!-- DÉTAILS DE LA REQUÊTE -->
+      <div *ngIf="requeteASupprimer" class="bg-gray-50 rounded-lg p-4 mb-6">
+        <p class="text-xs text-gray-500 font-medium mb-1">Sujet</p>
+        <p class="text-sm text-gray-800">{{ requeteASupprimer.sujet }}</p>
+        <p class="text-xs text-gray-500 font-medium mt-3 mb-1">Message</p>
+        <p class="text-sm text-gray-700 line-clamp-2">{{ requeteASupprimer.message }}</p>
+        <p class="text-xs text-gray-400 mt-2">
+          {{ getTempsEcoule(requeteASupprimer.createdAt) }}
+        </p>
+      </div>
+
+      <!-- BOUTONS -->
+      <div class="flex flex-col sm:flex-row gap-3">
+
+        <button
+          type="button"
+          (click)="fermerModalSuppression()"
+          [disabled]="suppressionEnCours"
+          class="flex-1 px-4 py-2.5 rounded-xl border border-gray-200 text-gray-700 font-medium hover:bg-gray-50 transition disabled:opacity-50 disabled:cursor-not-allowed">
+          Annuler
+        </button>
+
+        <button
+          type="button"
+          (click)="supprimerRequete()"
+          [disabled]="suppressionEnCours"
+          class="flex-1 px-4 py-2.5 rounded-xl bg-red-600 text-white font-medium hover:bg-red-700 transition flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed">
+
+          <!-- Spinner pendant la suppression -->
+          <svg *ngIf="suppressionEnCours" class="animate-spin h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
           </svg>
 
-        </button>
-
-        <button
-          type="button"
-          class="w-9 h-9 rounded-lg
-                 bg-orange-500
-                 text-white
-                 text-sm font-semibold
-                 flex items-center justify-center">
-
-          1
-
-        </button>
-
-        <button
-          type="button"
-          class="w-9 h-9 rounded-lg
-                 border border-gray-200
-                 text-gray-600
-                 text-sm
-                 flex items-center justify-center
-                 hover:bg-gray-50
-                 transition">
-
-          2
-
-        </button>
-
-        <button
-          type="button"
-          class="w-9 h-9 rounded-lg
-                 border border-gray-200
-                 text-gray-600
-                 text-sm
-                 flex items-center justify-center
-                 hover:bg-gray-50
-                 transition">
-
-          3
-
-        </button>
-
-        <button
-          type="button"
-          class="w-9 h-9 rounded-lg
-                 border border-gray-200
-                 text-gray-600
-                 flex items-center justify-center
-                 hover:bg-gray-50
-                 transition">
-
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            class="w-4 h-4"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-            stroke-width="2">
-
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              d="m9 5 7 7-7 7" />
-
-          </svg>
+          <span *ngIf="!suppressionEnCours">Supprimer</span>
+          <span *ngIf="suppressionEnCours">Suppression...</span>
 
         </button>
 
