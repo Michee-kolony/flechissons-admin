@@ -1,4 +1,3 @@
-// detailsarticles.component.ts
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
@@ -34,7 +33,9 @@ export class DetailsarticlesComponent implements OnInit {
   errorMessage: string = '';
   currentImageIndex: number = 0;
 
-  // Toast
+  showDeleteModal: boolean = false;
+  isDeleting: boolean = false;
+
   toastMessage: string = '';
   toastType: 'success' | 'error' = 'success';
   showToast: boolean = false;
@@ -50,10 +51,6 @@ export class DetailsarticlesComponent implements OnInit {
   ngOnInit(): void {
     this.loadArticle();
   }
-
-  // =====================================================
-  // CHARGER L'ARTICLE
-  // =====================================================
 
   loadArticle(): void {
     const id = this.route.snapshot.paramMap.get('id');
@@ -73,9 +70,6 @@ export class DetailsarticlesComponent implements OnInit {
         
         if (response.success && response.article) {
           this.article = response.article;
-          if (this.article && this.article.images) {
-            console.log('📸 Images de l\'article:', this.article.images);
-          }
         } else {
           this.errorMessage = 'Article non trouvé';
           this.showToastMessage('Article non trouvé', 'error');
@@ -83,7 +77,7 @@ export class DetailsarticlesComponent implements OnInit {
         this.isLoading = false;
       },
       error: (error: HttpErrorResponse) => {
-        console.error('❌ Erreur lors du chargement de l\'article:', error);
+        console.error('❌ Erreur:', error);
         this.isLoading = false;
         
         let errorMessage = 'Erreur lors du chargement de l\'article';
@@ -96,9 +90,45 @@ export class DetailsarticlesComponent implements OnInit {
     });
   }
 
-  // =====================================================
-  // NAVIGATION DES IMAGES
-  // =====================================================
+  openDeleteModal(): void {
+    this.showDeleteModal = true;
+  }
+
+  closeDeleteModal(): void {
+    if (!this.isDeleting) {
+      this.showDeleteModal = false;
+    }
+  }
+
+  confirmDelete(): void {
+    if (!this.article) return;
+
+    this.isDeleting = true;
+
+    this.http.delete(`${this.urlArticle}/${this.article._id}`).subscribe({
+      next: (response: any) => {
+        console.log('🗑️ Article supprimé:', response);
+        this.isDeleting = false;
+        this.showDeleteModal = false;
+        this.showToastMessage('Article supprimé avec succès', 'success');
+        
+        setTimeout(() => {
+          this.router.navigate(['/admin/gestion']);
+        }, 1500);
+      },
+      error: (error: HttpErrorResponse) => {
+        console.error('❌ Erreur suppression:', error);
+        this.isDeleting = false;
+        this.showDeleteModal = false;
+        
+        let errorMessage = 'Erreur lors de la suppression de l\'article';
+        if (error.error?.message) {
+          errorMessage = error.error.message;
+        }
+        this.showToastMessage(errorMessage, 'error');
+      }
+    });
+  }
 
   nextImage(): void {
     if (this.article && this.article.images && this.article.images.length > 0) {
@@ -116,17 +146,11 @@ export class DetailsarticlesComponent implements OnInit {
     this.currentImageIndex = index;
   }
 
-  // =====================================================
-  // YOUTUBE
-  // =====================================================
-
   getYoutubeId(url: string | null): string {
     if (!url) return '';
     
     const patterns = [
-      /youtu\.be\/([^?&]+)/,
-      /youtube\.com\/watch\?v=([^&]+)/,
-      /youtube\.com\/embed\/([^?&]+)/
+      /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([^?&]+)/
     ];
     
     for (const pattern of patterns) {
@@ -143,10 +167,6 @@ export class DetailsarticlesComponent implements OnInit {
     const videoId = this.getYoutubeId(url);
     return this.sanitizer.bypassSecurityTrustResourceUrl(`https://www.youtube.com/embed/${videoId}`);
   }
-
-  // =====================================================
-  // AFFICHAGE DES TYPES
-  // =====================================================
 
   getTypeLabel(type: string): string {
     const labels: { [key: string]: string } = {
@@ -174,10 +194,6 @@ export class DetailsarticlesComponent implements OnInit {
     };
     return icons[type] || 'fa-tag';
   }
-
-  // =====================================================
-  // FORMATAGE DES DATES
-  // =====================================================
 
   formatDate(dateString: string): string {
     const date = new Date(dateString);
@@ -211,10 +227,6 @@ export class DetailsarticlesComponent implements OnInit {
     return `${years} an${years > 1 ? 's' : ''}`;
   }
 
-  // =====================================================
-  // GESTION DES IMAGES
-  // =====================================================
-
   getCurrentImageUrl(): string {
     if (this.article && this.article.images && this.article.images.length > 0) {
       return this.article.images[this.currentImageIndex];
@@ -242,23 +254,9 @@ export class DetailsarticlesComponent implements OnInit {
     event.target.className = 'w-full h-full object-contain p-8 bg-gray-100';
   }
 
-  // =====================================================
-  // NAVIGATION
-  // =====================================================
-
   goBack(): void {
     this.router.navigate(['/admin/gestion']);
   }
-
-  editArticle(): void {
-    if (this.article) {
-      this.router.navigate(['/admin/publier', this.article._id]);
-    }
-  }
-
-  // =====================================================
-  // TOAST
-  // =====================================================
 
   showToastMessage(message: string, type: 'success' | 'error' = 'success'): void {
     if (this.toastTimeout) {

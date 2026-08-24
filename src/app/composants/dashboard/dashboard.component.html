@@ -47,7 +47,7 @@
 <div *ngIf="erreur" class="bg-red-50 border border-red-200 rounded-2xl p-6 text-center mb-5">
   <p class="text-red-600 text-sm font-medium">{{ erreur }}</p>
   <button
-    (click)="chargerRequetes()"
+    (click)="chargerToutesLesDonnees()"
     class="mt-3 px-4 py-2 bg-red-600 text-white text-sm font-medium rounded-lg hover:bg-red-700 transition">
     Réessayer
   </button>
@@ -119,19 +119,19 @@
 
   </div>
 
-  <!-- REQUÊTES DE PRIÈRE -->
+  <!-- DONATIONS -->
   <div class="bg-white rounded-xl border border-gray-100 shadow-sm p-4 flex items-center gap-3 hover:shadow-md transition-shadow duration-200">
 
     <div class="w-12 h-12 rounded-full bg-orange-50 border-4 border-orange-400 flex items-center justify-center flex-shrink-0">
-      <i class="fa-solid fa-hands-praying text-orange-500 text-sm"></i>
+      <i class="fa-solid fa-hand-holding-heart text-orange-500 text-sm"></i>
     </div>
 
     <div class="min-w-0">
       <p class="text-[11px] text-gray-400">
-       Donnation
+        Donations
       </p>
       <p class="text-xl font-bold text-gray-900">
-      30.000$
+        $30,000
       </p>
       <p class="text-[10px] text-gray-400">
         Au total

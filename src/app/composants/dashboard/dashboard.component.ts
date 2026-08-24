@@ -25,6 +25,8 @@ export interface Statistiques {
 })
 export class DashboardComponent implements OnInit {
   private urlRequete = "https://backend-flechissons.onrender.com/requete/";
+  private urlArticle = "https://backend-flechissons.onrender.com/article";
+  private urlUser = "https://backend-flechissons.onrender.com/user";
   
   // Liste des requêtes
   toutesLesRequetes: Requete[] = [];
@@ -32,8 +34,8 @@ export class DashboardComponent implements OnInit {
   
   // Statistiques
   statistiques: Statistiques = {
-    totalFideles: 2540,
-    totalActualites: 186,
+    totalFideles: 0,
+    totalActualites: 0,
     totalRequetes: 0,
     totalRequetesPriere: 0
   };
@@ -49,30 +51,29 @@ export class DashboardComponent implements OnInit {
 
   ngOnInit(): void {
     this.dateAujourdhui = this.formaterDate(new Date());
-    this.chargerRequetes();
+    this.chargerToutesLesDonnees();
   }
 
   /**
-   * Charge les requêtes depuis l'API
+   * Charge toutes les données nécessaires
    */
-  chargerRequetes(): void {
+  chargerToutesLesDonnees(): void {
     this.chargement = true;
     this.erreur = null;
 
+    // Charger les requêtes
     this.http.get<Requete[]>(this.urlRequete).subscribe({
       next: (data) => {
-        // Trier par date décroissante (plus récent en premier)
         this.toutesLesRequetes = data.sort((a, b) => 
           new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
         );
-        
-        // Récupérer les 5 dernières requêtes
         this.dernieresRequetes = this.toutesLesRequetes.slice(0, 5);
         
-        // Mettre à jour les statistiques
-        this.mettreAJourStatistiques();
+        // Mettre à jour les statistiques des requêtes
+        this.mettreAJourStatistiquesRequetes();
         
-        this.chargement = false;
+        // Vérifier si toutes les données sont chargées
+        this.verifierChargementComplet();
       },
       error: (err) => {
         console.error('Erreur lors du chargement des requêtes:', err);
@@ -80,16 +81,76 @@ export class DashboardComponent implements OnInit {
         this.chargement = false;
       }
     });
+
+    // Charger les articles
+    this.http.get<any>(this.urlArticle).subscribe({
+      next: (data) => {
+        // Si l'API retourne un tableau d'articles
+        if (Array.isArray(data)) {
+          this.statistiques.totalActualites = data.length;
+        } 
+        // Si l'API retourne un objet avec une propriété contenant les articles
+        else if (data && data.articles && Array.isArray(data.articles)) {
+          this.statistiques.totalActualites = data.articles.length;
+        }
+        // Si l'API retourne un objet avec une propriété total
+        else if (data && data.total) {
+          this.statistiques.totalActualites = data.total;
+        }
+        
+        // Vérifier si toutes les données sont chargées
+        this.verifierChargementComplet();
+      },
+      error: (err) => {
+        console.error('Erreur lors du chargement des articles:', err);
+        // Ne pas bloquer l'interface si les articles ne se chargent pas
+        this.verifierChargementComplet();
+      }
+    });
+
+    // Charger les utilisateurs
+    this.http.get<any>(this.urlUser).subscribe({
+      next: (data) => {
+        // Si l'API retourne un tableau d'utilisateurs
+        if (Array.isArray(data)) {
+          this.statistiques.totalFideles = data.length;
+        }
+        // Si l'API retourne un objet avec une propriété total ou utilisateurs
+        else if (data) {
+          if (data.total) {
+            this.statistiques.totalFideles = data.total;
+          } else if (data.utilisateurs && Array.isArray(data.utilisateurs)) {
+            this.statistiques.totalFideles = data.utilisateurs.length;
+          }
+        }
+        
+        // Vérifier si toutes les données sont chargées
+        this.verifierChargementComplet();
+      },
+      error: (err) => {
+        console.error('Erreur lors du chargement des utilisateurs:', err);
+        // Ne pas bloquer l'interface si les utilisateurs ne se chargent pas
+        this.verifierChargementComplet();
+      }
+    });
   }
 
   /**
-   * Met à jour les statistiques
+   * Vérifie si toutes les données sont chargées
    */
-  mettreAJourStatistiques(): void {
-    // Compter le nombre total de requêtes
+  verifierChargementComplet(): void {
+    // Ici on peut ajouter une logique pour vérifier que toutes les données sont chargées
+    // Pour simplifier, on désactive le chargement après un délai
+    setTimeout(() => {
+      this.chargement = false;
+    }, 500);
+  }
+
+  /**
+   * Met à jour les statistiques des requêtes
+   */
+  mettreAJourStatistiquesRequetes(): void {
     this.statistiques.totalRequetes = this.toutesLesRequetes.length;
-    
-    // Compter les requêtes de prière (sujet contenant "prière" ou "priere")
     this.statistiques.totalRequetesPriere = this.toutesLesRequetes.filter(
       req => req.sujet.toLowerCase().includes('prière') || 
              req.sujet.toLowerCase().includes('priere')
