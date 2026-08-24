@@ -1,0 +1,1188 @@
+<div class="min-h-screen p-4 sm:p-6 lg:p-8">
+
+  <!-- =====================================================
+       HEADER
+  ====================================================== -->
+
+  <div class="mb-8 flex flex-col gap-5 md:flex-row md:items-center md:justify-between">
+
+    <div>
+
+      <div class="mb-3 flex items-center gap-2">
+
+        <div
+          class="flex h-9 w-9 items-center justify-center rounded-xl bg-orange-100 text-orange-600"
+        >
+          <i class="fa-solid fa-headphones"></i>
+        </div>
+
+        <span
+          class="text-sm font-bold uppercase tracking-wider text-orange-600"
+        >
+          Fléchissons
+        </span>
+
+      </div>
+
+
+      <h1
+        class="text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl"
+      >
+        Gestion des audios
+      </h1>
+
+
+      <p class="mt-1 text-sm text-slate-500">
+        Publiez, écoutez et gérez vos contenus audio.
+      </p>
+
+    </div>
+
+
+    <!-- TOTAL -->
+
+    <div
+      class="flex w-fit items-center gap-3 rounded-2xl border border-slate-200 bg-white px-4 py-3 shadow-sm"
+    >
+
+      <div
+        class="flex h-10 w-10 items-center justify-center rounded-xl bg-orange-50 text-orange-600"
+      >
+        <i class="fa-solid fa-music"></i>
+      </div>
+
+      <div>
+
+        <p class="text-xs text-slate-400">
+          Total
+        </p>
+
+        <p class="font-bold text-slate-800">
+          {{ audiosFiltres.length }}
+          audio{{ audiosFiltres.length > 1 ? 's' : '' }}
+        </p>
+
+      </div>
+
+    </div>
+
+  </div>
+
+
+
+  <!-- =====================================================
+       MESSAGE SUCCESS
+  ====================================================== -->
+
+  <div
+    *ngIf="message"
+    class="mb-6 flex items-center gap-3 rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-700 animate-in slide-in-from-top-2 duration-300"
+  >
+
+    <div
+      class="flex h-8 w-8 items-center justify-center rounded-full bg-emerald-100"
+    >
+      <i class="fa-solid fa-check"></i>
+    </div>
+
+    <span>
+      {{ message }}
+    </span>
+
+  </div>
+
+
+
+  <!-- =====================================================
+       MESSAGE ERROR
+  ====================================================== -->
+
+  <div
+    *ngIf="errorMessage"
+    class="mb-6 flex items-center gap-3 rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700 animate-in slide-in-from-top-2 duration-300"
+  >
+
+    <div
+      class="flex h-8 w-8 items-center justify-center rounded-full bg-red-100"
+    >
+      <i class="fa-solid fa-triangle-exclamation"></i>
+    </div>
+
+    <span>
+      {{ errorMessage }}
+    </span>
+
+  </div>
+
+
+
+  <!-- =====================================================
+       FORMULAIRE DE PUBLICATION (EN HAUT)
+  ====================================================== -->
+
+  <div
+    class="mb-6 overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm"
+  >
+
+    <!-- HEADER -->
+
+    <div
+      class="border-b border-slate-100 p-6"
+    >
+
+      <div class="flex items-center gap-4">
+
+        <div
+          class="flex h-12 w-12 items-center justify-center rounded-2xl bg-orange-100 text-lg text-orange-600"
+        >
+          <i class="fa-solid fa-cloud-arrow-up"></i>
+        </div>
+
+
+        <div>
+
+          <h2 class="font-bold text-slate-900">
+            Publier un audio
+          </h2>
+
+          <p class="mt-1 text-xs text-slate-400">
+            Ajoutez un nouveau contenu audio.
+          </p>
+
+        </div>
+
+      </div>
+
+    </div>
+
+
+
+    <!-- FORM -->
+
+    <form
+      (ngSubmit)="createAudio()"
+      class="space-y-5 p-6"
+    >
+
+
+      <!-- NOM -->
+
+      <div>
+
+        <label
+          class="mb-2 block text-sm font-semibold text-slate-700"
+        >
+          Nom de l'audio
+        </label>
+
+
+        <div class="relative">
+
+          <i
+            class="fa-solid fa-heading absolute left-4 top-1/2 -translate-y-1/2 text-sm text-slate-400"
+          ></i>
+
+
+          <input
+            type="text"
+            name="nom"
+            [(ngModel)]="formData.nom"
+            placeholder="Ex : Témoignage sur ma vie"
+            class="h-12 w-full rounded-xl border border-slate-200 bg-slate-50 pl-11 pr-4 text-sm text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-orange-400 focus:bg-white focus:ring-4 focus:ring-orange-100"
+          />
+
+        </div>
+
+      </div>
+
+
+
+      <!-- PERSONNE -->
+
+      <div>
+
+        <label
+          class="mb-2 block text-sm font-semibold text-slate-700"
+        >
+          Nom de la personne
+        </label>
+
+
+        <div class="relative">
+
+          <i
+            class="fa-solid fa-user absolute left-4 top-1/2 -translate-y-1/2 text-sm text-slate-400"
+          ></i>
+
+
+          <input
+            type="text"
+            name="personne"
+            [(ngModel)]="formData.personne"
+            placeholder="Ex : Pasteur Jean"
+            class="h-12 w-full rounded-xl border border-slate-200 bg-slate-50 pl-11 pr-4 text-sm text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-orange-400 focus:bg-white focus:ring-4 focus:ring-orange-100"
+          />
+
+        </div>
+
+      </div>
+
+
+
+      <!-- CATEGORIE + DATE -->
+
+      <div
+        class="grid grid-cols-1 gap-4 sm:grid-cols-2"
+      >
+
+        <!-- CATEGORIE -->
+
+        <div>
+
+          <label
+            class="mb-2 block text-sm font-semibold text-slate-700"
+          >
+            Catégorie
+          </label>
+
+
+          <div class="relative">
+
+            <i
+              class="fa-solid fa-layer-group absolute left-4 top-1/2 -translate-y-1/2 text-sm text-slate-400"
+            ></i>
+
+
+            <select
+              name="categorie"
+              [(ngModel)]="formData.categorie"
+              class="h-12 w-full appearance-none rounded-xl border border-slate-200 bg-slate-50 pl-11 pr-8 text-sm text-slate-700 outline-none transition focus:border-orange-400 focus:bg-white focus:ring-4 focus:ring-orange-100"
+            >
+
+              <option value="">
+                Sélectionner
+              </option>
+
+              <option value="priere">
+                Prière
+              </option>
+
+              <option value="miracles">
+                Miracles
+              </option>
+
+              <option value="esperances">
+                Espérances
+              </option>
+
+            </select>
+
+
+            <i
+              class="fa-solid fa-chevron-down pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-xs text-slate-400"
+            ></i>
+
+          </div>
+
+        </div>
+
+
+
+        <!-- DATE -->
+
+        <div>
+
+          <label
+            class="mb-2 block text-sm font-semibold text-slate-700"
+          >
+            Date
+          </label>
+
+
+          <div class="relative">
+
+            <i
+              class="fa-regular fa-calendar absolute left-4 top-1/2 -translate-y-1/2 text-sm text-slate-400"
+            ></i>
+
+
+            <input
+              type="date"
+              name="datePublication"
+              [(ngModel)]="formData.datePublication"
+              class="h-12 w-full rounded-xl border border-slate-200 bg-slate-50 pl-11 pr-3 text-sm text-slate-700 outline-none transition focus:border-orange-400 focus:bg-white focus:ring-4 focus:ring-orange-100"
+            />
+
+          </div>
+
+        </div>
+
+      </div>
+
+
+
+      <!-- =================================================
+           COVER
+      ================================================== -->
+
+      <div>
+
+        <label
+          class="mb-2 block text-sm font-semibold text-slate-700"
+        >
+          Photo de couverture
+        </label>
+
+
+        <input
+          type="file"
+          id="cover"
+          accept="image/*"
+          class="hidden"
+          (change)="onCoverSelected($event)"
+        />
+
+
+        <label
+          for="cover"
+          class="group flex cursor-pointer flex-col items-center justify-center rounded-2xl border-2 border-dashed border-slate-200 bg-slate-50 px-5 py-7 text-center transition hover:border-orange-300 hover:bg-orange-50"
+        >
+
+          <div
+            class="mb-3 flex h-12 w-12 items-center justify-center rounded-2xl bg-white text-orange-500 shadow-sm transition group-hover:scale-105"
+          >
+            <i class="fa-solid fa-image"></i>
+          </div>
+
+
+          <p
+            class="text-sm font-semibold text-slate-700"
+          >
+            Cliquez pour choisir une image
+          </p>
+
+
+          <p
+            class="mt-1 text-xs text-slate-400"
+          >
+            JPG, PNG ou WEBP
+          </p>
+
+        </label>
+
+
+
+        <!-- PREVIEW AVEC PROGRESSION -->
+
+        <div
+          *ngIf="coverPreview || coverUploadProgress > 0"
+          class="relative mt-3 overflow-hidden rounded-2xl border border-slate-200"
+        >
+
+          <img
+            *ngIf="coverPreview"
+            [src]="coverPreview"
+            alt="Aperçu couverture"
+            class="h-40 w-full object-cover"
+          />
+
+
+          <!-- BARRE DE PROGRESSION COVER -->
+
+          <div
+            *ngIf="coverUploadProgress > 0 && coverUploadProgress < 100"
+            class="absolute inset-0 flex flex-col items-center justify-center bg-black/50 backdrop-blur-sm"
+          >
+
+            <div class="w-3/4 max-w-xs">
+
+              <div class="flex items-center justify-between text-sm text-white mb-1">
+                <span>Importation</span>
+                <span>{{ coverUploadProgress }}%</span>
+              </div>
+
+              <div class="h-2 w-full overflow-hidden rounded-full bg-white/30">
+                <div
+                  class="h-full rounded-full bg-orange-400 transition-all duration-300 ease-out"
+                  [style.width.%]="coverUploadProgress"
+                ></div>
+              </div>
+
+            </div>
+
+          </div>
+
+
+          <!-- STATUT TERMINÉ -->
+
+          <div
+            *ngIf="coverUploadProgress === 100"
+            class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-4 flex items-center justify-between"
+          >
+
+            <p class="text-xs font-medium text-white">
+              Aperçu de la couverture
+            </p>
+
+            <span class="flex items-center gap-1.5 text-xs text-emerald-300">
+              <i class="fa-solid fa-circle-check"></i>
+              Importé
+            </span>
+
+          </div>
+
+
+          <!-- STATUT EN ATTENTE -->
+
+          <div
+            *ngIf="coverUploadProgress === 0 && coverPreview"
+            class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-4"
+          >
+
+            <p class="text-xs font-medium text-white">
+              Aperçu de la couverture
+            </p>
+
+          </div>
+
+        </div>
+
+      </div>
+
+
+
+      <!-- =================================================
+           AUDIO
+      ================================================== -->
+
+      <div>
+
+        <label
+          class="mb-2 block text-sm font-semibold text-slate-700"
+        >
+          Fichier audio
+        </label>
+
+
+        <input
+          type="file"
+          id="audio"
+          accept="audio/*"
+          class="hidden"
+          (change)="onAudioSelected($event)"
+        />
+
+
+        <label
+          for="audio"
+          class="group flex cursor-pointer items-center gap-4 rounded-2xl border-2 border-dashed border-slate-200 bg-slate-50 p-4 transition hover:border-orange-300 hover:bg-orange-50"
+        >
+
+          <div
+            class="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-white text-orange-500 shadow-sm"
+          >
+            <i class="fa-solid fa-file-audio"></i>
+          </div>
+
+
+          <div class="min-w-0">
+
+            <p
+              class="truncate text-sm font-semibold text-slate-700"
+            >
+              Choisir le fichier audio
+            </p>
+
+            <p class="mt-1 text-xs text-slate-400">
+              MP3, M4A, WAV...
+            </p>
+
+          </div>
+
+
+          <i
+            class="fa-solid fa-chevron-right ml-auto text-xs text-slate-300"
+          ></i>
+
+        </label>
+
+
+
+        <!-- FICHIER SÉLECTIONNÉ AVEC PROGRESSION -->
+
+        <div
+          *ngIf="selectedAudio || audioUploadProgress > 0"
+          class="mt-3 overflow-hidden rounded-xl border border-orange-100 bg-orange-50"
+        >
+
+          <div class="flex items-center gap-3 px-3 py-3">
+
+            <div
+              class="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-orange-100 text-orange-600"
+            >
+              <i class="fa-solid fa-music"></i>
+            </div>
+
+
+            <div class="min-w-0 flex-1">
+
+              <p
+                class="truncate text-xs font-semibold text-orange-800"
+              >
+                {{ selectedAudio ? selectedAudio.name : 'Importation en cours...' }}
+              </p>
+
+              <p class="mt-0.5 text-[11px] text-orange-500">
+
+                {{ selectedAudio ? (selectedAudio.size / 1024 / 1024).toFixed(2) + ' MB' : '' }}
+
+              </p>
+
+            </div>
+
+
+            <i
+              *ngIf="audioUploadProgress === 100"
+              class="fa-solid fa-circle-check text-emerald-500"
+            ></i>
+
+            <i
+              *ngIf="audioUploadProgress > 0 && audioUploadProgress < 100"
+              class="fa-solid fa-spinner fa-spin text-orange-500"
+            ></i>
+
+          </div>
+
+
+          <!-- BARRE DE PROGRESSION AUDIO -->
+
+          <div
+            *ngIf="audioUploadProgress > 0 && audioUploadProgress < 100"
+            class="px-3 pb-3"
+          >
+
+            <div class="flex items-center justify-between text-xs text-orange-600 mb-1">
+              <span>Importation en cours</span>
+              <span>{{ audioUploadProgress }}%</span>
+            </div>
+
+            <div class="h-1.5 w-full overflow-hidden rounded-full bg-orange-200">
+              <div
+                class="h-full rounded-full bg-orange-500 transition-all duration-300 ease-out"
+                [style.width.%]="audioUploadProgress"
+              ></div>
+            </div>
+
+          </div>
+
+
+          <!-- STATUT TERMINÉ -->
+
+          <div
+            *ngIf="audioUploadProgress === 100"
+            class="border-t border-orange-200 bg-orange-100/50 px-3 py-1.5"
+          >
+
+            <p class="text-[10px] font-medium text-orange-700 flex items-center gap-1.5">
+              <i class="fa-solid fa-circle-check text-emerald-500"></i>
+              Fichier audio importé avec succès
+            </p>
+
+          </div>
+
+        </div>
+
+      </div>
+
+
+
+      <!-- =================================================
+           PROGRESSION GLOBALE
+      ================================================== -->
+
+      <div
+        *ngIf="coverUploadProgress > 0 || audioUploadProgress > 0"
+        class="rounded-xl bg-slate-50 p-4 border border-slate-200"
+      >
+
+        <div class="flex items-center justify-between text-sm text-slate-600 mb-2">
+          <span class="font-medium">Progression globale</span>
+          <span>{{ globalProgress }}%</span>
+        </div>
+
+        <div class="h-2 w-full overflow-hidden rounded-full bg-slate-200">
+          <div
+            class="h-full rounded-full bg-gradient-to-r from-orange-400 to-orange-500 transition-all duration-500 ease-out"
+            [style.width.%]="globalProgress"
+          ></div>
+        </div>
+
+        <p class="mt-2 text-[10px] text-slate-400 text-center">
+          {{ getProgressStatus() }}
+        </p>
+
+      </div>
+
+
+
+      <!-- =================================================
+           BUTTON
+      ================================================== -->
+
+      <button
+        type="submit"
+        [disabled]="loading || coverUploadProgress < 100 || audioUploadProgress < 100"
+        class="flex h-12 w-full items-center justify-center gap-2 rounded-xl bg-orange-500 px-5 text-sm font-bold text-white shadow-lg shadow-orange-200 transition hover:bg-orange-600 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60"
+      >
+
+        <i
+          *ngIf="!loading"
+          class="fa-solid fa-paper-plane"
+        ></i>
+
+
+        <span *ngIf="!loading">
+          Publier l'audio
+        </span>
+
+
+        <span
+          *ngIf="loading"
+          class="flex items-center gap-2"
+        >
+
+          <i
+            class="fa-solid fa-spinner fa-spin"
+          ></i>
+
+          Publication en cours...
+
+        </span>
+
+      </button>
+
+
+      <!-- INDICATEUR DE VALIDATION -->
+
+      <div class="flex flex-wrap items-center justify-center gap-4 text-xs text-slate-400">
+
+        <span class="flex items-center gap-1.5">
+          <i
+            class="fa-solid fa-circle"
+            [class.text-emerald-500]="coverUploadProgress === 100"
+            [class.text-slate-300]="coverUploadProgress !== 100"
+          ></i>
+          Image
+        </span>
+
+        <span class="flex items-center gap-1.5">
+          <i
+            class="fa-solid fa-circle"
+            [class.text-emerald-500]="audioUploadProgress === 100"
+            [class.text-slate-300]="audioUploadProgress !== 100"
+          ></i>
+          Audio
+        </span>
+
+        <span class="flex items-center gap-1.5">
+          <i
+            class="fa-solid fa-circle"
+            [class.text-emerald-500]="formData.nom.trim() && formData.personne.trim() && formData.categorie"
+            [class.text-slate-300]="!(formData.nom.trim() && formData.personne.trim() && formData.categorie)"
+          ></i>
+          Formulaire
+        </span>
+
+      </div>
+
+    </form>
+
+  </div>
+
+
+
+  <!-- =====================================================
+       LISTE DES AUDIOS (EN BAS)
+  ====================================================== -->
+
+  <div
+    class="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm"
+  >
+
+
+    <!-- HEADER AVEC RECHERCHE -->
+
+    <div
+      class="flex flex-col gap-4 border-b border-slate-100 p-6 sm:flex-row sm:items-center sm:justify-between"
+    >
+
+      <div>
+
+        <div class="flex items-center gap-2">
+
+          <div
+            class="flex h-9 w-9 items-center justify-center rounded-xl bg-orange-100 text-orange-600"
+          >
+            <i class="fa-solid fa-list"></i>
+          </div>
+
+
+          <h2 class="font-bold text-slate-900">
+            Audios publiés
+          </h2>
+
+
+          <span
+            class="rounded-full bg-orange-100 px-2.5 py-1 text-[11px] font-bold text-orange-600"
+          >
+            {{ audiosFiltres.length }}
+          </span>
+
+        </div>
+
+
+        <p
+          class="mt-2 text-xs text-slate-400"
+        >
+          Les plus récents apparaissent en premier.
+        </p>
+
+      </div>
+
+
+      <!-- BARRE DE RECHERCHE DYNAMIQUE -->
+
+      <div class="flex items-center gap-3 w-full sm:w-auto">
+
+        <div class="relative flex-1 sm:w-64">
+
+          <i
+            class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-sm text-slate-400"
+          ></i>
+
+          <input
+            type="text"
+            [(ngModel)]="recherche"
+            (ngModelChange)="filtrerAudios()"
+            placeholder="Rechercher un audio..."
+            class="h-10 w-full rounded-xl border border-slate-200 bg-slate-50 pl-9 pr-4 text-sm text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-orange-400 focus:bg-white focus:ring-4 focus:ring-orange-100"
+          />
+
+          <button
+            *ngIf="recherche"
+            type="button"
+            (click)="reinitialiserRecherche()"
+            class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
+          >
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+
+        </div>
+
+        <!-- REFRESH -->
+
+        <button
+          type="button"
+          (click)="getAudios()"
+          class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-500 transition hover:border-orange-200 hover:bg-orange-50 hover:text-orange-600"
+          title="Actualiser"
+        >
+
+          <i
+            class="fa-solid fa-arrows-rotate"
+            [class.fa-spin]="loadingAudios"
+          ></i>
+
+        </button>
+
+      </div>
+
+    </div>
+
+
+
+    <!-- =================================================
+         LOADING
+    ================================================== -->
+
+    <div
+      *ngIf="loadingAudios"
+      class="flex flex-col items-center justify-center px-6 py-20"
+    >
+
+      <i
+        class="fa-solid fa-spinner fa-spin text-3xl text-orange-500"
+      ></i>
+
+
+      <p
+        class="mt-4 text-sm text-slate-400"
+      >
+        Chargement des audios...
+      </p>
+
+    </div>
+
+
+
+    <!-- =================================================
+         EMPTY
+    ================================================== -->
+
+    <div
+      *ngIf="
+        !loadingAudios &&
+        audiosFiltres.length === 0
+      "
+      class="flex flex-col items-center justify-center px-6 py-20 text-center"
+    >
+
+      <div
+        class="mb-4 flex h-20 w-20 items-center justify-center rounded-3xl bg-orange-50 text-3xl text-orange-500"
+      >
+        <i class="fa-solid fa-headphones"></i>
+      </div>
+
+
+      <h3
+        class="font-bold text-slate-800"
+      >
+        {{ recherche ? 'Aucun résultat' : 'Aucun audio publié' }}
+      </h3>
+
+
+      <p
+        class="mt-1 max-w-sm text-sm text-slate-400"
+      >
+        {{ recherche ? 'Aucun audio ne correspond à votre recherche.' : 'Les audios que vous publierez apparaîtront automatiquement ici.' }}
+      </p>
+
+    </div>
+
+
+
+    <!-- =================================================
+         LISTE
+    ================================================== -->
+
+    <div
+      *ngIf="
+        !loadingAudios &&
+        audiosFiltres.length > 0
+      "
+      class="divide-y divide-slate-100"
+    >
+
+
+      <!-- AUDIO -->
+
+      <div
+        *ngFor="let audio of audiosFiltres"
+        class="group p-5 transition hover:bg-slate-50/70 sm:p-6"
+      >
+
+        <div
+          class="flex flex-col gap-4 sm:flex-row"
+        >
+
+
+          <!-- =========================================
+               COVER
+          ========================================== -->
+
+          <div
+            class="relative h-28 w-full shrink-0 sm:h-24 sm:w-24"
+          >
+
+            <img
+              [src]="audio.photoCouverture"
+              [alt]="audio.nom"
+              class="h-full w-full rounded-2xl object-cover shadow-sm"
+            />
+
+
+            <!-- PLAY -->
+
+            <div
+              class="absolute inset-0 flex items-center justify-center"
+            >
+
+              <div
+                class="flex h-10 w-10 items-center justify-center rounded-full bg-black/45 text-white backdrop-blur-sm"
+              >
+
+                <i
+                  class="fa-solid fa-play text-xs"
+                ></i>
+
+              </div>
+
+            </div>
+
+          </div>
+
+
+
+          <!-- =========================================
+               INFORMATIONS
+          ========================================== -->
+
+          <div class="min-w-0 flex-1">
+
+
+            <!-- CATEGORY + DATE -->
+
+            <div
+              class="mb-2 flex flex-wrap items-center gap-2"
+            >
+
+              <span
+                class="inline-flex items-center gap-1.5 rounded-full bg-orange-100 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide text-orange-600"
+              >
+
+                <i
+                  class="fa-solid"
+                  [ngClass]="getCategoryIcon(audio.categorie)"
+                ></i>
+
+                {{ getCategoryLabel(audio.categorie) }}
+
+              </span>
+
+
+              <span
+                class="flex items-center gap-1 text-[11px] text-slate-400"
+              >
+
+                <i class="fa-regular fa-calendar"></i>
+
+                {{ formatDate(audio.datePublication) }}
+
+              </span>
+
+            </div>
+
+
+
+            <!-- TITRE -->
+
+            <h3
+              class="truncate text-base font-bold text-slate-900"
+            >
+              {{ audio.nom }}
+            </h3>
+
+
+
+            <!-- PERSONNE -->
+
+            <p
+              class="mt-1 flex items-center gap-1.5 text-sm text-slate-500"
+            >
+
+              <i
+                class="fa-solid fa-user text-xs text-slate-400"
+              ></i>
+
+              {{ audio.personne }}
+
+            </p>
+
+
+
+            <!-- PLAYER -->
+
+            <div class="mt-4 flex items-center gap-3">
+
+              <div
+                class="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-orange-50 text-orange-500"
+              >
+
+                <i
+                  class="fa-solid fa-volume-high text-xs"
+                ></i>
+
+              </div>
+
+
+              <audio
+                controls
+                preload="metadata"
+                [src]="audio.fichierAudio"
+                class="h-9 w-full"
+              >
+              </audio>
+
+            </div>
+
+          </div>
+
+
+
+          <!-- =========================================
+               DELETE
+          ========================================== -->
+
+          <div
+            class="flex items-start"
+          >
+
+            <button
+              type="button"
+              (click)="ouvrirModalSuppression(audio._id)"
+              title="Supprimer l'audio"
+              class="flex h-10 w-10 items-center justify-center rounded-xl border border-red-100 bg-red-50 text-red-500 transition hover:bg-red-100 hover:text-red-600"
+            >
+
+              <i
+                class="fa-solid fa-trash-can"
+              ></i>
+
+            </button>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+
+
+  <!-- =====================================================
+       MODAL DE CONFIRMATION SUPPRESSION (TAILWIND CSS)
+  ====================================================== -->
+
+  <div
+    *ngIf="modalSuppressionOuvert"
+    class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-in fade-in duration-200"
+    (click)="fermerModalSuppression()"
+  >
+
+    <div
+      class="relative w-full max-w-md rounded-3xl bg-white shadow-2xl animate-in slide-in-from-bottom-4 duration-300"
+      (click)="$event.stopPropagation()"
+    >
+
+      <!-- HEADER -->
+
+      <div
+        class="flex items-center justify-between border-b border-slate-100 p-6"
+      >
+
+        <div class="flex items-center gap-3">
+
+          <div
+            class="flex h-12 w-12 items-center justify-center rounded-2xl bg-red-50 text-red-500"
+          >
+            <i class="fa-solid fa-triangle-exclamation text-xl"></i>
+          </div>
+
+          <div>
+
+            <h3 class="font-bold text-slate-900">
+              Confirmer la suppression
+            </h3>
+
+            <p class="text-xs text-slate-400">
+              Cette action est irréversible.
+            </p>
+
+          </div>
+
+        </div>
+
+        <button
+          type="button"
+          (click)="fermerModalSuppression()"
+          class="flex h-10 w-10 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-400 transition hover:bg-slate-50 hover:text-slate-600"
+        >
+
+          <i class="fa-solid fa-xmark"></i>
+
+        </button>
+
+      </div>
+
+
+      <!-- CONTENU -->
+
+      <div class="p-6">
+
+        <div
+          class="mb-6 rounded-2xl bg-red-50 p-4 text-center"
+        >
+
+          <p class="text-sm text-red-700">
+            Êtes-vous sûr de vouloir supprimer cet audio ?
+          </p>
+
+          <p class="mt-2 text-xs text-red-500">
+            Cette action ne peut pas être annulée.
+          </p>
+
+        </div>
+
+
+        <!-- ACTIONS -->
+
+        <div
+          class="flex flex-col-reverse gap-3 sm:flex-row sm:gap-3"
+        >
+
+          <button
+            type="button"
+            (click)="fermerModalSuppression()"
+            class="flex h-12 flex-1 items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white text-sm font-semibold text-slate-700 transition hover:bg-slate-50 active:scale-[0.98]"
+          >
+
+            <i class="fa-solid fa-times"></i>
+
+            Annuler
+
+          </button>
+
+
+          <button
+            type="button"
+            (click)="confirmerSuppression()"
+            [disabled]="loadingSuppression"
+            class="flex h-12 flex-1 items-center justify-center gap-2 rounded-xl bg-red-500 px-5 text-sm font-bold text-white shadow-lg shadow-red-200 transition hover:bg-red-600 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60"
+          >
+
+            <i
+              *ngIf="!loadingSuppression"
+              class="fa-solid fa-trash-can"
+            ></i>
+
+            <span *ngIf="!loadingSuppression">
+              Supprimer
+            </span>
+
+            <span
+              *ngIf="loadingSuppression"
+              class="flex items-center gap-2"
+            >
+
+              <i
+                class="fa-solid fa-spinner fa-spin"
+              ></i>
+
+              Suppression...
+
+            </span>
+
+          </button>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</div>

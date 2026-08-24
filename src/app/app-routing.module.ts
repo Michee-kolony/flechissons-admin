@@ -7,6 +7,7 @@ import { LoginComponent } from './composants/login/login.component';
 import { GestionComponent } from './composants/gestion/gestion.component';
 import { RequetesComponent } from './composants/requetes/requetes.component';
 import { DetailsarticlesComponent } from './composants/detailsarticles/detailsarticles.component';
+import { AudioComponent } from './composants/audio/audio.component';
 
 const routes: Routes = [
   {path:'', redirectTo: 'login', pathMatch: 'full'},
@@ -18,7 +19,8 @@ const routes: Routes = [
       {path:'publier', component: PublierComponent},
       {path:'gestion', component: GestionComponent},
       {path:'requetes-de-priere', component: RequetesComponent},
-      {path:'detailsarticles/:id', component: DetailsarticlesComponent}
+      {path:'detailsarticles/:id', component: DetailsarticlesComponent},
+      {path:'audios', component: AudioComponent}
     ]
   }
 ];

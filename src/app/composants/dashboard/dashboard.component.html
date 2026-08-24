@@ -1,3 +1,4 @@
+<!-- dashboard.component.html -->
 <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 mb-6">
 
   <!-- TITRE -->
@@ -15,21 +16,29 @@
     </p>
   </div>
 
-  <!-- DATE -->
-  <div class="w-full lg:w-auto flex items-center gap-2.5 bg-white border border-gray-100 rounded-xl px-3 py-2.5 shadow-sm">
+  <!-- ACTIONS : DATE + BOUTON RAFRAÎCHIR -->
+  <div class="w-full lg:w-auto flex items-center gap-3">
 
-    <div class="w-8 h-8 rounded-lg bg-orange-50 text-orange-600 flex items-center justify-center flex-shrink-0">
-      <i class="fa-solid fa-calendar-days text-sm"></i>
+    <!-- DATE -->
+    <div class="flex items-center gap-2.5 bg-white border border-gray-100 rounded-xl px-3 py-2.5 shadow-sm">
+      <div class="w-8 h-8 rounded-lg bg-orange-50 text-orange-600 flex items-center justify-center flex-shrink-0">
+        <i class="fa-solid fa-calendar-days text-sm"></i>
+      </div>
+      <div>
+        <p class="text-[10px] text-gray-400">Aujourd'hui</p>
+        <p class="text-xs font-semibold text-gray-700">{{ dateAujourdhui }}</p>
+      </div>
     </div>
 
-    <div>
-      <p class="text-[10px] text-gray-400">
-        Aujourd'hui
-      </p>
-      <p class="text-xs font-semibold text-gray-700">
-        {{ dateAujourdhui }}
-      </p>
-    </div>
+    <!-- BOUTON ACTUALISER -->
+    <button
+      (click)="chargerToutesLesDonnees()"
+      [disabled]="chargement"
+      class="flex items-center gap-2 px-4 py-2.5 bg-orange-500 hover:bg-orange-600 disabled:bg-orange-300 text-white text-sm font-medium rounded-xl shadow-sm transition-all duration-200"
+    >
+      <i class="fa-solid fa-rotate" [class.animate-spin]="chargement"></i>
+      <span>{{ chargement ? 'Actualisation...' : 'Actualiser' }}</span>
+    </button>
 
   </div>
 
@@ -58,86 +67,50 @@
 
   <!-- FIDÈLES -->
   <div class="bg-white rounded-xl border border-gray-100 shadow-sm p-4 flex items-center gap-3 hover:shadow-md transition-shadow duration-200">
-
     <div class="w-12 h-12 rounded-full bg-orange-50 border-4 border-orange-400 flex items-center justify-center flex-shrink-0">
       <i class="fa-solid fa-users text-orange-500 text-sm"></i>
     </div>
-
     <div class="min-w-0">
-      <p class="text-[11px] text-gray-400">
-        Fidèles
-      </p>
-      <p class="text-xl font-bold text-gray-900">
-        {{ statistiques.totalFideles | number }}
-      </p>
-      <p class="text-[10px] text-gray-400">
-        Nombre total
-      </p>
+      <p class="text-[11px] text-gray-400">Fidèles</p>
+      <p class="text-xl font-bold text-gray-900">{{ statistiques.totalFideles | number }}</p>
+      <p class="text-[10px] text-gray-400">Nombre total</p>
     </div>
-
   </div>
 
   <!-- ACTUALITÉS -->
   <div class="bg-white rounded-xl border border-gray-100 shadow-sm p-4 flex items-center gap-3 hover:shadow-md transition-shadow duration-200">
-
     <div class="w-12 h-12 rounded-full bg-orange-50 border-4 border-orange-500 flex items-center justify-center flex-shrink-0">
       <i class="fa-solid fa-newspaper text-orange-600 text-sm"></i>
     </div>
-
     <div class="min-w-0">
-      <p class="text-[11px] text-gray-400">
-        Actualités
-      </p>
-      <p class="text-xl font-bold text-gray-900">
-        {{ statistiques.totalActualites | number }}
-      </p>
-      <p class="text-[10px] text-gray-400">
-        Publiées
-      </p>
+      <p class="text-[11px] text-gray-400">Actualités</p>
+      <p class="text-xl font-bold text-gray-900">{{ statistiques.totalActualites | number }}</p>
+      <p class="text-[10px] text-gray-400">Publiées</p>
     </div>
-
   </div>
 
   <!-- REQUÊTES -->
   <div class="bg-white rounded-xl border border-gray-100 shadow-sm p-4 flex items-center gap-3 hover:shadow-md transition-shadow duration-200">
-
     <div class="w-12 h-12 rounded-full bg-orange-50 border-4 border-orange-600 flex items-center justify-center flex-shrink-0">
       <i class="fa-solid fa-envelope text-orange-700 text-sm"></i>
     </div>
-
     <div class="min-w-0">
-      <p class="text-[11px] text-gray-400">
-        Requêtes
-      </p>
-      <p class="text-xl font-bold text-gray-900">
-        {{ statistiques.totalRequetes | number }}
-      </p>
-      <p class="text-[10px] text-gray-400">
-        Reçues
-      </p>
+      <p class="text-[11px] text-gray-400">Requêtes</p>
+      <p class="text-xl font-bold text-gray-900">{{ statistiques.totalRequetes | number }}</p>
+      <p class="text-[10px] text-gray-400">Reçues</p>
     </div>
-
   </div>
 
   <!-- DONATIONS -->
   <div class="bg-white rounded-xl border border-gray-100 shadow-sm p-4 flex items-center gap-3 hover:shadow-md transition-shadow duration-200">
-
     <div class="w-12 h-12 rounded-full bg-orange-50 border-4 border-orange-400 flex items-center justify-center flex-shrink-0">
       <i class="fa-solid fa-hand-holding-heart text-orange-500 text-sm"></i>
     </div>
-
     <div class="min-w-0">
-      <p class="text-[11px] text-gray-400">
-        Donations
-      </p>
-      <p class="text-xl font-bold text-gray-900">
-        $30,000
-      </p>
-      <p class="text-[10px] text-gray-400">
-        Au total
-      </p>
+      <p class="text-[11px] text-gray-400">Donations</p>
+      <p class="text-xl font-bold text-gray-900">$30,000</p>
+      <p class="text-[10px] text-gray-400">Au total</p>
     </div>
-
   </div>
 
 </div>
@@ -150,29 +123,20 @@
 
     <!-- HEADER GRAPHIQUE -->
     <div class="px-4 sm:px-5 py-3.5 border-b border-gray-100 flex items-center justify-between gap-3">
-
       <div>
-        <h2 class="font-semibold text-gray-800 text-sm sm:text-base">
-          Activité de la plateforme
-        </h2>
-        <p class="text-[11px] text-gray-400 mt-0.5">
-          Évolution de l'activité
-        </p>
+        <h2 class="font-semibold text-gray-800 text-sm sm:text-base">Activité de la plateforme</h2>
+        <p class="text-[11px] text-gray-400 mt-0.5">Évolution de l'activité</p>
       </div>
-
       <button type="button" class="w-8 h-8 rounded-lg bg-orange-50 text-orange-600 flex items-center justify-center hover:bg-orange-100 transition">
         <i class="fa-solid fa-ellipsis text-xs"></i>
       </button>
-
     </div>
 
     <!-- ESPACE GRAPHIQUE -->
     <div class="h-[280px] sm:h-[320px] p-3 sm:p-4">
-
       <div class="w-full h-full flex items-center justify-center bg-gray-50/50 rounded-lg">
         <app-chart></app-chart>
       </div>
-
     </div>
 
   </div>
@@ -182,29 +146,18 @@
 
     <!-- HEADER -->
     <div class="px-4 py-3.5 border-b border-gray-100 flex items-center justify-between gap-3">
-
       <div class="flex items-center gap-2.5 min-w-0">
-
         <div class="w-8 h-8 min-w-[32px] rounded-lg bg-orange-50 text-orange-600 flex items-center justify-center">
           <i class="fa-solid fa-hands-praying text-xs"></i>
         </div>
-
         <div class="min-w-0">
-          <h2 class="font-semibold text-sm text-gray-800 truncate">
-            Requêtes de prière
-          </h2>
-          <p class="text-[10px] text-gray-400 mt-0.5">
-            Les 5 dernières requêtes
-          </p>
+          <h2 class="font-semibold text-sm text-gray-800 truncate">Requêtes de prière</h2>
+          <p class="text-[10px] text-gray-400 mt-0.5">Les 5 dernières requêtes</p>
         </div>
-
       </div>
-
-      <!-- VOIR TOUT -->
       <button type="button" class="text-[11px] font-medium text-orange-600 hover:text-orange-700 whitespace-nowrap flex-shrink-0">
         Voir tout
       </button>
-
     </div>
 
     <!-- LISTE -->
@@ -217,28 +170,16 @@
 
       <!-- REQUÊTE -->
       <div *ngFor="let requete of dernieresRequetes" class="p-3 flex gap-2.5 hover:bg-orange-50/40 transition">
-
         <div class="w-8 h-8 min-w-[32px] rounded-full flex items-center justify-center font-bold text-[10px]" [class]="getCouleurAvatar(requete.nom)">
           {{ getInitiales(requete.nom) }}
         </div>
-
         <div class="min-w-0 flex-1">
-
           <div class="flex justify-between gap-2">
-            <p class="font-semibold text-xs text-gray-800 truncate">
-              {{ requete.nom }}
-            </p>
-            <span class="text-[10px] text-gray-400 whitespace-nowrap">
-              {{ getTempsEcoule(requete.createdAt) }}
-            </span>
+            <p class="font-semibold text-xs text-gray-800 truncate">{{ requete.nom }}</p>
+            <span class="text-[10px] text-gray-400 whitespace-nowrap">{{ getTempsEcoule(requete.createdAt) }}</span>
           </div>
-
-          <p class="text-xs text-gray-500 mt-0.5 line-clamp-2">
-            {{ requete.message }}
-          </p>
-
+          <p class="text-xs text-gray-500 mt-0.5 line-clamp-2">{{ requete.message }}</p>
         </div>
-
       </div>
 
     </div>

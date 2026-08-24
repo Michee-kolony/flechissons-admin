@@ -1,3 +1,4 @@
+// dashboard.component.ts
 import { Component, OnInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 
@@ -27,11 +28,11 @@ export class DashboardComponent implements OnInit {
   private urlRequete = "https://backend-flechissons.onrender.com/requete/";
   private urlArticle = "https://backend-flechissons.onrender.com/article";
   private urlUser = "https://backend-flechissons.onrender.com/user";
-  
+
   // Liste des requêtes
   toutesLesRequetes: Requete[] = [];
   dernieresRequetes: Requete[] = [];
-  
+
   // Statistiques
   statistiques: Statistiques = {
     totalFideles: 0,
@@ -39,10 +40,10 @@ export class DashboardComponent implements OnInit {
     totalRequetes: 0,
     totalRequetesPriere: 0
   };
-  
+
   // Date du jour
   dateAujourdhui: string = '';
-  
+
   // Indicateurs de chargement
   chargement: boolean = false;
   erreur: string | null = null;
@@ -58,22 +59,34 @@ export class DashboardComponent implements OnInit {
    * Charge toutes les données nécessaires
    */
   chargerToutesLesDonnees(): void {
+    // Éviter les appels multiples pendant le chargement
+    if (this.chargement) {
+      return;
+    }
+
     this.chargement = true;
     this.erreur = null;
+
+    // Nombre de réponses attendues (3 appels)
+    let reponsesRecues = 0;
+    const totalAppels = 3;
+
+    const verifierFinChargement = () => {
+      reponsesRecues++;
+      if (reponsesRecues === totalAppels) {
+        this.chargement = false;
+      }
+    };
 
     // Charger les requêtes
     this.http.get<Requete[]>(this.urlRequete).subscribe({
       next: (data) => {
-        this.toutesLesRequetes = data.sort((a, b) => 
+        this.toutesLesRequetes = data.sort((a, b) =>
           new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
         );
         this.dernieresRequetes = this.toutesLesRequetes.slice(0, 5);
-        
-        // Mettre à jour les statistiques des requêtes
         this.mettreAJourStatistiquesRequetes();
-        
-        // Vérifier si toutes les données sont chargées
-        this.verifierChargementComplet();
+        verifierFinChargement();
       },
       error: (err) => {
         console.error('Erreur lors du chargement des requêtes:', err);
@@ -85,65 +98,40 @@ export class DashboardComponent implements OnInit {
     // Charger les articles
     this.http.get<any>(this.urlArticle).subscribe({
       next: (data) => {
-        // Si l'API retourne un tableau d'articles
         if (Array.isArray(data)) {
           this.statistiques.totalActualites = data.length;
-        } 
-        // Si l'API retourne un objet avec une propriété contenant les articles
-        else if (data && data.articles && Array.isArray(data.articles)) {
+        } else if (data && data.articles && Array.isArray(data.articles)) {
           this.statistiques.totalActualites = data.articles.length;
-        }
-        // Si l'API retourne un objet avec une propriété total
-        else if (data && data.total) {
+        } else if (data && data.total) {
           this.statistiques.totalActualites = data.total;
         }
-        
-        // Vérifier si toutes les données sont chargées
-        this.verifierChargementComplet();
+        verifierFinChargement();
       },
       error: (err) => {
         console.error('Erreur lors du chargement des articles:', err);
-        // Ne pas bloquer l'interface si les articles ne se chargent pas
-        this.verifierChargementComplet();
+        verifierFinChargement();
       }
     });
 
     // Charger les utilisateurs
     this.http.get<any>(this.urlUser).subscribe({
       next: (data) => {
-        // Si l'API retourne un tableau d'utilisateurs
         if (Array.isArray(data)) {
           this.statistiques.totalFideles = data.length;
-        }
-        // Si l'API retourne un objet avec une propriété total ou utilisateurs
-        else if (data) {
+        } else if (data) {
           if (data.total) {
             this.statistiques.totalFideles = data.total;
           } else if (data.utilisateurs && Array.isArray(data.utilisateurs)) {
             this.statistiques.totalFideles = data.utilisateurs.length;
           }
         }
-        
-        // Vérifier si toutes les données sont chargées
-        this.verifierChargementComplet();
+        verifierFinChargement();
       },
       error: (err) => {
         console.error('Erreur lors du chargement des utilisateurs:', err);
-        // Ne pas bloquer l'interface si les utilisateurs ne se chargent pas
-        this.verifierChargementComplet();
+        verifierFinChargement();
       }
     });
-  }
-
-  /**
-   * Vérifie si toutes les données sont chargées
-   */
-  verifierChargementComplet(): void {
-    // Ici on peut ajouter une logique pour vérifier que toutes les données sont chargées
-    // Pour simplifier, on désactive le chargement après un délai
-    setTimeout(() => {
-      this.chargement = false;
-    }, 500);
   }
 
   /**
@@ -152,7 +140,7 @@ export class DashboardComponent implements OnInit {
   mettreAJourStatistiquesRequetes(): void {
     this.statistiques.totalRequetes = this.toutesLesRequetes.length;
     this.statistiques.totalRequetesPriere = this.toutesLesRequetes.filter(
-      req => req.sujet.toLowerCase().includes('prière') || 
+      req => req.sujet.toLowerCase().includes('prière') ||
              req.sujet.toLowerCase().includes('priere')
     ).length;
   }
@@ -161,7 +149,7 @@ export class DashboardComponent implements OnInit {
    * Formate une date en "11 Août 2026"
    */
   formaterDate(date: Date): string {
-    const jours = ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 
+    const jours = ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin',
                    'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre'];
     const jour = date.getDate();
     const mois = jours[date.getMonth()];
@@ -220,7 +208,7 @@ export class DashboardComponent implements OnInit {
       'bg-teal-50 text-teal-700',
       'bg-cyan-50 text-cyan-700'
     ];
-    
+
     let hash = 0;
     for (let i = 0; i < nom.length; i++) {
       hash = nom.charCodeAt(i) + ((hash << 5) - hash);
@@ -233,7 +221,7 @@ export class DashboardComponent implements OnInit {
    */
   get requetesPriere(): Requete[] {
     return this.toutesLesRequetes.filter(
-      req => req.sujet.toLowerCase().includes('prière') || 
+      req => req.sujet.toLowerCase().includes('prière') ||
              req.sujet.toLowerCase().includes('priere')
     );
   }

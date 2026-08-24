@@ -227,6 +227,42 @@
     </a>
 
 
+     <!-- ARTICLES                                                -->
+    <!-- ===================================================== -->
+
+    <a
+      routerLink="/admin/audios"
+      (click)="closeSidebar()"
+      routerLinkActive="bg-white/20 shadow-lg"
+      class="flex items-center gap-4
+             px-3 py-3 mb-2
+             rounded-xl
+             text-decoration-none
+             text-white
+             hover:bg-white/15
+             transition-all duration-200
+             group">
+
+      <i
+        class="fa-solid fa-play
+               text-lg w-6
+               text-center
+               group-hover:scale-110
+               transition">
+      </i>
+
+      <span
+        *ngIf="sidebarOpen"
+        class="font-medium whitespace-nowrap">
+
+        Gestion audios
+
+      </span>
+
+    </a>
+
+
+
 
     <!-- ===================================================== -->
     <!-- COMMANDES                                               -->

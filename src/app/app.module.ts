@@ -14,6 +14,7 @@ import { RequetesComponent } from './composants/requetes/requetes.component';
 import { HttpClientModule } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
 import { DetailsarticlesComponent } from './composants/detailsarticles/detailsarticles.component';
+import { AudioComponent } from './composants/audio/audio.component';
 
 @NgModule({
   declarations: [
@@ -25,7 +26,8 @@ import { DetailsarticlesComponent } from './composants/detailsarticles/detailsar
     ChartComponent,
     GestionComponent,
     RequetesComponent,
-    DetailsarticlesComponent
+    DetailsarticlesComponent,
+    AudioComponent
   ],
 
   imports: [
