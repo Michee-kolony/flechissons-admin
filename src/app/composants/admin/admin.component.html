@@ -302,11 +302,11 @@
 
 
     <!-- ===================================================== -->
-    <!-- UTILISATEURS                                            -->
+    <!-- GESTION ADMINISTRATEUR                                  -->
     <!-- ===================================================== -->
 
     <a
-      routerLink="/admin/utilisateurs"
+      routerLink="/admin/administrateurs"
       (click)="closeSidebar()"
       routerLinkActive="bg-white/20 shadow-lg"
       class="flex items-center gap-4
@@ -319,7 +319,7 @@
              group">
 
       <i
-        class="fa-solid fa-users
+        class="fa-solid fa-user-shield
                text-lg w-6
                text-center
                group-hover:scale-110
@@ -330,7 +330,7 @@
         *ngIf="sidebarOpen"
         class="font-medium whitespace-nowrap">
 
-        Utilisateurs
+        Gestion administrateur
 
       </span>
 

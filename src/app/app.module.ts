@@ -10,6 +10,7 @@ import { LoginComponent } from './composants/login/login.component';
 import { ChartComponent } from './composants/chart/chart.component';
 import { GestionComponent } from './composants/gestion/gestion.component';
 import { RequetesComponent } from './composants/requetes/requetes.component';
+import { AdministrateursComponent } from './composants/administrateurs/administrateurs.component';
 
 import { HttpClientModule } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
@@ -27,7 +28,8 @@ import { AudioComponent } from './composants/audio/audio.component';
     GestionComponent,
     RequetesComponent,
     DetailsarticlesComponent,
-    AudioComponent
+    AudioComponent,
+    AdministrateursComponent
   ],
 
   imports: [

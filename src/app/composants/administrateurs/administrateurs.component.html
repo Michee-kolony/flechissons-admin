@@ -1,0 +1,327 @@
+<!-- administrateurs.component.html -->
+<div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+
+  <div>
+    <h1 class="text-2xl sm:text-3xl font-bold text-gray-800">
+      Gestion administrateur
+    </h1>
+    <p class="text-gray-500 mt-1">
+      Consultez les administrateurs de la plateforme et ajoutez-en de nouveaux.
+    </p>
+  </div>
+
+  <button
+    (click)="openModal()"
+    class="flex items-center gap-2 px-5 py-2.5
+           bg-orange-600 text-white rounded-xl
+           hover:bg-orange-700 transition font-semibold
+           shadow-lg shadow-orange-600/20">
+    <i class="fa-solid fa-user-plus"></i>
+    Ajouter un administrateur
+  </button>
+
+</div>
+
+<!-- ======================================================= -->
+<!-- STATISTIQUES                                             -->
+<!-- ======================================================= -->
+
+<div class="mt-6">
+  <h2 class="text-lg font-bold text-gray-800">
+    Administrateurs
+  </h2>
+  <p class="text-sm text-gray-500">
+    {{ admins.length }} administrateur{{ admins.length > 1 ? 's' : '' }} enregistré{{ admins.length > 1 ? 's' : '' }}
+  </p>
+</div>
+
+<!-- ======================================================= -->
+<!-- CHARGEMENT                                               -->
+<!-- ======================================================= -->
+
+<div *ngIf="isLoading" class="flex justify-center items-center py-12">
+  <div class="animate-spin rounded-full h-12 w-12 border-4 border-orange-500 border-t-transparent"></div>
+</div>
+
+<!-- ======================================================= -->
+<!-- LISTE DES ADMINISTRATEURS                                -->
+<!-- ======================================================= -->
+
+<div *ngIf="!isLoading" class="mt-4 space-y-3">
+
+  <!-- Message si aucun admin -->
+  <div *ngIf="admins.length === 0"
+       class="bg-white rounded-2xl border border-gray-100 shadow-sm p-12 text-center">
+    <i class="fa-solid fa-user-shield text-5xl text-gray-300 mb-4"></i>
+    <h3 class="text-xl font-semibold text-gray-700">Aucun administrateur</h3>
+    <p class="text-gray-500 mt-2">Ajoutez le premier administrateur de la plateforme.</p>
+  </div>
+
+  <!-- Carte administrateur -->
+  <div *ngFor="let admin of admins"
+       class="bg-white rounded-2xl border border-gray-100 shadow-sm p-4 sm:p-5
+              flex items-center gap-4">
+
+    <div class="w-12 h-12 min-w-[48px] rounded-full
+                bg-gradient-to-br from-orange-500 to-orange-800
+                text-white flex items-center justify-center
+                font-semibold">
+      {{ getInitials(admin.nom) }}
+    </div>
+
+    <div class="flex-1 min-w-0">
+      <div class="flex items-center gap-2 flex-wrap">
+        <p class="font-semibold text-gray-800 truncate">
+          {{ admin.nom }}
+        </p>
+        <span *ngIf="admin.email === currentAdminEmail"
+              class="px-2 py-0.5 rounded-full bg-orange-50 text-orange-600 text-xs font-semibold">
+          Vous
+        </span>
+      </div>
+      <p class="text-sm text-gray-500 truncate">
+        {{ admin.email }}
+      </p>
+    </div>
+
+    <div class="hidden sm:block text-right">
+      <p class="text-xs text-gray-400">Créé le</p>
+      <p class="text-sm text-gray-600 font-medium">{{ formatDate(admin.date) }}</p>
+    </div>
+
+  </div>
+
+</div>
+
+<!-- ======================================================= -->
+<!-- MODAL AJOUT ADMINISTRATEUR                               -->
+<!-- ======================================================= -->
+
+<div
+  *ngIf="showModal"
+  class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm"
+  (click)="closeModal()">
+
+  <div
+    class="relative w-full max-w-md rounded-3xl bg-white shadow-2xl"
+    (click)="$event.stopPropagation()">
+
+    <!-- HEADER -->
+    <div class="flex items-center justify-between border-b border-gray-100 p-6">
+
+      <div class="flex items-center gap-3">
+        <div class="w-11 h-11 rounded-xl bg-orange-50 text-orange-600 flex items-center justify-center">
+          <i class="fa-solid fa-user-plus"></i>
+        </div>
+        <div>
+          <h3 class="font-bold text-gray-800">Nouvel administrateur</h3>
+          <p class="text-xs text-gray-500">Créer un compte d'accès à l'administration</p>
+        </div>
+      </div>
+
+      <button
+        (click)="closeModal()"
+        class="w-9 h-9 rounded-lg text-gray-400 hover:bg-gray-100 hover:text-gray-600 transition
+               flex items-center justify-center">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+
+    </div>
+
+    <!-- FORMULAIRE -->
+    <form (ngSubmit)="onSubmit($event)" class="p-6 space-y-4">
+
+      <div>
+        <label for="nom" class="block text-sm font-medium text-gray-700 mb-2">
+          Nom complet
+        </label>
+        <input
+          id="nom"
+          type="text"
+          [(ngModel)]="newAdmin.nom"
+          name="nom"
+          placeholder="Jean Dupont"
+          [disabled]="isSubmitting"
+          class="w-full h-12 px-4 rounded-xl
+                 border border-gray-200 bg-gray-50
+                 text-gray-800 placeholder-gray-400
+                 outline-none focus:bg-white
+                 focus:border-orange-500 focus:ring-4
+                 focus:ring-orange-500/10 transition
+                 disabled:opacity-60 disabled:cursor-not-allowed"
+          required>
+      </div>
+
+      <div>
+        <label for="email" class="block text-sm font-medium text-gray-700 mb-2">
+          Adresse e-mail
+        </label>
+        <input
+          id="email"
+          type="email"
+          [(ngModel)]="newAdmin.email"
+          name="email"
+          placeholder="admin@example.com"
+          [disabled]="isSubmitting"
+          class="w-full h-12 px-4 rounded-xl
+                 border border-gray-200 bg-gray-50
+                 text-gray-800 placeholder-gray-400
+                 outline-none focus:bg-white
+                 focus:border-orange-500 focus:ring-4
+                 focus:ring-orange-500/10 transition
+                 disabled:opacity-60 disabled:cursor-not-allowed"
+          required>
+      </div>
+
+      <div>
+        <label for="password" class="block text-sm font-medium text-gray-700 mb-2">
+          Mot de passe
+        </label>
+        <input
+          id="password"
+          type="password"
+          [(ngModel)]="newAdmin.password"
+          name="password"
+          placeholder="••••••••"
+          [disabled]="isSubmitting"
+          class="w-full h-12 px-4 rounded-xl
+                 border border-gray-200 bg-gray-50
+                 text-gray-800 placeholder-gray-400
+                 outline-none focus:bg-white
+                 focus:border-orange-500 focus:ring-4
+                 focus:ring-orange-500/10 transition
+                 disabled:opacity-60 disabled:cursor-not-allowed"
+          required>
+      </div>
+
+      <div>
+        <label for="confirmPassword" class="block text-sm font-medium text-gray-700 mb-2">
+          Confirmer le mot de passe
+        </label>
+        <input
+          id="confirmPassword"
+          type="password"
+          [(ngModel)]="confirmPassword"
+          name="confirmPassword"
+          placeholder="••••••••"
+          [disabled]="isSubmitting"
+          class="w-full h-12 px-4 rounded-xl
+                 border border-gray-200 bg-gray-50
+                 text-gray-800 placeholder-gray-400
+                 outline-none focus:bg-white
+                 focus:border-orange-500 focus:ring-4
+                 focus:ring-orange-500/10 transition
+                 disabled:opacity-60 disabled:cursor-not-allowed"
+          required>
+      </div>
+
+      <!-- ACTIONS -->
+      <div class="flex items-center gap-3 pt-2">
+
+        <button
+          type="button"
+          (click)="closeModal()"
+          [disabled]="isSubmitting"
+          class="flex-1 px-5 py-3 rounded-xl
+                 border border-gray-200 text-gray-600
+                 hover:bg-gray-50 transition font-semibold
+                 disabled:opacity-60 disabled:cursor-not-allowed">
+          Annuler
+        </button>
+
+        <button
+          type="submit"
+          [disabled]="isSubmitting"
+          class="flex-1 flex items-center justify-center gap-2
+                 px-5 py-3 rounded-xl
+                 bg-orange-600 text-white
+                 hover:bg-orange-700 transition font-semibold
+                 shadow-lg shadow-orange-600/20
+                 disabled:opacity-70 disabled:cursor-not-allowed">
+
+          <svg *ngIf="isSubmitting"
+               class="animate-spin h-5 w-5 text-white"
+               xmlns="http://www.w3.org/2000/svg"
+               fill="none"
+               viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor"
+                  d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+          </svg>
+
+          <span *ngIf="!isSubmitting">Créer</span>
+          <span *ngIf="isSubmitting">Création...</span>
+
+        </button>
+
+      </div>
+
+    </form>
+
+  </div>
+
+</div>
+
+<!-- Toast Container -->
+<div *ngIf="showToast"
+     class="fixed top-4 right-4 z-50 w-80 transition-all duration-500 toast-slide-in">
+
+  <!-- Toast Success -->
+  <div *ngIf="toastType === 'success'"
+       class="bg-white rounded-lg shadow-2xl overflow-hidden border-l-4 border-green-500">
+
+    <div class="p-4 flex items-start gap-3">
+      <div class="flex-shrink-0">
+        <div class="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
+          <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+          </svg>
+        </div>
+      </div>
+
+      <div class="flex-1 min-w-0">
+        <p class="text-sm font-semibold text-gray-900">Succès</p>
+        <p class="text-sm text-gray-600">{{ toastMessage }}</p>
+      </div>
+
+      <button (click)="hideToast()"
+              class="flex-shrink-0 text-gray-400 hover:text-gray-600 transition-colors">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+        </svg>
+      </button>
+    </div>
+
+    <div class="h-1 bg-green-500 animate-progress"></div>
+  </div>
+
+  <!-- Toast Error -->
+  <div *ngIf="toastType === 'error'"
+       class="bg-white rounded-lg shadow-2xl overflow-hidden border-l-4 border-red-500">
+
+    <div class="p-4 flex items-start gap-3">
+      <div class="flex-shrink-0">
+        <div class="w-10 h-10 bg-red-100 rounded-full flex items-center justify-center">
+          <svg class="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+          </svg>
+        </div>
+      </div>
+
+      <div class="flex-1 min-w-0">
+        <p class="text-sm font-semibold text-gray-900">Erreur</p>
+        <p class="text-sm text-gray-600">{{ toastMessage }}</p>
+      </div>
+
+      <button (click)="hideToast()"
+              class="flex-shrink-0 text-gray-400 hover:text-gray-600 transition-colors">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+        </svg>
+      </button>
+    </div>
+
+    <div class="h-1 bg-red-500 animate-progress"></div>
+  </div>
+
+</div>
