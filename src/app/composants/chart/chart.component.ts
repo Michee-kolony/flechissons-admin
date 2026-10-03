@@ -209,16 +209,16 @@ export class ChartComponent implements AfterViewInit, OnDestroy {
             ctx.save();
 
             // Total
-            ctx.font = '700 28px Inter, sans-serif';
+            ctx.font = '700 40px Inter, sans-serif';
             ctx.fillStyle = '#111827';
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
-            ctx.fillText(total.toString(), centerX, centerY - 8);
+            ctx.fillText(total.toString(), centerX, centerY - 12);
 
             // Label
-            ctx.font = '500 12px Inter, sans-serif';
+            ctx.font = '500 14px Inter, sans-serif';
             ctx.fillStyle = '#9CA3AF';
-            ctx.fillText('Utilisateurs', centerX, centerY + 18);
+            ctx.fillText('Utilisateurs', centerX, centerY + 22);
 
             ctx.restore();
           }

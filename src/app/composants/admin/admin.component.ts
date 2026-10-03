@@ -9,7 +9,12 @@ import { Router } from '@angular/router';
 })
 export class AdminComponent implements OnInit {
 
-  sidebarOpen = true;
+  // Desktop : sidebar étendue (icônes + libellés) ou repliée (icônes seules)
+  sidebarExpanded = true;
+
+  // Mobile : tiroir latéral ouvert ou fermé (superposé au contenu)
+  mobileMenuOpen = false;
+
   adminData: any = null;
   adminName: string = '';
   adminEmail: string = '';
@@ -40,12 +45,33 @@ export class AdminComponent implements OnInit {
     }
   }
 
+  /**
+   * Replie/étend la sidebar sur desktop (bouton chevron flottant)
+   */
   toggleSidebar(): void {
-    this.sidebarOpen = !this.sidebarOpen;
+    this.sidebarExpanded = !this.sidebarExpanded;
   }
 
-  closeSidebar(): void {
-    this.sidebarOpen = false;
+  /**
+   * Ouvre/ferme le tiroir latéral sur mobile (bouton hamburger du header)
+   */
+  toggleMobileMenu(): void {
+    this.mobileMenuOpen = !this.mobileMenuOpen;
+  }
+
+  /**
+   * Ferme le tiroir mobile (clic sur un lien, sur le fond sombre, ou bouton fermer)
+   */
+  closeMobileMenu(): void {
+    this.mobileMenuOpen = false;
+  }
+
+  /**
+   * Les libellés texte doivent être visibles quand la sidebar est étendue sur
+   * desktop, ou quand le tiroir est ouvert sur mobile (toujours affiché en plein).
+   */
+  get afficherLabels(): boolean {
+    return this.sidebarExpanded || this.mobileMenuOpen;
   }
 
   logout(): void {
@@ -54,7 +80,7 @@ export class AdminComponent implements OnInit {
     localStorage.removeItem('adminData');
     localStorage.removeItem('rememberMe');
     localStorage.removeItem('adminEmail');
-    
+
     // Rediriger vers la page de connexion
     this.router.navigate(['/login']);
   }

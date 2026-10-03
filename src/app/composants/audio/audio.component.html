@@ -71,6 +71,54 @@
 
 
   <!-- =====================================================
+       ONGLETS
+  ====================================================== -->
+
+  <div
+    class="mb-6 inline-flex w-full items-center gap-1.5 overflow-x-auto rounded-2xl border border-slate-200 bg-white p-1.5 shadow-sm sm:w-fit"
+  >
+
+    <button
+      type="button"
+      (click)="changerOnglet('publier')"
+      class="flex shrink-0 items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold transition"
+      [class.bg-orange-500]="ongletActif === 'publier'"
+      [class.text-white]="ongletActif === 'publier'"
+      [class.shadow-lg]="ongletActif === 'publier'"
+      [class.shadow-orange-200]="ongletActif === 'publier'"
+      [class.text-slate-500]="ongletActif !== 'publier'"
+      [class.hover:bg-slate-50]="ongletActif !== 'publier'"
+    >
+      <i class="fa-solid fa-cloud-arrow-up"></i>
+      Publier un audio
+    </button>
+
+    <button
+      type="button"
+      (click)="changerOnglet('liste')"
+      class="flex shrink-0 items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold transition"
+      [class.bg-orange-500]="ongletActif === 'liste'"
+      [class.text-white]="ongletActif === 'liste'"
+      [class.shadow-lg]="ongletActif === 'liste'"
+      [class.shadow-orange-200]="ongletActif === 'liste'"
+      [class.text-slate-500]="ongletActif !== 'liste'"
+      [class.hover:bg-slate-50]="ongletActif !== 'liste'"
+    >
+      <i class="fa-solid fa-list"></i>
+      Tous les audios
+      <span
+        class="ml-0.5 rounded-full px-2 py-0.5 text-[11px] font-bold"
+        [ngClass]="ongletActif === 'liste' ? 'bg-white/20 text-white' : 'bg-orange-100 text-orange-600'"
+      >
+        {{ audiosFiltres.length }}
+      </span>
+    </button>
+
+  </div>
+
+
+
+  <!-- =====================================================
        MESSAGE SUCCESS
   ====================================================== -->
 
@@ -117,10 +165,11 @@
 
 
   <!-- =====================================================
-       FORMULAIRE DE PUBLICATION (EN HAUT)
+       FORMULAIRE DE PUBLICATION (ONGLET "PUBLIER")
   ====================================================== -->
 
   <div
+    *ngIf="ongletActif === 'publier'"
     class="mb-6 overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm"
   >
 
@@ -702,10 +751,11 @@
 
 
   <!-- =====================================================
-       LISTE DES AUDIOS (EN BAS)
+       LISTE DES AUDIOS (ONGLET "TOUS LES AUDIOS")
   ====================================================== -->
 
   <div
+    *ngIf="ongletActif === 'liste'"
     class="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm"
   >
 

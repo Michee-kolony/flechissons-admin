@@ -103,10 +103,10 @@
 <!-- LISTE DES PUBLICATIONS                                   -->
 <!-- ======================================================= -->
 
-<div *ngIf="!isLoading" class="space-y-4">
+<div *ngIf="!isLoading">
 
   <!-- Message si aucun article -->
-  <div *ngIf="filteredArticles.length === 0" 
+  <div *ngIf="filteredArticles.length === 0"
        class="bg-white rounded-2xl border border-gray-100 shadow-sm p-12 text-center">
     <i class="fa-solid fa-newspaper text-5xl text-gray-300 mb-4"></i>
     <h3 class="text-xl font-semibold text-gray-700">Aucune publication</h3>
@@ -122,17 +122,17 @@
   </div>
 
   <!-- ===================================================== -->
-  <!-- PUBLICATION CARD                                       -->
+  <!-- GRILLE DE PUBLICATIONS (CARDS COMPACTES)               -->
   <!-- ===================================================== -->
 
-  <div *ngFor="let article of paginatedArticles"
-       class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden
-              hover:shadow-lg transition-all duration-300">
+  <div *ngIf="filteredArticles.length > 0" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
 
-    <div class="flex flex-col md:flex-row min-h-[220px]">
+    <div *ngFor="let article of paginatedArticles"
+         class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden
+                flex flex-col hover:shadow-md hover:-translate-y-0.5 transition-all duration-300">
 
       <!-- IMAGE ou VIDEO -->
-      <div class="relative w-full md:w-72 lg:w-80 h-56 md:h-auto flex-shrink-0 bg-gray-100 overflow-hidden group">
+      <div class="relative w-full h-36 flex-shrink-0 bg-gray-100 overflow-hidden group">
 
         <!-- Si une vidéo est présente (videoUrl ou youtube) -->
         <div *ngIf="hasVideo(article); else imageBlock" class="relative w-full h-full bg-black">
@@ -147,49 +147,49 @@
             class="w-full h-full object-contain"
             (error)="onVideoError($event, article)"
             #videoPlayer>
-            
-            <p class="text-white text-center p-4">
+
+            <p class="text-white text-center p-4 text-xs">
               Votre navigateur ne supporte pas la lecture de vidéos.
             </p>
           </video>
-          
+
           <!-- Overlay avec bouton play central -->
           <div class="absolute inset-0 flex items-center justify-center bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
                (click)="toggleVideoPlay(videoPlayer)">
-            
+
             <!-- Bouton Play/Pause central -->
-            <button 
-              class="w-16 h-16 bg-orange-600 hover:bg-orange-700 text-white rounded-full 
-                     shadow-2xl transform hover:scale-110 transition-all duration-300
+            <button
+              class="w-10 h-10 bg-orange-600 hover:bg-orange-700 text-white rounded-full
+                     shadow-xl transform hover:scale-110 transition-all duration-300
                      flex items-center justify-center">
-              <i class="fa-solid text-2xl" 
+              <i class="fa-solid text-sm"
                  [class.fa-play]="videoPlayer?.paused || !videoPlayer?.currentTime"
                  [class.fa-pause]="!videoPlayer?.paused && (videoPlayer?.currentTime ?? 0) > 0"></i>
             </button>
           </div>
-          
+
           <!-- Contrôles personnalisés en bas à droite -->
-          <div class="absolute bottom-4 right-4 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-            <button 
+          <div class="absolute bottom-2 right-2 flex gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+            <button
               (click)="toggleVideoPlay(videoPlayer); $event.stopPropagation()"
-              class="bg-black/50 hover:bg-black/70 text-white w-9 h-9 rounded-full backdrop-blur-sm transition-transform hover:scale-110"
+              class="bg-black/50 hover:bg-black/70 text-white w-7 h-7 rounded-full backdrop-blur-sm transition-transform hover:scale-110 text-xs"
               title="Lecture/Pause">
-              <i class="fa-solid" 
+              <i class="fa-solid"
                  [class.fa-play]="videoPlayer?.paused || !videoPlayer?.currentTime"
                  [class.fa-pause]="!videoPlayer?.paused && (videoPlayer?.currentTime ?? 0) > 0"></i>
             </button>
-            
-            <button 
+
+            <button
               (click)="toggleVideoMute(videoPlayer); $event.stopPropagation()"
-              class="bg-black/50 hover:bg-black/70 text-white w-9 h-9 rounded-full backdrop-blur-sm transition-transform hover:scale-110"
+              class="bg-black/50 hover:bg-black/70 text-white w-7 h-7 rounded-full backdrop-blur-sm transition-transform hover:scale-110 text-xs"
               title="Activer/Désactiver le son">
               <i class="fa-solid" [class.fa-volume-high]="!videoPlayer?.muted" [class.fa-volume-mute]="videoPlayer?.muted"></i>
             </button>
           </div>
-          
+
           <!-- Indicateur de progression du chargement -->
-          <div class="absolute bottom-0 left-0 right-0 h-1 bg-gray-800/50">
-            <div class="h-full bg-orange-500 transition-all duration-300" 
+          <div class="absolute bottom-0 left-0 right-0 h-0.5 bg-gray-800/50">
+            <div class="h-full bg-orange-500 transition-all duration-300"
                  [style.width.%]="videoPlayer?.buffered?.length ? (videoPlayer.buffered.end(0) / (videoPlayer.duration || 1) * 100) : 0">
             </div>
           </div>
@@ -206,28 +206,28 @@
               (error)="onImageError($event, article)"
               class="w-full h-full object-cover hover:scale-105 transition-transform duration-500">
           </div>
-          
+
           <!-- Image par défaut si aucune image -->
           <ng-template #noImage>
             <div class="w-full h-full flex items-center justify-center bg-gradient-to-br from-orange-50 to-gray-100">
-              <div class="text-center p-4">
-                <i class="fa-solid fa-image text-5xl text-gray-300 mb-2"></i>
-                <p class="text-xs text-gray-400">Aucune image</p>
+              <div class="text-center p-3">
+                <i class="fa-solid fa-image text-2xl text-gray-300 mb-1"></i>
+                <p class="text-[11px] text-gray-400">Aucune image</p>
               </div>
             </div>
           </ng-template>
         </ng-template>
 
         <!-- TYPE -->
-        <span class="absolute top-4 left-4 inline-flex items-center gap-2 px-3 py-1.5 rounded-full
-                     text-white text-xs font-semibold z-10"
+        <span class="absolute top-2 left-2 inline-flex items-center gap-1 px-2 py-1 rounded-full
+                     text-white text-[10px] font-semibold z-10"
               [ngClass]="{
                 'bg-blue-600': article.type === 'annonces',
                 'bg-orange-600': article.type === 'predications',
                 'bg-green-600': article.type === 'exhortations'
               }">
 
-          <i class="fa-solid" [ngClass]="{
+          <i class="fa-solid text-[10px]" [ngClass]="{
             'fa-bullhorn': article.type === 'annonces',
             'fa-church': article.type === 'predications',
             'fa-heart': article.type === 'exhortations'
@@ -239,52 +239,41 @@
 
         <!-- INDICATEUR VIDÉO -->
         <span *ngIf="hasVideo(article)"
-              class="absolute top-4 right-4 inline-flex items-center gap-1 px-3 py-1.5 rounded-full
-                     bg-red-600/90 text-white text-xs font-medium backdrop-blur-sm z-10">
-          <i class="fa-solid fa-video"></i>
+              class="absolute top-2 right-2 inline-flex items-center gap-1 px-2 py-1 rounded-full
+                     bg-red-600/90 text-white text-[10px] font-medium backdrop-blur-sm z-10">
+          <i class="fa-solid fa-video text-[10px]"></i>
           Vidéo
         </span>
 
         <!-- NOMBRE D'IMAGES -->
         <span *ngIf="hasImages(article) && !hasVideo(article)"
-              class="absolute bottom-4 left-4 inline-flex items-center gap-1 px-3 py-1.5 rounded-full
-                     bg-black/60 text-white text-xs font-medium backdrop-blur-sm">
-          <i class="fa-solid fa-images"></i>
-          {{ article.images.length }} image{{ article.images.length > 1 ? 's' : '' }}
+              class="absolute bottom-2 left-2 inline-flex items-center gap-1 px-2 py-1 rounded-full
+                     bg-black/60 text-white text-[10px] font-medium backdrop-blur-sm">
+          <i class="fa-solid fa-images text-[10px]"></i>
+          {{ article.images.length }}
         </span>
 
       </div>
 
       <!-- CONTENU -->
-      <div class="flex-1 p-5 md:p-6 flex flex-col justify-between">
+      <div class="flex-1 p-3.5 flex flex-col">
 
-        <div>
+        <div class="flex-1">
 
           <!-- META -->
-          <div class="flex flex-wrap items-center gap-2 mb-3">
+          <div class="flex flex-wrap items-center gap-x-2 gap-y-1 mb-2">
 
-            <span class="px-2.5 py-1 rounded-lg text-xs font-semibold"
-                  [ngClass]="getTypeColor(article.type)">
-              {{ getTypeLabel(article.type) }}
-            </span>
-
-            <span class="text-xs text-gray-400">
-              Publié le {{ formatDate(article.createdAt) }}
-            </span>
-
-            <span class="text-xs text-gray-400 flex items-center gap-1">
+            <span class="text-[11px] text-gray-400 flex items-center gap-1">
               <i class="fa-regular fa-clock"></i>
               {{ getTimeAgo(article.createdAt) }}
             </span>
 
-            <!-- Likes -->
-            <span class="text-xs text-gray-400 flex items-center gap-1">
+            <span class="text-[11px] text-gray-400 flex items-center gap-1">
               <i class="fa-regular fa-heart text-red-500"></i>
               {{ article.likes ? article.likes.length : 0 }}
             </span>
 
-            <!-- Commentaires -->
-            <span class="text-xs text-gray-400 flex items-center gap-1">
+            <span class="text-[11px] text-gray-400 flex items-center gap-1">
               <i class="fa-regular fa-comment"></i>
               {{ article.commentaires ? article.commentaires.length : 0 }}
             </span>
@@ -292,59 +281,44 @@
           </div>
 
           <!-- TITRE -->
-          <h3 class="text-xl font-bold text-gray-800 line-clamp-2">
+          <h3 class="text-sm font-bold text-gray-800 leading-snug line-clamp-2">
             {{ article.titre }}
           </h3>
 
           <!-- THEME -->
-          <p class="text-sm text-orange-600 font-medium mt-1">
-            <i class="fa-solid fa-tag text-xs mr-1"></i>
+          <p class="text-xs text-orange-600 font-medium mt-1 truncate">
+            <i class="fa-solid fa-tag text-[10px] mr-1"></i>
             {{ article.theme }}
           </p>
 
           <!-- DESCRIPTION -->
-          <p class="text-sm text-gray-500 mt-3 line-clamp-3 max-w-3xl">
+          <p class="text-xs text-gray-500 mt-2 line-clamp-2">
             {{ article.description }}
           </p>
 
         </div>
 
         <!-- BAS -->
-        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mt-6 pt-4 border-t border-gray-100">
+        <div class="flex items-center justify-between gap-2 mt-3 pt-3 border-t border-gray-100">
 
-          <!-- AUTEUR -->
-          <div class="flex items-center gap-2">
-            <div class="w-9 h-9 rounded-full bg-orange-100 text-orange-600 flex items-center justify-center">
-              <i class="fa-solid fa-user text-xs"></i>
-            </div>
-            <div>
-              <p class="text-xs text-gray-400">Auteur</p>
-              <p class="text-sm font-medium text-gray-700">Administrateur</p>
-            </div>
-          </div>
+          <!-- Lien externe -->
+          <a *ngIf="article.lien"
+             [href]="article.lien"
+             target="_blank"
+             class="w-8 h-8 rounded-lg bg-gray-50 text-gray-500
+                    hover:bg-orange-50 hover:text-orange-600
+                    flex items-center justify-center transition text-xs"
+             title="Voir le lien externe">
+            <i class="fa-solid fa-arrow-up-right-from-square"></i>
+          </a>
 
-          <!-- ACTIONS -->
-          <div class="flex items-center gap-2">
-
-            <!-- Lien externe -->
-            <a *ngIf="article.lien"
-               [href]="article.lien"
-               target="_blank"
-               class="w-10 h-10 rounded-xl bg-gray-50 text-gray-500
-                      hover:bg-orange-50 hover:text-orange-600
-                      flex items-center justify-center transition"
-               title="Voir le lien externe">
-              <i class="fa-solid fa-arrow-up-right-from-square"></i>
-            </a>
-            <!-- Gérer -->
-            <button
-             [routerLink]="['/admin/detailsarticles', article._id]"
-              class="px-4 py-2.5 rounded-xl bg-orange-600 text-white text-sm font-semibold
-                     hover:bg-orange-700 transition">
-              Gérer
-            </button>
-
-          </div>
+          <!-- Gérer -->
+          <button
+           [routerLink]="['/admin/detailsarticles', article._id]"
+            class="ml-auto px-3 py-1.5 rounded-lg bg-orange-600 text-white text-xs font-semibold
+                   hover:bg-orange-700 transition">
+            Gérer
+          </button>
 
         </div>
 

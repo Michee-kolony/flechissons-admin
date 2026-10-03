@@ -15,54 +15,6 @@
     </p>
   </div>
 
-  <!-- BARRE DE RECHERCHE + COMPTEUR -->
-  <div class="bg-white border border-gray-100 rounded-2xl p-4 sm:p-5 shadow-sm">
-
-    <div class="flex flex-col sm:flex-row gap-4 sm:items-center sm:justify-between">
-
-      <!-- Recherche -->
-      <div class="relative w-full sm:max-w-md">
-
-        <div class="absolute inset-y-0 left-0 flex items-center pl-4 pointer-events-none text-gray-400">
-          <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-            <path stroke-linecap="round" stroke-linejoin="round" d="m21 21-4.35-4.35m1.35-5.4a6.75 6.75 0 1 1-13.5 0 6.75 6.75 0 0 1 13.5 0Z" />
-          </svg>
-        </div>
-
-        <input
-          type="text"
-          placeholder="Rechercher une requête..."
-          [(ngModel)]="termeRecherche"
-          (ngModelChange)="filtrerRequetes()"
-          class="w-full pl-11 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-sm text-gray-800 placeholder:text-gray-400 outline-none focus:bg-white focus:border-orange-400 focus:ring-4 focus:ring-orange-100 transition"
-        />
-
-      </div>
-
-      <!-- Nombre -->
-      <div class="flex items-center gap-3 px-4 py-3 bg-orange-50 rounded-xl w-fit">
-
-        <div class="w-9 h-9 rounded-lg bg-orange-100 text-orange-600 flex items-center justify-center">
-          <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M8 10h8M8 14h5m7-2a8 8 0 1 1-16 0 8 8 0 0 1 16 0Z" />
-          </svg>
-        </div>
-
-        <div>
-          <p class="text-xs text-gray-500">
-            Total
-          </p>
-          <p class="text-sm font-bold text-gray-900">
-            {{ totalRequetes }} requêtes
-          </p>
-        </div>
-
-      </div>
-
-    </div>
-
-  </div>
-
   <!-- ÉTAT DE CHARGEMENT -->
   <div *ngIf="chargement" class="bg-white border border-gray-100 rounded-2xl shadow-sm p-12 text-center">
     <div class="flex flex-col items-center justify-center">
@@ -81,140 +33,242 @@
     </button>
   </div>
 
-  <!-- LISTE DES REQUÊTES -->
-  <div *ngIf="!chargement && !erreur" class="bg-white border border-gray-100 rounded-2xl shadow-sm overflow-hidden">
+  <!-- ======================================================= -->
+  <!-- VUE "BOÎTE DE RÉCEPTION" : LISTE À GAUCHE, DÉTAIL À DROITE -->
+  <!-- ======================================================= -->
 
-    <!-- HEADER -->
-    <div class="px-5 sm:px-6 py-4 border-b border-gray-100 flex items-center justify-between">
+  <div *ngIf="!chargement && !erreur"
+       class="bg-white border border-gray-100 rounded-2xl shadow-sm overflow-hidden flex flex-col lg:flex-row h-[calc(100vh-230px)] min-h-[560px]">
 
-      <div>
-        <h2 class="text-base font-semibold text-gray-900">
-          Dernières requêtes
-        </h2>
-        <p class="text-xs text-gray-500 mt-0.5">
-          Les demandes de prière reçues
-        </p>
-      </div>
+    <!-- ===================================================== -->
+    <!-- COLONNE GAUCHE : LISTE DES REQUÊTES                     -->
+    <!-- ===================================================== -->
 
-      <span class="hidden sm:inline-flex items-center px-3 py-1.5 rounded-full bg-gray-100 text-xs font-medium text-gray-600">
-        {{ totalRequetes }} demandes
-      </span>
+    <div
+      [ngClass]="requeteSelectionnee ? 'hidden lg:flex' : 'flex'"
+      class="w-full lg:w-[380px] lg:flex-shrink-0 flex-col border-gray-100 lg:border-r min-h-0">
 
-    </div>
+      <!-- Recherche + compteur -->
+      <div class="p-4 border-b border-gray-100 flex-shrink-0 space-y-3">
 
-    <!-- AUCUNE REQUÊTE -->
-    <div *ngIf="totalRequetes === 0" class="px-5 sm:px-6 py-12 text-center">
-      <div class="flex flex-col items-center">
-        <svg xmlns="http://www.w3.org/2000/svg" class="w-16 h-16 text-gray-300 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M8 10h8M8 14h5m7-2a8 8 0 1 1-16 0 8 8 0 0 1 16 0Z" />
-        </svg>
-        <p class="text-gray-500 font-medium">Aucune requête trouvée</p>
-        <p class="text-sm text-gray-400 mt-1">Aucune demande ne correspond à votre recherche.</p>
-      </div>
-    </div>
-
-    <!-- ITEMS -->
-    <div *ngFor="let requete of requetesPage; let last = last"
-         [class.border-b]="!last"
-         [class.border-gray-100]="!last"
-         class="px-5 sm:px-6 py-5 hover:bg-gray-50 transition">
-
-      <div class="flex gap-4">
-
-        <!-- AVATAR -->
-        <div class="flex-shrink-0 w-11 h-11 rounded-full flex items-center justify-center font-bold text-sm"
-             [class]="getCouleurAvatar(requete.nom)">
-          {{ getInitiales(requete.nom) }}
+        <div class="flex items-center justify-between">
+          <h2 class="text-sm font-semibold text-gray-900">
+            Boîte de réception
+          </h2>
+          <span class="inline-flex items-center px-2.5 py-1 rounded-full bg-orange-50 text-orange-600 text-xs font-bold">
+            {{ totalRequetes }}
+          </span>
         </div>
 
-        <!-- CONTENU -->
-        <div class="min-w-0 flex-1">
+        <div class="relative">
+          <div class="absolute inset-y-0 left-0 flex items-center pl-3.5 pointer-events-none text-gray-400">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="m21 21-4.35-4.35m1.35-5.4a6.75 6.75 0 1 1-13.5 0 6.75 6.75 0 0 1 13.5 0Z" />
+            </svg>
+          </div>
 
-          <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-1">
+          <input
+            type="text"
+            placeholder="Rechercher..."
+            [(ngModel)]="termeRecherche"
+            (ngModelChange)="filtrerRequetes()"
+            class="w-full pl-10 pr-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm text-gray-800 placeholder:text-gray-400 outline-none focus:bg-white focus:border-orange-400 focus:ring-4 focus:ring-orange-100 transition"
+          />
+        </div>
 
-            <div class="flex-1">
-              <h3 class="text-sm font-semibold text-gray-900">
+      </div>
+
+      <!-- Liste scrollable -->
+      <div class="flex-1 overflow-y-auto">
+
+        <!-- AUCUNE REQUÊTE -->
+        <div *ngIf="totalRequetes === 0" class="px-5 py-12 text-center">
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-12 h-12 text-gray-300 mb-3 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M8 10h8M8 14h5m7-2a8 8 0 1 1-16 0 8 8 0 0 1 16 0Z" />
+          </svg>
+          <p class="text-gray-500 text-sm font-medium">Aucune requête trouvée</p>
+          <p class="text-xs text-gray-400 mt-1">Aucune demande ne correspond à votre recherche.</p>
+        </div>
+
+        <!-- ITEM DE LISTE -->
+        <button
+          *ngFor="let requete of requetesPage"
+          type="button"
+          (click)="selectionnerRequete(requete)"
+          class="w-full text-left px-4 py-3.5 flex gap-3 border-b border-gray-50 transition-colors duration-150"
+          [class.bg-orange-50]="requeteSelectionnee?._id === requete._id"
+          [class.hover:bg-gray-50]="requeteSelectionnee?._id !== requete._id">
+
+          <!-- Barre d'accent sélection -->
+          <div class="w-1 rounded-full flex-shrink-0"
+               [class.bg-orange-500]="requeteSelectionnee?._id === requete._id"
+               [class.bg-transparent]="requeteSelectionnee?._id !== requete._id">
+          </div>
+
+          <!-- AVATAR -->
+          <div class="flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center font-bold text-xs"
+               [class]="getCouleurAvatar(requete.nom)">
+            {{ getInitiales(requete.nom) }}
+          </div>
+
+          <!-- CONTENU -->
+          <div class="min-w-0 flex-1">
+
+            <div class="flex items-center justify-between gap-2">
+              <h3 class="text-sm font-semibold text-gray-900 truncate">
                 {{ requete.nom }}
               </h3>
-
-              <p class="text-xs text-gray-400 mt-0.5">
-                {{ requete.sujet }}
-              </p>
-            </div>
-
-            <div class="flex items-center gap-3 flex-shrink-0 mt-1 sm:mt-0">
-
-              <span class="text-xs text-gray-400">
+              <span class="text-[11px] text-gray-400 flex-shrink-0 whitespace-nowrap">
                 {{ getTempsEcoule(requete.createdAt) }}
               </span>
-
-              <!-- BOUTON SUPPRIMER - TOUJOURS VISIBLE -->
-              <button
-                (click)="ouvrirModalSuppression(requete)"
-                class="p-1.5 rounded-lg hover:bg-red-50 text-gray-400 hover:text-red-600 transition-colors duration-200"
-                title="Supprimer cette requête">
-                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
-                </svg>
-              </button>
-
             </div>
+
+            <p class="text-xs font-medium text-gray-500 truncate mt-0.5">
+              {{ requete.sujet }}
+            </p>
+
+            <p class="text-xs text-gray-400 truncate mt-0.5">
+              {{ requete.message }}
+            </p>
 
           </div>
 
-          <p class="text-sm text-gray-600 leading-6 mt-2">
-            {{ requete.message }}
-          </p>
-
-        </div>
+        </button>
 
       </div>
 
-    </div>
+      <!-- Pagination compacte -->
+      <div *ngIf="totalPages > 1" class="p-3 border-t border-gray-100 flex items-center justify-between flex-shrink-0">
 
-    <!-- PAGINATION -->
-    <div *ngIf="totalRequetes > 0" class="px-5 sm:px-6 py-4 border-t border-gray-100 flex flex-col sm:flex-row items-center justify-between gap-3">
-
-      <p class="text-xs text-gray-500">
-        Affichage de <span class="font-medium text-gray-700">{{ plageAffichage }}</span>
-        sur <span class="font-medium text-gray-700">{{ totalRequetes }}</span> requêtes
-      </p>
-
-      <div class="flex items-center gap-2">
-
-        <!-- Précédent -->
         <button
           type="button"
           [disabled]="pageActuelle === 1"
           (click)="changerPage(pageActuelle - 1)"
-          class="w-9 h-9 rounded-lg border border-gray-200 text-gray-400 flex items-center justify-center hover:bg-gray-50 transition disabled:opacity-50 disabled:cursor-not-allowed">
+          class="w-8 h-8 rounded-lg border border-gray-200 text-gray-500 flex items-center justify-center hover:bg-gray-50 transition disabled:opacity-40 disabled:cursor-not-allowed">
           <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
             <path stroke-linecap="round" stroke-linejoin="round" d="m15 19-7-7 7-7" />
           </svg>
         </button>
 
-        <!-- Pages -->
-        <button
-          *ngFor="let page of pages"
-          type="button"
-          (click)="changerPage(page)"
-          class="w-9 h-9 rounded-lg flex items-center justify-center text-sm transition"
-          [class]="page === pageActuelle ? 'bg-orange-500 text-white font-semibold' : 'border border-gray-200 text-gray-600 hover:bg-gray-50'">
-          {{ page }}
-        </button>
+        <p class="text-xs text-gray-500">
+          Page <span class="font-semibold text-gray-700">{{ pageActuelle }}</span> / {{ totalPages }}
+        </p>
 
-        <!-- Suivant -->
         <button
           type="button"
           [disabled]="pageActuelle === totalPages"
           (click)="changerPage(pageActuelle + 1)"
-          class="w-9 h-9 rounded-lg border border-gray-200 text-gray-400 flex items-center justify-center hover:bg-gray-50 transition disabled:opacity-50 disabled:cursor-not-allowed">
+          class="w-8 h-8 rounded-lg border border-gray-200 text-gray-500 flex items-center justify-center hover:bg-gray-50 transition disabled:opacity-40 disabled:cursor-not-allowed">
           <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
             <path stroke-linecap="round" stroke-linejoin="round" d="m9 5 7 7-7 7" />
           </svg>
         </button>
 
       </div>
+
+    </div>
+
+    <!-- ===================================================== -->
+    <!-- COLONNE DROITE : DÉTAIL DE LA REQUÊTE                   -->
+    <!-- ===================================================== -->
+
+    <div
+      [ngClass]="requeteSelectionnee ? 'flex' : 'hidden lg:flex'"
+      class="flex-1 flex-col min-h-0">
+
+      <ng-container *ngIf="requeteSelectionnee; else aucuneSelection">
+
+        <!-- HEADER DU DÉTAIL -->
+        <div class="p-4 sm:p-5 border-b border-gray-100 flex items-start gap-4 flex-shrink-0">
+
+          <!-- Retour (mobile uniquement) -->
+          <button
+            type="button"
+            (click)="fermerDetail()"
+            class="lg:hidden flex-shrink-0 w-9 h-9 rounded-lg border border-gray-200 text-gray-500 flex items-center justify-center hover:bg-gray-50 transition">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="m15 19-7-7 7-7" />
+            </svg>
+          </button>
+
+          <!-- AVATAR -->
+          <div class="flex-shrink-0 w-12 h-12 rounded-full flex items-center justify-center font-bold text-sm"
+               [class]="getCouleurAvatar(requeteSelectionnee.nom)">
+            {{ getInitiales(requeteSelectionnee.nom) }}
+          </div>
+
+          <!-- INFOS -->
+          <div class="min-w-0 flex-1">
+            <h2 class="text-base font-bold text-gray-900 truncate">
+              {{ requeteSelectionnee.nom }}
+            </h2>
+            <p class="text-sm text-gray-500 truncate">
+              {{ requeteSelectionnee.email }}
+            </p>
+            <p class="text-xs text-gray-400 mt-0.5">
+              {{ getDateComplete(requeteSelectionnee.createdAt) }}
+            </p>
+          </div>
+
+          <!-- ACTIONS -->
+          <div class="flex items-center gap-2 flex-shrink-0">
+
+            <a
+              [href]="getLienReponse(requeteSelectionnee)"
+              class="w-9 h-9 rounded-lg border border-gray-200 text-gray-500 flex items-center justify-center hover:bg-orange-50 hover:text-orange-600 hover:border-orange-200 transition"
+              title="Répondre par e-mail">
+              <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 0 1-2.25 2.25h-15a2.25 2.25 0 0 1-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25m19.5 0v.243a2.25 2.25 0 0 1-1.07 1.916l-7.5 4.615a2.25 2.25 0 0 1-2.36 0L3.32 8.91a2.25 2.25 0 0 1-1.07-1.916V6.75" />
+              </svg>
+            </a>
+
+            <button
+              type="button"
+              (click)="ouvrirModalSuppression(requeteSelectionnee)"
+              class="w-9 h-9 rounded-lg border border-gray-200 text-gray-500 flex items-center justify-center hover:bg-red-50 hover:text-red-600 hover:border-red-200 transition"
+              title="Supprimer cette requête">
+              <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
+              </svg>
+            </button>
+
+          </div>
+
+        </div>
+
+        <!-- CORPS DU MESSAGE -->
+        <div class="flex-1 overflow-y-auto p-5 sm:p-8">
+
+          <div class="max-w-2xl">
+
+            <span class="inline-flex items-center px-3 py-1 rounded-full bg-orange-50 text-orange-600 text-xs font-semibold mb-4">
+              {{ requeteSelectionnee.sujet }}
+            </span>
+
+            <p class="text-[15px] text-gray-700 leading-7 whitespace-pre-line">
+              {{ requeteSelectionnee.message }}
+            </p>
+
+          </div>
+
+        </div>
+
+      </ng-container>
+
+      <!-- ÉTAT VIDE : AUCUNE REQUÊTE SÉLECTIONNÉE -->
+      <ng-template #aucuneSelection>
+        <div class="flex-1 flex flex-col items-center justify-center text-center p-8">
+          <div class="w-16 h-16 rounded-2xl bg-orange-50 text-orange-300 flex items-center justify-center mb-4">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M8 10h8M8 14h5m7-2a8 8 0 1 1-16 0 8 8 0 0 1 16 0Z" />
+            </svg>
+          </div>
+          <p class="text-gray-600 font-medium">Sélectionnez une requête</p>
+          <p class="text-sm text-gray-400 mt-1 max-w-xs">
+            Cliquez sur une demande dans la liste pour afficher son contenu complet ici.
+          </p>
+        </div>
+      </ng-template>
 
     </div>
 

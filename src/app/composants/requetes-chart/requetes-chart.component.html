@@ -1,0 +1,10 @@
+<div class="relative w-full h-full">
+
+  <div *ngIf="aucuneDonnee" class="absolute inset-0 flex flex-col items-center justify-center text-center z-10">
+    <i class="fa-solid fa-chart-line text-3xl text-gray-300 mb-2"></i>
+    <p class="text-sm text-gray-400">Aucune requête à analyser pour le moment</p>
+  </div>
+
+  <canvas id="requetesParMoisChart"></canvas>
+
+</div>

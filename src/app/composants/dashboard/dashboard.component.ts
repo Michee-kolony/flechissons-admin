@@ -44,6 +44,9 @@ export class DashboardComponent implements OnInit {
   // Date du jour
   dateAujourdhui: string = '';
 
+  // Bannière "Commencer à publier" (ouverte en grand, ou repliée en bande fine)
+  bannerOuverte: boolean = true;
+
   // Indicateurs de chargement
   chargement: boolean = false;
   erreur: string | null = null;
@@ -52,7 +55,24 @@ export class DashboardComponent implements OnInit {
 
   ngOnInit(): void {
     this.dateAujourdhui = this.formaterDate(new Date());
+    this.bannerOuverte = localStorage.getItem('dashboardBannerFerme') !== 'true';
     this.chargerToutesLesDonnees();
+  }
+
+  /**
+   * Replie la bannière "Commencer à publier" en une bande fine (préférence mémorisée)
+   */
+  fermerBanniere(): void {
+    this.bannerOuverte = false;
+    localStorage.setItem('dashboardBannerFerme', 'true');
+  }
+
+  /**
+   * Rouvre la bannière "Commencer à publier"
+   */
+  ouvrirBanniere(): void {
+    this.bannerOuverte = true;
+    localStorage.setItem('dashboardBannerFerme', 'false');
   }
 
   /**

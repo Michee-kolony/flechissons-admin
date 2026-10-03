@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import { ActivatedRoute } from '@angular/router';
 
 export interface Requete {
   _id: string;
@@ -30,7 +31,7 @@ export class RequetesComponent implements OnInit {
   
   // Pagination
   pageActuelle: number = 1;
-  itemsParPage: number = 5;
+  itemsParPage: number = 15;
   totalPages: number = 0;
   
   // Indicateurs de chargement
@@ -42,10 +43,42 @@ export class RequetesComponent implements OnInit {
   modalSuppressionOuverte: boolean = false;
   suppressionEnCours: boolean = false;
 
-  constructor(private http: HttpClient) {}
+  // Requête actuellement affichée dans le panneau de détail
+  requeteSelectionnee: Requete | null = null;
+
+  // Id de la requête à ouvrir automatiquement (venant du dashboard, via ?id=...)
+  private idARevelerDepuisRoute: string | null = null;
+
+  constructor(
+    private http: HttpClient,
+    private route: ActivatedRoute
+  ) {}
 
   ngOnInit(): void {
+    this.route.queryParams.subscribe(params => {
+      this.idARevelerDepuisRoute = params['id'] || null;
+      this.appliquerSelectionDepuisRoute();
+    });
+
     this.chargerRequetes();
+  }
+
+  /**
+   * Sélectionne automatiquement la requête ciblée par le paramètre d'URL "id"
+   * (utilisé quand on arrive depuis le dashboard en cliquant sur un message)
+   */
+  appliquerSelectionDepuisRoute(): void {
+    if (!this.idARevelerDepuisRoute) return;
+
+    const requete = this.toutesLesRequetes.find(r => r._id === this.idARevelerDepuisRoute);
+    if (!requete) return;
+
+    this.requeteSelectionnee = requete;
+
+    const index = this.requetesFiltrees.findIndex(r => r._id === requete._id);
+    if (index >= 0) {
+      this.pageActuelle = Math.floor(index / this.itemsParPage) + 1;
+    }
   }
 
   /**
@@ -66,6 +99,7 @@ export class RequetesComponent implements OnInit {
         this.requetesFiltrees = [...this.toutesLesRequetes];
         this.calculerTotalPages();
         this.chargement = false;
+        this.appliquerSelectionDepuisRoute();
       },
       error: (err) => {
         console.error('Erreur lors du chargement des requêtes:', err);
@@ -123,6 +157,20 @@ export class RequetesComponent implements OnInit {
   }
 
   /**
+   * Sélectionne une requête pour l'afficher dans le panneau de détail
+   */
+  selectionnerRequete(requete: Requete): void {
+    this.requeteSelectionnee = requete;
+  }
+
+  /**
+   * Revient à la liste (vue mobile)
+   */
+  fermerDetail(): void {
+    this.requeteSelectionnee = null;
+  }
+
+  /**
    * Ouvre la modale de confirmation de suppression
    */
   ouvrirModalSuppression(requete: Requete): void {
@@ -151,19 +199,24 @@ export class RequetesComponent implements OnInit {
 
     this.http.delete(`${this.urlRequete}${this.requeteASupprimer._id}`).subscribe({
       next: () => {
+        // Si la requête supprimée était affichée dans le détail, on referme le panneau
+        if (this.requeteSelectionnee?._id === this.requeteASupprimer!._id) {
+          this.requeteSelectionnee = null;
+        }
+
         // Supprimer la requête de la liste complète
         this.toutesLesRequetes = this.toutesLesRequetes.filter(
           req => req._id !== this.requeteASupprimer!._id
         );
-        
+
         // Mettre à jour les requêtes filtrées
         this.filtrerRequetes();
-        
+
         // Vérifier si la page actuelle est vide après suppression
         if (this.requetesPage.length === 0 && this.pageActuelle > 1) {
           this.pageActuelle--;
         }
-        
+
         // Fermer la modale
         this.fermerModalSuppression();
       },
@@ -237,6 +290,27 @@ export class RequetesComponent implements OnInit {
     } else {
       return 'À l\'instant';
     }
+  }
+
+  /**
+   * Formate la date complète (ex: 3 octobre 2026 à 14:32)
+   */
+  getDateComplete(date: string): string {
+    return new Date(date).toLocaleDateString('fr-FR', {
+      day: 'numeric',
+      month: 'long',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+  }
+
+  /**
+   * Construit le lien mailto pour répondre à l'auteur de la requête
+   */
+  getLienReponse(requete: Requete): string {
+    const sujet = encodeURIComponent(`Re: ${requete.sujet}`);
+    return `mailto:${requete.email}?subject=${sujet}`;
   }
 
   /**

@@ -68,6 +68,12 @@ export class AudioComponent implements OnInit {
     datePublication: ''
   };
 
+  // =====================================================
+  // ONGLETS
+  // =====================================================
+
+  ongletActif: 'publier' | 'liste' = 'publier';
+
 
   constructor(
     private http: HttpClient
@@ -77,6 +83,15 @@ export class AudioComponent implements OnInit {
   ngOnInit(): void {
     this.setDefaultDate();
     this.getAudios();
+  }
+
+
+  // =====================================================
+  // CHANGER D'ONGLET
+  // =====================================================
+
+  changerOnglet(onglet: 'publier' | 'liste'): void {
+    this.ongletActif = onglet;
   }
 
 
@@ -373,6 +388,7 @@ export class AudioComponent implements OnInit {
 
         this.resetForm();
         this.getAudios();
+        this.ongletActif = 'liste';
       },
       error: (error) => {
         console.error('❌ Erreur publication audio :', error);
