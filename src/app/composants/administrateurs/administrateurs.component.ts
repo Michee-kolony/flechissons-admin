@@ -6,6 +6,7 @@ export interface Admin {
   _id?: string;
   nom: string;
   email: string;
+  role?: 'admin' | 'superadmin';
   date?: string;
 }
 
@@ -30,10 +31,16 @@ export class AdministrateursComponent implements OnInit {
   newAdmin = {
     nom: '',
     email: '',
-    password: ''
+    password: '',
+    role: 'admin' as 'admin' | 'superadmin'
   };
 
   confirmPassword: string = '';
+
+  // Modal de suppression
+  adminASupprimer: Admin | null = null;
+  modalSuppressionOuverte: boolean = false;
+  suppressionEnCours: boolean = false;
 
   // Toast
   toastMessage: string = '';
@@ -83,7 +90,9 @@ export class AdministrateursComponent implements OnInit {
       },
       error: (error: HttpErrorResponse) => {
         this.isLoading = false;
-        const message = error.error?.message || 'Erreur lors du chargement des administrateurs';
+        const message = error.status === 403
+          ? 'Accès réservé au superadmin'
+          : (error.error?.message || 'Erreur lors du chargement des administrateurs');
         this.showToastMessage(message, 'error');
       }
     });
@@ -103,7 +112,7 @@ export class AdministrateursComponent implements OnInit {
   }
 
   resetForm(): void {
-    this.newAdmin = { nom: '', email: '', password: '' };
+    this.newAdmin = { nom: '', email: '', password: '', role: 'admin' };
     this.confirmPassword = '';
   }
 
@@ -134,11 +143,49 @@ export class AdministrateursComponent implements OnInit {
         this.loadAdmins();
       },
       error: (error: HttpErrorResponse) => {
-        const message = error.error?.message || "Erreur lors de l'ajout de l'administrateur";
+        const message = error.status === 403
+          ? 'Accès réservé au superadmin'
+          : (error.error?.message || "Erreur lors de l'ajout de l'administrateur");
         this.showToastMessage(message, 'error');
       },
       complete: () => {
         this.isSubmitting = false;
+      }
+    });
+  }
+
+  // =====================================================
+  // SUPPRESSION
+  // =====================================================
+
+  ouvrirModalSuppression(admin: Admin): void {
+    this.adminASupprimer = admin;
+    this.modalSuppressionOuverte = true;
+  }
+
+  fermerModalSuppression(): void {
+    this.modalSuppressionOuverte = false;
+    this.adminASupprimer = null;
+    this.suppressionEnCours = false;
+  }
+
+  confirmerSuppression(): void {
+    if (!this.adminASupprimer?._id) return;
+
+    this.suppressionEnCours = true;
+
+    this.http.delete(`${this.UrlAuth}${this.adminASupprimer._id}`, { headers: this.authHeaders() }).subscribe({
+      next: () => {
+        this.showToastMessage('Administrateur supprimé avec succès', 'success');
+        this.fermerModalSuppression();
+        this.loadAdmins();
+      },
+      error: (error: HttpErrorResponse) => {
+        const message = error.status === 403
+          ? 'Accès réservé au superadmin'
+          : (error.error?.message || "Erreur lors de la suppression de l'administrateur");
+        this.showToastMessage(message, 'error');
+        this.fermerModalSuppression();
       }
     });
   }

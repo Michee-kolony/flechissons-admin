@@ -1,6 +1,7 @@
 // dashboard.component.ts
 import { Component, OnInit } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { isSuperAdmin } from '../../shared/auth.util';
 
 export interface Requete {
   _id: string;
@@ -17,6 +18,8 @@ export interface Statistiques {
   totalActualites: number;
   totalRequetes: number;
   totalRequetesPriere: number;
+  totalDonsUSD: number;
+  totalDonsCDF: number;
 }
 
 @Component({
@@ -28,6 +31,7 @@ export class DashboardComponent implements OnInit {
   private urlRequete = "https://backend-flechissons.onrender.com/requete/";
   private urlArticle = "https://backend-flechissons.onrender.com/article";
   private urlUser = "https://backend-flechissons.onrender.com/user";
+  private urlDonation = "https://backend-flechissons.onrender.com/donation";
 
   // Liste des requêtes
   toutesLesRequetes: Requete[] = [];
@@ -38,7 +42,9 @@ export class DashboardComponent implements OnInit {
     totalFideles: 0,
     totalActualites: 0,
     totalRequetes: 0,
-    totalRequetesPriere: 0
+    totalRequetesPriere: 0,
+    totalDonsUSD: 0,
+    totalDonsCDF: 0
   };
 
   // Date du jour
@@ -46,6 +52,9 @@ export class DashboardComponent implements OnInit {
 
   // Bannière "Commencer à publier" (ouverte en grand, ou repliée en bande fine)
   bannerOuverte: boolean = true;
+
+  // Les requêtes de prière sont réservées au superadmin
+  estSuperAdmin: boolean = false;
 
   // Indicateurs de chargement
   chargement: boolean = false;
@@ -56,6 +65,7 @@ export class DashboardComponent implements OnInit {
   ngOnInit(): void {
     this.dateAujourdhui = this.formaterDate(new Date());
     this.bannerOuverte = localStorage.getItem('dashboardBannerFerme') !== 'true';
+    this.estSuperAdmin = isSuperAdmin();
     this.chargerToutesLesDonnees();
   }
 
@@ -76,6 +86,14 @@ export class DashboardComponent implements OnInit {
   }
 
   /**
+   * En-têtes d'authentification (route /requete réservée au superadmin côté backend)
+   */
+  private authHeaders(): HttpHeaders {
+    const token = localStorage.getItem('adminToken');
+    return new HttpHeaders(token ? { Authorization: `Bearer ${token}` } : {});
+  }
+
+  /**
    * Charge toutes les données nécessaires
    */
   chargerToutesLesDonnees(): void {
@@ -87,9 +105,9 @@ export class DashboardComponent implements OnInit {
     this.chargement = true;
     this.erreur = null;
 
-    // Nombre de réponses attendues (3 appels)
+    // Nombre de réponses attendues (les requêtes sont réservées au superadmin)
     let reponsesRecues = 0;
-    const totalAppels = 3;
+    const totalAppels = this.estSuperAdmin ? 4 : 3;
 
     const verifierFinChargement = () => {
       reponsesRecues++;
@@ -98,22 +116,24 @@ export class DashboardComponent implements OnInit {
       }
     };
 
-    // Charger les requêtes
-    this.http.get<Requete[]>(this.urlRequete).subscribe({
-      next: (data) => {
-        this.toutesLesRequetes = data.sort((a, b) =>
-          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-        );
-        this.dernieresRequetes = this.toutesLesRequetes.slice(0, 5);
-        this.mettreAJourStatistiquesRequetes();
-        verifierFinChargement();
-      },
-      error: (err) => {
-        console.error('Erreur lors du chargement des requêtes:', err);
-        this.erreur = 'Impossible de charger les données. Veuillez réessayer.';
-        this.chargement = false;
-      }
-    });
+    // Charger les requêtes (superadmin uniquement)
+    if (this.estSuperAdmin) {
+      this.http.get<Requete[]>(this.urlRequete, { headers: this.authHeaders() }).subscribe({
+        next: (data) => {
+          this.toutesLesRequetes = data.sort((a, b) =>
+            new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+          );
+          this.dernieresRequetes = this.toutesLesRequetes.slice(0, 5);
+          this.mettreAJourStatistiquesRequetes();
+          verifierFinChargement();
+        },
+        error: (err) => {
+          console.error('Erreur lors du chargement des requêtes:', err);
+          this.erreur = 'Impossible de charger les données. Veuillez réessayer.';
+          this.chargement = false;
+        }
+      });
+    }
 
     // Charger les articles
     this.http.get<any>(this.urlArticle).subscribe({
@@ -149,6 +169,24 @@ export class DashboardComponent implements OnInit {
       },
       error: (err) => {
         console.error('Erreur lors du chargement des utilisateurs:', err);
+        verifierFinChargement();
+      }
+    });
+
+    // Charger les donations
+    this.http.get<any[]>(this.urlDonation, { headers: this.authHeaders() }).subscribe({
+      next: (data) => {
+        const donations = Array.isArray(data) ? data : [];
+        this.statistiques.totalDonsUSD = donations
+          .filter(d => d.devise === 'USD')
+          .reduce((somme, d) => somme + (d.montant || 0), 0);
+        this.statistiques.totalDonsCDF = donations
+          .filter(d => d.devise === 'CDF')
+          .reduce((somme, d) => somme + (d.montant || 0), 0);
+        verifierFinChargement();
+      },
+      error: (err) => {
+        console.error('Erreur lors du chargement des donations:', err);
         verifierFinChargement();
       }
     });
@@ -234,6 +272,22 @@ export class DashboardComponent implements OnInit {
       hash = nom.charCodeAt(i) + ((hash << 5) - hash);
     }
     return couleurs[Math.abs(hash) % couleurs.length];
+  }
+
+  /**
+   * Formate un montant selon sa devise (USD ou CDF)
+   */
+  formatMontant(montant: number, devise: 'USD' | 'CDF'): string {
+    try {
+      const locale = devise === 'CDF' ? 'fr-CD' : 'en-US';
+      return new Intl.NumberFormat(locale, {
+        style: 'currency',
+        currency: devise,
+        maximumFractionDigits: 0
+      }).format(montant || 0);
+    } catch {
+      return `${montant} ${devise}`;
+    }
   }
 
   /**

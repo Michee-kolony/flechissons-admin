@@ -78,6 +78,15 @@
               class="px-2 py-0.5 rounded-full bg-orange-50 text-orange-600 text-xs font-semibold">
           Vous
         </span>
+        <span *ngIf="admin.role === 'superadmin'"
+              class="px-2 py-0.5 rounded-full bg-purple-50 text-purple-600 text-xs font-semibold flex items-center gap-1">
+          <i class="fa-solid fa-crown text-[10px]"></i>
+          Superadmin
+        </span>
+        <span *ngIf="admin.role !== 'superadmin'"
+              class="px-2 py-0.5 rounded-full bg-gray-100 text-gray-500 text-xs font-semibold">
+          Admin
+        </span>
       </div>
       <p class="text-sm text-gray-500 truncate">
         {{ admin.email }}
@@ -87,6 +96,87 @@
     <div class="hidden sm:block text-right">
       <p class="text-xs text-gray-400">Créé le</p>
       <p class="text-sm text-gray-600 font-medium">{{ formatDate(admin.date) }}</p>
+    </div>
+
+    <!-- Supprimer (impossible sur son propre compte) -->
+    <button
+      *ngIf="admin.email !== currentAdminEmail"
+      type="button"
+      (click)="ouvrirModalSuppression(admin)"
+      title="Supprimer cet administrateur"
+      class="w-10 h-10 min-w-[40px] rounded-xl bg-red-50 text-red-500
+             hover:bg-red-100 hover:text-red-600 transition
+             flex items-center justify-center">
+      <i class="fa-solid fa-trash-can"></i>
+    </button>
+
+  </div>
+
+</div>
+
+<!-- ======================================================= -->
+<!-- MODAL CONFIRMATION SUPPRESSION                           -->
+<!-- ======================================================= -->
+
+<div
+  *ngIf="modalSuppressionOuverte"
+  class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm"
+  (click)="!suppressionEnCours && fermerModalSuppression()">
+
+  <div
+    class="relative w-full max-w-md rounded-3xl bg-white shadow-2xl"
+    (click)="$event.stopPropagation()">
+
+    <div class="p-6">
+
+      <div class="flex justify-center mb-4">
+        <div class="w-16 h-16 rounded-full bg-red-100 flex items-center justify-center">
+          <i class="fa-solid fa-triangle-exclamation text-2xl text-red-600"></i>
+        </div>
+      </div>
+
+      <h3 class="text-xl font-bold text-gray-900 text-center mb-2">
+        Confirmer la suppression
+      </h3>
+
+      <p class="text-sm text-gray-600 text-center mb-6">
+        Êtes-vous sûr de vouloir supprimer l'administrateur
+        <span class="font-semibold text-gray-900">{{ adminASupprimer?.nom }}</span> ?
+        <br>
+        <span class="text-gray-500 text-xs">Cette action est irréversible.</span>
+      </p>
+
+      <div class="flex flex-col sm:flex-row gap-3">
+
+        <button
+          type="button"
+          (click)="fermerModalSuppression()"
+          [disabled]="suppressionEnCours"
+          class="flex-1 px-4 py-2.5 rounded-xl border border-gray-200 text-gray-700 font-medium
+                 hover:bg-gray-50 transition disabled:opacity-50 disabled:cursor-not-allowed">
+          Annuler
+        </button>
+
+        <button
+          type="button"
+          (click)="confirmerSuppression()"
+          [disabled]="suppressionEnCours"
+          class="flex-1 px-4 py-2.5 rounded-xl bg-red-600 text-white font-medium
+                 hover:bg-red-700 transition flex items-center justify-center gap-2
+                 disabled:opacity-50 disabled:cursor-not-allowed">
+
+          <svg *ngIf="suppressionEnCours" class="animate-spin h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+          </svg>
+
+          <span *ngIf="!suppressionEnCours">Supprimer</span>
+          <span *ngIf="suppressionEnCours">Suppression...</span>
+
+        </button>
+
+      </div>
+
     </div>
 
   </div>
@@ -171,6 +261,30 @@
                  focus:ring-orange-500/10 transition
                  disabled:opacity-60 disabled:cursor-not-allowed"
           required>
+      </div>
+
+      <div>
+        <label for="role" class="block text-sm font-medium text-gray-700 mb-2">
+          Rôle
+        </label>
+        <select
+          id="role"
+          [(ngModel)]="newAdmin.role"
+          name="role"
+          [disabled]="isSubmitting"
+          class="w-full h-12 px-4 rounded-xl
+                 border border-gray-200 bg-gray-50
+                 text-gray-800
+                 outline-none focus:bg-white
+                 focus:border-orange-500 focus:ring-4
+                 focus:ring-orange-500/10 transition
+                 disabled:opacity-60 disabled:cursor-not-allowed">
+          <option value="admin">Administrateur</option>
+          <option value="superadmin">Superadmin</option>
+        </select>
+        <p class="text-xs text-gray-400 mt-1.5">
+          Le superadmin est seul à pouvoir consulter les requêtes de prière et gérer les administrateurs.
+        </p>
       </div>
 
       <div>

@@ -266,10 +266,42 @@
 
 
     <!-- ===================================================== -->
+    <!-- DONATIONS                                                -->
+    <!-- ===================================================== -->
+
+    <a
+      routerLink="/admin/donations"
+      (click)="closeMobileMenu()"
+      routerLinkActive
+      #rlaDonations="routerLinkActive"
+      [ngClass]="rlaDonations.isActive ? 'bg-white text-orange-600 font-semibold' : 'text-white/90 hover:bg-white/10'"
+      class="flex items-center gap-3
+             px-3 py-2.5 mb-1
+             rounded-lg
+             text-decoration-none
+             text-sm
+             transition-all duration-150">
+
+      <i class="fa-solid fa-hand-holding-heart text-[15px] w-5 text-center flex-shrink-0"></i>
+
+      <span
+        *ngIf="afficherLabels"
+        class="whitespace-nowrap">
+
+        Donations
+
+      </span>
+
+    </a>
+
+
+
+    <!-- ===================================================== -->
     <!-- REQUÊTES DE PRIÈRE                                      -->
     <!-- ===================================================== -->
 
     <a
+      *ngIf="estSuperAdmin"
       routerLink="/admin/requetes-de-priere"
       (click)="closeMobileMenu()"
       routerLinkActive
@@ -301,6 +333,7 @@
     <!-- ===================================================== -->
 
     <a
+      *ngIf="estSuperAdmin"
       routerLink="/admin/administrateurs"
       (click)="closeMobileMenu()"
       routerLinkActive

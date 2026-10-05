@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
 import { ActivatedRoute } from '@angular/router';
 
 export interface Requete {
@@ -64,6 +64,14 @@ export class RequetesComponent implements OnInit {
   }
 
   /**
+   * En-têtes d'authentification (routes réservées au superadmin côté backend)
+   */
+  private authHeaders(): HttpHeaders {
+    const token = localStorage.getItem('adminToken');
+    return new HttpHeaders(token ? { Authorization: `Bearer ${token}` } : {});
+  }
+
+  /**
    * Sélectionne automatiquement la requête ciblée par le paramètre d'URL "id"
    * (utilisé quand on arrive depuis le dashboard en cliquant sur un message)
    */
@@ -88,22 +96,24 @@ export class RequetesComponent implements OnInit {
     this.chargement = true;
     this.erreur = null;
 
-    this.http.get<Requete[]>(this.urlRequete).subscribe({
+    this.http.get<Requete[]>(this.urlRequete, { headers: this.authHeaders() }).subscribe({
       next: (data) => {
         // Trier par date décroissante (plus récent en premier)
-        this.toutesLesRequetes = data.sort((a, b) => 
+        this.toutesLesRequetes = data.sort((a, b) =>
           new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
         );
-        
+
         // Initialiser les requêtes filtrées
         this.requetesFiltrees = [...this.toutesLesRequetes];
         this.calculerTotalPages();
         this.chargement = false;
         this.appliquerSelectionDepuisRoute();
       },
-      error: (err) => {
+      error: (err: HttpErrorResponse) => {
         console.error('Erreur lors du chargement des requêtes:', err);
-        this.erreur = 'Impossible de charger les requêtes. Veuillez réessayer.';
+        this.erreur = err.status === 403
+          ? 'Accès réservé au superadmin.'
+          : 'Impossible de charger les requêtes. Veuillez réessayer.';
         this.chargement = false;
       }
     });
@@ -197,7 +207,7 @@ export class RequetesComponent implements OnInit {
 
     this.suppressionEnCours = true;
 
-    this.http.delete(`${this.urlRequete}${this.requeteASupprimer._id}`).subscribe({
+    this.http.delete(`${this.urlRequete}${this.requeteASupprimer._id}`, { headers: this.authHeaders() }).subscribe({
       next: () => {
         // Si la requête supprimée était affichée dans le détail, on referme le panneau
         if (this.requeteSelectionnee?._id === this.requeteASupprimer!._id) {

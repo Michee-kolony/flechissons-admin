@@ -158,7 +158,9 @@
 </div>
 
 <!-- STATISTIQUES -->
-<div *ngIf="!chargement && !erreur" class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-3 mb-5">
+<div *ngIf="!chargement && !erreur"
+     class="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-5"
+     [ngClass]="estSuperAdmin ? 'xl:grid-cols-4' : 'xl:grid-cols-3'">
 
   <!-- FIDÈLES -->
   <div class="bg-white rounded-xl border border-gray-100 shadow-sm p-4 flex items-center gap-3 hover:shadow-md transition-shadow duration-200">
@@ -184,8 +186,8 @@
     </div>
   </div>
 
-  <!-- REQUÊTES -->
-  <div class="bg-white rounded-xl border border-gray-100 shadow-sm p-4 flex items-center gap-3 hover:shadow-md transition-shadow duration-200">
+  <!-- REQUÊTES (superadmin uniquement) -->
+  <div *ngIf="estSuperAdmin" class="bg-white rounded-xl border border-gray-100 shadow-sm p-4 flex items-center gap-3 hover:shadow-md transition-shadow duration-200">
     <div class="w-12 h-12 rounded-full bg-orange-50 border-4 border-orange-600 flex items-center justify-center flex-shrink-0">
       <i class="fa-solid fa-envelope text-orange-700 text-sm"></i>
     </div>
@@ -197,16 +199,17 @@
   </div>
 
   <!-- DONATIONS -->
-  <div class="bg-white rounded-xl border border-gray-100 shadow-sm p-4 flex items-center gap-3 hover:shadow-md transition-shadow duration-200">
+  <a routerLink="/admin/donations"
+     class="bg-white rounded-xl border border-gray-100 shadow-sm p-4 flex items-center gap-3 hover:shadow-md transition-shadow duration-200">
     <div class="w-12 h-12 rounded-full bg-orange-50 border-4 border-orange-400 flex items-center justify-center flex-shrink-0">
       <i class="fa-solid fa-hand-holding-heart text-orange-500 text-sm"></i>
     </div>
     <div class="min-w-0">
       <p class="text-[11px] text-gray-400">Donations</p>
-      <p class="text-xl font-bold text-gray-900">$30,000</p>
-      <p class="text-[10px] text-gray-400">Au total</p>
+      <p class="text-base font-bold text-gray-900 truncate">{{ formatMontant(statistiques.totalDonsUSD, 'USD') }}</p>
+      <p class="text-[10px] text-gray-400 truncate">{{ formatMontant(statistiques.totalDonsCDF, 'CDF') }}</p>
     </div>
-  </div>
+  </a>
 
 </div>
 
@@ -214,7 +217,8 @@
 <div *ngIf="!chargement && !erreur" class="grid grid-cols-1 xl:grid-cols-3 gap-4">
 
   <!-- GRAPHIQUE -->
-  <div class="xl:col-span-2 bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden min-w-0">
+  <div class="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden min-w-0"
+       [ngClass]="estSuperAdmin ? 'xl:col-span-2' : 'xl:col-span-3'">
 
     <!-- HEADER GRAPHIQUE -->
     <div class="px-4 sm:px-5 py-3.5 border-b border-gray-100 flex items-center justify-between gap-3">
@@ -236,8 +240,8 @@
 
   </div>
 
-  <!-- REQUÊTES DE PRIÈRE -->
-  <div class="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden min-w-0">
+  <!-- REQUÊTES DE PRIÈRE (superadmin uniquement) -->
+  <div *ngIf="estSuperAdmin" class="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden min-w-0">
 
     <!-- HEADER -->
     <div class="px-4 py-3.5 border-b border-gray-100 flex items-center justify-between gap-3">
@@ -286,8 +290,8 @@
 
 </div>
 
-<!-- GRAPHIQUE : REQUÊTES PAR MOIS ET PAR ANNÉE -->
-<div *ngIf="!chargement && !erreur" class="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden min-w-0 mt-4">
+<!-- GRAPHIQUE : REQUÊTES PAR MOIS ET PAR ANNÉE (superadmin uniquement) -->
+<div *ngIf="!chargement && !erreur && estSuperAdmin" class="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden min-w-0 mt-4">
 
   <!-- HEADER -->
   <div class="px-4 sm:px-5 py-3.5 border-b border-gray-100 flex items-center justify-between gap-3">

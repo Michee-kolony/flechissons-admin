@@ -12,6 +12,7 @@ import { GestionComponent } from './composants/gestion/gestion.component';
 import { RequetesComponent } from './composants/requetes/requetes.component';
 import { AdministrateursComponent } from './composants/administrateurs/administrateurs.component';
 import { RequetesChartComponent } from './composants/requetes-chart/requetes-chart.component';
+import { DonationsComponent } from './composants/donations/donations.component';
 
 import { HttpClientModule } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
@@ -31,7 +32,8 @@ import { AudioComponent } from './composants/audio/audio.component';
     DetailsarticlesComponent,
     AudioComponent,
     AdministrateursComponent,
-    RequetesChartComponent
+    RequetesChartComponent,
+    DonationsComponent
   ],
 
   imports: [

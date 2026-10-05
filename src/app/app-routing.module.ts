@@ -9,6 +9,8 @@ import { AdministrateursComponent } from './composants/administrateurs/administr
 import { RequetesComponent } from './composants/requetes/requetes.component';
 import { DetailsarticlesComponent } from './composants/detailsarticles/detailsarticles.component';
 import { AudioComponent } from './composants/audio/audio.component';
+import { DonationsComponent } from './composants/donations/donations.component';
+import { superAdminGuard } from './guards/super-admin.guard';
 
 const routes: Routes = [
   {path:'', redirectTo: 'login', pathMatch: 'full'},
@@ -19,10 +21,11 @@ const routes: Routes = [
       {path:'dashboard', component: DashboardComponent},
       {path:'publier', component: PublierComponent},
       {path:'gestion', component: GestionComponent},
-      {path:'requetes-de-priere', component: RequetesComponent},
+      {path:'requetes-de-priere', component: RequetesComponent, canActivate: [superAdminGuard]},
       {path:'detailsarticles/:id', component: DetailsarticlesComponent},
       {path:'audios', component: AudioComponent},
-      {path:'administrateurs', component: AdministrateursComponent}
+      {path:'donations', component: DonationsComponent},
+      {path:'administrateurs', component: AdministrateursComponent, canActivate: [superAdminGuard]}
     ]
   }
 ];

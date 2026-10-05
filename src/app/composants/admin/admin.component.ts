@@ -1,6 +1,7 @@
 // admin.component.ts
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
+import { isSuperAdmin } from '../../shared/auth.util';
 
 @Component({
   selector: 'app-admin',
@@ -18,12 +19,14 @@ export class AdminComponent implements OnInit {
   adminData: any = null;
   adminName: string = '';
   adminEmail: string = '';
+  estSuperAdmin: boolean = false;
 
   constructor(private router: Router) {}
 
   ngOnInit(): void {
     // Récupérer les données de l'administrateur depuis localStorage
     this.loadAdminData();
+    this.estSuperAdmin = isSuperAdmin();
   }
 
   loadAdminData(): void {
