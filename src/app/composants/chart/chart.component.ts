@@ -18,7 +18,7 @@ interface User {
 export class ChartComponent implements AfterViewInit, OnDestroy {
 
   private chart?: Chart;
-  private urlUser = "https://backend-flechissons.onrender.com/user";
+  private urlUser = "https://flechissons.com/user";
   
   // Statistiques des utilisateurs
   hommes: number = 0;

@@ -28,10 +28,10 @@ export interface Statistiques {
   styleUrl: './dashboard.component.css'
 })
 export class DashboardComponent implements OnInit {
-  private urlRequete = "https://backend-flechissons.onrender.com/requete/";
-  private urlArticle = "https://backend-flechissons.onrender.com/article";
-  private urlUser = "https://backend-flechissons.onrender.com/user";
-  private urlDonation = "https://backend-flechissons.onrender.com/donation";
+  private urlRequete = "https://flechissons.com/requete/";
+  private urlArticle = "https://flechissons.com/article";
+  private urlUser = "https://flechissons.com/user";
+  private urlDonation = "https://flechissons.com/donation";
 
   // Liste des requêtes
   toutesLesRequetes: Requete[] = [];

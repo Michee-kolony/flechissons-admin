@@ -21,7 +21,7 @@ export interface Donation {
 })
 export class DonationsComponent implements OnInit {
 
-  private urlDonation = "https://backend-flechissons.onrender.com/donation";
+  private urlDonation = "https://flechissons.com/donation";
 
   donations: Donation[] = [];
   donationsFiltrees: Donation[] = [];

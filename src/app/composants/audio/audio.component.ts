@@ -20,7 +20,7 @@ interface AudioModel {
 })
 export class AudioComponent implements OnInit {
 
-  private urlAudio = 'https://backend-flechissons.onrender.com/audio';
+  private urlAudio = 'https://flechissons.com/audio';
 
   audios: AudioModel[] = [];
   audiosFiltres: AudioModel[] = [];

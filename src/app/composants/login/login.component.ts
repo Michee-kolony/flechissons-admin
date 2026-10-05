@@ -10,7 +10,7 @@ import { HttpClient } from '@angular/common/http';
 })
 export class LoginComponent {
 
-  private Urllogin = "https://backend-flechissons.onrender.com/auth/login";
+  private Urllogin = "https://flechissons.com/auth/login";
 
   loginData = {
     email: '',

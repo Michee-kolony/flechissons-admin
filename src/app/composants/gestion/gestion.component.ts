@@ -28,7 +28,7 @@ export interface Article {
 })
 export class GestionComponent implements OnInit {
 
-  private urlArticle = "https://backend-flechissons.onrender.com/article";
+  private urlArticle = "https://flechissons.com/article";
 
   articles: Article[] = [];
   filteredArticles: Article[] = [];

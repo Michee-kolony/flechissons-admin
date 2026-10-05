@@ -17,8 +17,8 @@ export interface Admin {
 })
 export class AdministrateursComponent implements OnInit {
 
-  private UrlAuth = "https://backend-flechissons.onrender.com/auth/";
-  private UrlRegister = "https://backend-flechissons.onrender.com/auth/register";
+  private UrlAuth = "https://flechissons.com/auth/";
+  private UrlRegister = "https://flechissons.com/auth/register";
 
   admins: Admin[] = [];
   isLoading: boolean = true;

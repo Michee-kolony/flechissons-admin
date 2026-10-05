@@ -36,7 +36,7 @@ export interface Article {
 })
 export class DetailsarticlesComponent implements OnInit {
 
-  private urlArticle = "https://backend-flechissons.onrender.com/article";
+  private urlArticle = "https://flechissons.com/article";
 
   article: Article | null = null;
   isLoading: boolean = true;

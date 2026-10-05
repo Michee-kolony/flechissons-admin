@@ -18,7 +18,7 @@ export interface Requete {
   styleUrl: './requetes.component.css'
 })
 export class RequetesComponent implements OnInit {
-  private urlRequete = "https://backend-flechissons.onrender.com/requete/";
+  private urlRequete = "https://flechissons.com/requete/";
   
   // Liste complète des requêtes
   toutesLesRequetes: Requete[] = [];

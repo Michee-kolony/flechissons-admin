@@ -10,7 +10,7 @@ import { Router } from '@angular/router';
 })
 export class PublierComponent {
 
-  private urlArticle = "https://backend-flechissons.onrender.com/article";
+  private urlArticle = "https://flechissons.com/article";
 
   // Données du formulaire
   articleData = {
