@@ -3,6 +3,16 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 
+export interface Commentaire {
+  _id: string;
+  utilisateurId: string;
+  nom: string;
+  prenom: string;
+  photo: string | null;
+  contenu: string;
+  createdAt: string;
+}
+
 export interface Article {
   _id: string;
   titre: string;
@@ -13,7 +23,7 @@ export interface Article {
   images: string[];
   lien: string | null;
   likes: string[];
-  commentaires: any[];
+  commentaires: Commentaire[];
   createdAt: string;
   updatedAt: string;
   __v: number;
@@ -246,6 +256,48 @@ export class DetailsarticlesComponent implements OnInit {
       return this.article.images.length;
     }
     return 0;
+  }
+
+  /**
+   * Commentaires triés du plus récent au plus ancien
+   */
+  get commentairesTries(): Commentaire[] {
+    if (!this.article?.commentaires) return [];
+    return [...this.article.commentaires].sort((a, b) =>
+      new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+    );
+  }
+
+  getCommentInitials(nom: string, prenom?: string): string {
+    const n = (nom || '').trim();
+    const p = (prenom || '').trim();
+    if (p && n) return (p.charAt(0) + n.charAt(0)).toUpperCase();
+    if (n) return n.substring(0, 2).toUpperCase();
+    return '?';
+  }
+
+  getCommentAvatarColor(nom: string): string {
+    const couleurs = [
+      'bg-orange-100 text-orange-600',
+      'bg-blue-100 text-blue-600',
+      'bg-purple-100 text-purple-600',
+      'bg-green-100 text-green-600',
+      'bg-pink-100 text-pink-600',
+      'bg-indigo-100 text-indigo-600',
+      'bg-teal-100 text-teal-600',
+      'bg-cyan-100 text-cyan-600'
+    ];
+
+    let hash = 0;
+    const texte = nom || '?';
+    for (let i = 0; i < texte.length; i++) {
+      hash = texte.charCodeAt(i) + ((hash << 5) - hash);
+    }
+    return couleurs[Math.abs(hash) % couleurs.length];
+  }
+
+  onCommentPhotoError(event: any): void {
+    event.target.style.display = 'none';
   }
 
   onImageError(event: any): void {

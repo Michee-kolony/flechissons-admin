@@ -213,6 +213,65 @@
       </div>
     </div>
 
+    <!-- ======================================================= -->
+    <!-- COMMENTAIRES                                             -->
+    <!-- ======================================================= -->
+
+    <div class="mt-6 bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+
+      <div class="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
+        <h3 class="text-sm font-semibold text-gray-700">
+          <i class="fa-regular fa-comments mr-2 text-blue-500"></i>
+          Commentaires
+        </h3>
+        <span class="px-2.5 py-1 rounded-full bg-blue-50 text-blue-600 text-xs font-semibold">
+          {{ article.commentaires ? article.commentaires.length : 0 }}
+        </span>
+      </div>
+
+      <!-- Aucun commentaire -->
+      <div *ngIf="!article.commentaires || article.commentaires.length === 0" class="p-10 text-center">
+        <i class="fa-regular fa-comment-dots text-4xl text-gray-300 mb-3"></i>
+        <p class="text-gray-500 text-sm">Aucun commentaire pour le moment.</p>
+      </div>
+
+      <!-- Liste des commentaires -->
+      <div *ngIf="article.commentaires && article.commentaires.length > 0" class="divide-y divide-gray-100 max-h-[500px] overflow-y-auto">
+
+        <div *ngFor="let commentaire of commentairesTries" class="p-4 sm:p-5 flex gap-3 hover:bg-gray-50/60 transition">
+
+          <!-- AVATAR -->
+          <div class="relative w-10 h-10 min-w-[40px] rounded-full flex-shrink-0 flex items-center justify-center font-bold text-xs"
+               [class]="getCommentAvatarColor(commentaire.nom)">
+            {{ getCommentInitials(commentaire.nom, commentaire.prenom) }}
+            <img *ngIf="commentaire.photo"
+                 [src]="commentaire.photo"
+                 [alt]="commentaire.nom"
+                 (error)="onCommentPhotoError($event)"
+                 class="absolute inset-0 w-full h-full rounded-full object-cover">
+          </div>
+
+          <!-- CONTENU -->
+          <div class="min-w-0 flex-1">
+            <div class="flex items-start justify-between gap-2">
+              <p class="font-semibold text-sm text-gray-800 truncate">
+                {{ commentaire.prenom }} {{ commentaire.nom }}
+              </p>
+              <span class="text-xs text-gray-400 whitespace-nowrap flex-shrink-0">
+                {{ getTimeAgo(commentaire.createdAt) }}
+              </span>
+            </div>
+            <p class="text-sm text-gray-600 mt-1 whitespace-pre-wrap leading-relaxed">
+              {{ commentaire.contenu }}
+            </p>
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
   </div>
 
   <!-- MODALE DE SUPPRESSION -->
