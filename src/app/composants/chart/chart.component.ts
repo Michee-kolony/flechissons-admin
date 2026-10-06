@@ -108,10 +108,10 @@ export class ChartComponent implements AfterViewInit, OnDestroy {
     const backgroundColors: string[] = [];
     const hoverBackgroundColors: string[] = [];
 
-    // Ajouter les hommes si > 0 ou si c'est la seule catégorie
-    if (this.hommes > 0 || (this.hommes === 0 && this.femmes === 0 && this.nonPrecise === 0)) {
+    // Ajouter les hommes
+    if (this.hommes > 0) {
       labels.push('Hommes');
-      data.push(this.hommes > 0 ? this.hommes : 0);
+      data.push(this.hommes);
       backgroundColors.push('#F97316');
       hoverBackgroundColors.push('#EA580C');
     }
@@ -132,8 +132,9 @@ export class ChartComponent implements AfterViewInit, OnDestroy {
       hoverBackgroundColors.push('#64748B');
     }
 
-    // Si aucune donnée, afficher un message
-    if (data.length === 0 || data.every(v => v === 0)) {
+    // Si aucune donnée, afficher un anneau gris (la valeur 1 sert uniquement au dessin)
+    const vide = this.total === 0;
+    if (vide) {
       labels.push('Aucune donnée');
       data.push(1);
       backgroundColors.push('#E5E7EB');
@@ -186,6 +187,7 @@ export class ChartComponent implements AfterViewInit, OnDestroy {
             displayColors: true,
             callbacks: {
               label: function(context) {
+                if (vide) return ' 0 utilisateur';
                 const value = context.raw as number;
                 const total = (context.dataset.data as number[]).reduce((a, b) => a + b, 0);
                 const percentage = total > 0 ? ((value / total) * 100).toFixed(1) : 0;
@@ -198,11 +200,11 @@ export class ChartComponent implements AfterViewInit, OnDestroy {
       plugins: [
         {
           id: 'centerText',
-          beforeDraw(chart) {
+          beforeDraw: (chart) => {
             const { ctx, chartArea } = chart;
             if (!chartArea) return;
 
-            const total = (chart.data.datasets[0].data as number[]).reduce((a, b) => a + b, 0);
+            const total = this.total;
             const centerX = (chartArea.left + chartArea.right) / 2;
             const centerY = (chartArea.top + chartArea.bottom) / 2;
 

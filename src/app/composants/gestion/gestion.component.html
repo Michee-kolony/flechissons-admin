@@ -134,8 +134,8 @@
       <!-- IMAGE ou VIDEO -->
       <div class="relative w-full h-36 flex-shrink-0 bg-gray-100 overflow-hidden group">
 
-        <!-- Si une vidéo est présente (videoUrl ou youtube) -->
-        <div *ngIf="hasVideo(article); else imageBlock" class="relative w-full h-full bg-black">
+        <!-- Vidéo seulement si aucune image (sinon la photo de couverture est prioritaire) -->
+        <div *ngIf="hasVideo(article) && !hasImages(article); else imageBlock" class="relative w-full h-full bg-black">
           <video
             [src]="getVideoUrl(article)"
             controls
@@ -246,7 +246,7 @@
         </span>
 
         <!-- NOMBRE D'IMAGES -->
-        <span *ngIf="hasImages(article) && !hasVideo(article)"
+        <span *ngIf="hasImages(article)"
               class="absolute bottom-2 left-2 inline-flex items-center gap-1 px-2 py-1 rounded-full
                      bg-black/60 text-white text-[10px] font-medium backdrop-blur-sm">
           <i class="fa-solid fa-images text-[10px]"></i>

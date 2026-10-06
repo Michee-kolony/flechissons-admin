@@ -1,7 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
-import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 
 export interface Commentaire {
   _id: string;
@@ -20,6 +19,7 @@ export interface Article {
   type: string;
   theme: string;
   youtube: string | null;
+  videoUrl: string | null;
   images: string[];
   lien: string | null;
   likes: string[];
@@ -54,8 +54,7 @@ export class DetailsarticlesComponent implements OnInit {
   constructor(
     private route: ActivatedRoute,
     private http: HttpClient,
-    private router: Router,
-    private sanitizer: DomSanitizer
+    private router: Router
   ) {}
 
   ngOnInit(): void {
@@ -156,26 +155,12 @@ export class DetailsarticlesComponent implements OnInit {
     this.currentImageIndex = index;
   }
 
-  getYoutubeId(url: string | null): string {
-    if (!url) return '';
-    
-    const patterns = [
-      /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([^?&]+)/
-    ];
-    
-    for (const pattern of patterns) {
-      const match = url.match(pattern);
-      if (match && match[1]) {
-        return match[1];
-      }
-    }
-    
-    return url;
+  hasVideo(): boolean {
+    return !!(this.article?.videoUrl || this.article?.youtube);
   }
 
-  getSafeYoutubeUrl(url: string | null): SafeResourceUrl {
-    const videoId = this.getYoutubeId(url);
-    return this.sanitizer.bypassSecurityTrustResourceUrl(`https://www.youtube.com/embed/${videoId}`);
+  getVideoUrl(): string | null {
+    return this.article?.videoUrl || this.article?.youtube || null;
   }
 
   getTypeLabel(type: string): string {

@@ -40,18 +40,18 @@
       <!-- IMAGE / VIDEO -->
       <div class="relative w-full bg-gray-100" style="min-height: 300px; max-height: 500px;">
 
-        <!-- YOUTUBE -->
-        <div *ngIf="article.youtube; else imageDisplay" class="w-full h-full" style="min-height: 300px;">
-          <iframe 
-            [src]="getSafeYoutubeUrl(article.youtube)" 
-            class="w-full h-full" 
-            style="min-height: 300px;" 
-            frameborder="0" 
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
-            allowfullscreen
-            loading="lazy"
-            title="Vidéo YouTube: {{ article.titre }}">
-          </iframe>
+        <!-- VIDEO (Cloudflare) -->
+        <div *ngIf="hasVideo(); else imageDisplay" class="w-full h-full bg-black" style="min-height: 300px;">
+          <video
+            [src]="getVideoUrl()"
+            controls
+            controlsList="nodownload"
+            playsinline
+            preload="metadata"
+            class="w-full h-full object-contain"
+            style="min-height: 300px; max-height: 500px;">
+            Votre navigateur ne supporte pas la lecture de vidéos.
+          </video>
         </div>
 
         <!-- IMAGES -->
@@ -151,12 +151,12 @@
 
         <!-- Liens -->
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-          <div *ngIf="article.youtube" class="p-4 bg-gray-50 rounded-xl border border-gray-100">
+          <div *ngIf="hasVideo()" class="p-4 bg-gray-50 rounded-xl border border-gray-100">
             <p class="text-xs text-gray-500 font-medium uppercase tracking-wider mb-1">
-              <i class="fa-brands fa-youtube text-red-500 mr-1"></i>
-              YouTube
+              <i class="fa-solid fa-video text-red-500 mr-1"></i>
+              Vidéo
             </p>
-            <a [href]="article.youtube" target="_blank" class="text-orange-600 hover:text-orange-700 hover:underline break-all text-sm">{{ article.youtube }}</a>
+            <a [href]="getVideoUrl()" target="_blank" class="text-orange-600 hover:text-orange-700 hover:underline break-all text-sm">{{ getVideoUrl() }}</a>
           </div>
           <div *ngIf="article.lien" class="p-4 bg-gray-50 rounded-xl border border-gray-100">
             <p class="text-xs text-gray-500 font-medium uppercase tracking-wider mb-1">
@@ -182,8 +182,8 @@
             <p class="text-xs text-gray-500"><i class="fa-regular fa-image mr-1"></i>Images</p>
           </div>
           <div class="text-center">
-            <p class="text-2xl font-bold text-purple-600">{{ article.youtube ? '✅' : '❌' }}</p>
-            <p class="text-xs text-gray-500"><i class="fa-brands fa-youtube mr-1"></i>Vidéo</p>
+            <p class="text-2xl font-bold text-purple-600">{{ hasVideo() ? '✅' : '❌' }}</p>
+            <p class="text-xs text-gray-500"><i class="fa-solid fa-video mr-1"></i>Vidéo</p>
           </div>
         </div>
 
