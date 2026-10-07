@@ -205,8 +205,13 @@ export class AudioComponent implements OnInit {
 
     const file = input.files[0];
 
-    if (!file.type.startsWith('image/')) {
-      this.errorMessage = 'Veuillez sélectionner une image valide.';
+    // Tous les formats image sauf GIF et SVG (mêmes règles que le backend)
+    const extension = file.name.split('.').pop()?.toLowerCase() || '';
+    const formatsAcceptes = ['jpg', 'jpeg', 'jfif', 'pjpeg', 'pjp', 'png', 'webp', 'avif', 'heic', 'heif', 'bmp', 'tif', 'tiff', 'jxl'];
+
+    if (!formatsAcceptes.includes(extension) || file.type === 'image/gif' || file.type === 'image/svg+xml') {
+      this.errorMessage = 'Format non autorisé. Utilisez JPG, PNG, WEBP, AVIF, HEIC, BMP, TIFF ou JXL (GIF et SVG refusés).';
+      input.value = '';
       return;
     }
 
