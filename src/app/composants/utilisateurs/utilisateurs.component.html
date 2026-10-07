@@ -1,0 +1,213 @@
+<!-- utilisateurs.component.html -->
+<div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+
+  <div>
+    <h1 class="text-2xl sm:text-3xl font-bold text-gray-800">
+      Utilisateurs
+    </h1>
+    <p class="text-gray-500 mt-1">
+      Tous les fidèles inscrits sur l'application Fléchissons.
+    </p>
+  </div>
+
+  <button
+    (click)="chargerUtilisateurs()"
+    [disabled]="isLoading"
+    class="flex items-center gap-2 px-4 py-2.5
+           bg-orange-50 text-orange-600 rounded-xl
+           hover:bg-orange-100 transition font-medium
+           disabled:opacity-60 disabled:cursor-not-allowed">
+    <i class="fa-solid fa-rotate" [class.fa-spin]="isLoading"></i>
+    Actualiser
+  </button>
+
+</div>
+
+<!-- ======================================================= -->
+<!-- TOTAL + RÉPARTITION PAR SEXE                             -->
+<!-- ======================================================= -->
+
+<div class="grid grid-cols-2 lg:grid-cols-5 gap-3 mt-6">
+
+  <!-- TOTAL -->
+  <div class="col-span-2 lg:col-span-1 relative overflow-hidden rounded-xl bg-gradient-to-br from-orange-500 to-orange-700 text-white p-4 shadow-sm">
+    <div class="absolute -top-6 -right-6 w-20 h-20 bg-white/10 rounded-full blur-xl pointer-events-none"></div>
+    <div class="relative flex items-center gap-3">
+      <div class="w-10 h-10 rounded-lg bg-white/15 flex items-center justify-center flex-shrink-0">
+        <i class="fa-solid fa-users text-sm"></i>
+      </div>
+      <div class="min-w-0">
+        <p class="text-[11px] text-orange-50/80">Utilisateurs inscrits</p>
+        <p class="text-lg font-bold">{{ utilisateurs.length | number }}</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- PAR SEXE (cliquable pour filtrer) -->
+  <button
+    *ngFor="let s of sexes"
+    type="button"
+    (click)="basculerSexe(s.valeur)"
+    class="rounded-xl border bg-white shadow-sm p-3 text-left transition"
+    [ngClass]="sexeFiltre === s.valeur ? 'border-orange-400 ring-2 ring-orange-500/10' : 'border-gray-100 hover:border-gray-200'">
+    <div class="flex items-center gap-2">
+      <span class="w-8 h-8 rounded-lg flex items-center justify-center text-xs flex-shrink-0" [ngClass]="s.classe">
+        <i class="fa-solid" [ngClass]="s.icone"></i>
+      </span>
+      <div class="min-w-0">
+        <p class="text-[11px] text-gray-400 truncate">{{ s.libelle }}</p>
+        <p class="text-base font-bold text-gray-900">{{ compteursSexe[s.valeur] | number }}</p>
+      </div>
+    </div>
+  </button>
+
+</div>
+
+<!-- ======================================================= -->
+<!-- RECHERCHE + FILTRES                                      -->
+<!-- ======================================================= -->
+
+<div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-4 mt-6">
+
+  <div class="flex flex-col md:flex-row gap-3">
+
+    <div class="relative flex-1">
+      <i class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
+      <input
+        type="text"
+        [(ngModel)]="recherche"
+        (ngModelChange)="filtrer()"
+        placeholder="Rechercher par nom, prénom, e-mail, téléphone ou ville..."
+        class="w-full h-12 pl-11 pr-4 rounded-xl
+               border border-gray-200 bg-gray-50
+               text-gray-800 placeholder-gray-400
+               outline-none focus:bg-white
+               focus:border-orange-500 focus:ring-4
+               focus:ring-orange-500/10 transition">
+    </div>
+
+    <select [(ngModel)]="sexeFiltre" (ngModelChange)="filtrer()"
+            class="h-12 px-3 rounded-xl border border-gray-200 bg-gray-50 text-gray-700 text-sm outline-none focus:bg-white focus:border-orange-500 focus:ring-4 focus:ring-orange-500/10 transition">
+      <option value="">Tous les sexes</option>
+      <option *ngFor="let s of sexes" [value]="s.valeur">{{ s.libelle }}</option>
+    </select>
+
+    <select [(ngModel)]="profilFiltre" (ngModelChange)="filtrer()"
+            class="h-12 px-3 rounded-xl border border-gray-200 bg-gray-50 text-gray-700 text-sm outline-none focus:bg-white focus:border-orange-500 focus:ring-4 focus:ring-orange-500/10 transition">
+      <option value="">Tous les profils</option>
+      <option value="complet">Profil complet</option>
+      <option value="incomplet">Profil incomplet</option>
+    </select>
+
+  </div>
+
+</div>
+
+<!-- ======================================================= -->
+<!-- TITRE LISTE                                              -->
+<!-- ======================================================= -->
+
+<div class="flex items-center justify-between mt-5">
+  <div>
+    <h2 class="text-lg font-bold text-gray-800">Liste des utilisateurs</h2>
+    <p class="text-sm text-gray-500">
+      {{ utilisateursFiltres.length }} utilisateur{{ utilisateursFiltres.length > 1 ? 's' : '' }} affiché{{ utilisateursFiltres.length > 1 ? 's' : '' }}
+      <span *ngIf="filtresActifs"> sur {{ utilisateurs.length }}</span>
+    </p>
+  </div>
+
+  <button *ngIf="filtresActifs" type="button" (click)="reinitialiserFiltres()"
+          class="text-sm text-orange-600 hover:text-orange-700 font-medium">
+    <i class="fa-solid fa-xmark mr-1"></i> Réinitialiser
+  </button>
+</div>
+
+<!-- ======================================================= -->
+<!-- CHARGEMENT                                               -->
+<!-- ======================================================= -->
+
+<div *ngIf="isLoading" class="flex justify-center items-center py-12">
+  <div class="animate-spin rounded-full h-12 w-12 border-4 border-orange-500 border-t-transparent"></div>
+</div>
+
+<!-- ======================================================= -->
+<!-- ERREUR                                                   -->
+<!-- ======================================================= -->
+
+<div *ngIf="!isLoading && erreur" class="bg-red-50 border border-red-200 rounded-2xl p-6 text-center mt-4">
+  <p class="text-red-600 text-sm font-medium">{{ erreur }}</p>
+  <button
+    (click)="chargerUtilisateurs()"
+    class="mt-3 px-4 py-2 bg-red-600 text-white text-sm font-medium rounded-lg hover:bg-red-700 transition">
+    Réessayer
+  </button>
+</div>
+
+<!-- ======================================================= -->
+<!-- LISTE DES UTILISATEURS                                   -->
+<!-- ======================================================= -->
+
+<div *ngIf="!isLoading && !erreur" class="mt-4">
+
+  <!-- Aucun utilisateur -->
+  <div *ngIf="utilisateursFiltres.length === 0"
+       class="bg-white rounded-2xl border border-gray-100 shadow-sm p-12 text-center">
+    <i class="fa-solid fa-users text-5xl text-gray-300 mb-4"></i>
+    <h3 class="text-xl font-semibold text-gray-700">Aucun utilisateur</h3>
+    <p class="text-gray-500 mt-2">
+      {{ filtresActifs ? 'Aucun utilisateur ne correspond à votre recherche.' : 'Les fidèles inscrits apparaîtront automatiquement ici.' }}
+    </p>
+  </div>
+
+  <div class="space-y-2.5">
+
+    <!-- Carte utilisateur : l'essentiel, le reste est dans la page de détails -->
+    <a *ngFor="let u of utilisateursFiltres; trackBy: trackById"
+       [routerLink]="['/admin/utilisateurs', u.id]"
+       class="bg-white rounded-xl border border-gray-100 shadow-sm min-w-0
+              p-3 sm:p-3.5 flex items-center gap-3 sm:gap-4
+              text-decoration-none hover:border-orange-200 hover:shadow transition">
+
+      <!-- PHOTO -->
+      <img *ngIf="afficherPhoto(u)"
+           [src]="u.photo"
+           [alt]="nomComplet(u)"
+           (error)="photoEnErreur(u)"
+           loading="lazy"
+           class="w-12 h-12 min-w-[48px] rounded-full object-cover border-2 border-orange-100 flex-shrink-0">
+
+      <div *ngIf="!afficherPhoto(u)"
+           class="w-12 h-12 min-w-[48px] rounded-full flex-shrink-0
+                  bg-gradient-to-br from-orange-500 to-orange-800
+                  text-white flex items-center justify-center
+                  font-semibold text-sm">
+        {{ getInitiales(u) }}
+      </div>
+
+      <!-- NOM + E-MAIL -->
+      <div class="flex-1 min-w-0">
+        <div class="flex items-center gap-2 min-w-0">
+          <p class="font-semibold text-sm text-gray-900 truncate mb-0">{{ nomComplet(u) }}</p>
+          <span class="w-5 h-5 min-w-[20px] rounded-full flex items-center justify-center text-[10px]"
+                [ngClass]="infoSexe(u).classe" [title]="infoSexe(u).libelleSingulier">
+            <i class="fa-solid" [ngClass]="infoSexe(u).icone"></i>
+          </span>
+        </div>
+        <p class="text-xs text-gray-500 truncate mb-0">{{ u.email }}</p>
+      </div>
+
+      <!-- VILLE + INSCRIPTION -->
+      <div class="hidden sm:block text-right flex-shrink-0">
+        <p class="text-xs text-gray-700 font-medium mb-0">
+          <i class="fa-solid fa-location-dot text-[10px] text-gray-300 mr-1"></i>{{ u.ville || '—' }}
+        </p>
+        <p class="text-[11px] text-gray-400 mb-0">Inscrit le {{ formatDate(u.createdAt) }}</p>
+      </div>
+
+      <i class="fa-solid fa-chevron-right text-gray-300 text-xs flex-shrink-0"></i>
+
+    </a>
+
+  </div>
+
+</div>

@@ -11,6 +11,8 @@ import { DetailsarticlesComponent } from './composants/detailsarticles/detailsar
 import { AudioComponent } from './composants/audio/audio.component';
 import { DonationsComponent } from './composants/donations/donations.component';
 import { DetailspaiementComponent } from './composants/detailspaiement/detailspaiement.component';
+import { UtilisateursComponent } from './composants/utilisateurs/utilisateurs.component';
+import { DetailsutilisateurComponent } from './composants/detailsutilisateur/detailsutilisateur.component';
 import { superAdminGuard } from './guards/super-admin.guard';
 
 const routes: Routes = [
@@ -27,6 +29,8 @@ const routes: Routes = [
       {path:'audios', component: AudioComponent},
       {path:'donations', component: DonationsComponent},
       {path:'donations/:id', component: DetailspaiementComponent},
+      {path:'utilisateurs', component: UtilisateursComponent},
+      {path:'utilisateurs/:id', component: DetailsutilisateurComponent},
       {path:'administrateurs', component: AdministrateursComponent, canActivate: [superAdminGuard]}
     ]
   }

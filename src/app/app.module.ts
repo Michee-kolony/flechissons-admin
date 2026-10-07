@@ -14,6 +14,8 @@ import { AdministrateursComponent } from './composants/administrateurs/administr
 import { RequetesChartComponent } from './composants/requetes-chart/requetes-chart.component';
 import { DonationsComponent } from './composants/donations/donations.component';
 import { DetailspaiementComponent } from './composants/detailspaiement/detailspaiement.component';
+import { UtilisateursComponent } from './composants/utilisateurs/utilisateurs.component';
+import { DetailsutilisateurComponent } from './composants/detailsutilisateur/detailsutilisateur.component';
 
 import { HttpClientModule } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
@@ -35,7 +37,9 @@ import { AudioComponent } from './composants/audio/audio.component';
     AdministrateursComponent,
     RequetesChartComponent,
     DonationsComponent,
-    DetailspaiementComponent
+    DetailspaiementComponent,
+    UtilisateursComponent,
+    DetailsutilisateurComponent
   ],
 
   imports: [
