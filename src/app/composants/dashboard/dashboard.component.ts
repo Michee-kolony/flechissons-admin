@@ -1,6 +1,7 @@
 // dashboard.component.ts
 import { Component, OnInit } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
+import { Router } from '@angular/router';
 import { isSuperAdmin } from '../../shared/auth.util';
 import { Paiement, OperateurPaiement, OPERATEURS } from '../../shared/paiement.util';
 
@@ -61,6 +62,9 @@ export class DashboardComponent implements OnInit {
   // Analyse des transactions par opérateur
   paiements: Paiement[] = [];
   analyseReussiesSeulement: boolean = false;
+  paiementsAnalyses: Paiement[] = [];
+  statsOperateurs: StatOperateur[] = [];
+  operateurLeader: StatOperateur | null = null;
 
   // Couleurs des opérateurs
   private readonly couleursOperateurs: Record<OperateurPaiement, string> = {
@@ -82,7 +86,7 @@ export class DashboardComponent implements OnInit {
   chargement: boolean = false;
   erreur: string | null = null;
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient, private router: Router) {}
 
   ngOnInit(): void {
     this.dateAujourdhui = this.formaterDate(new Date());
@@ -116,6 +120,19 @@ export class DashboardComponent implements OnInit {
   }
 
   /**
+   * Token absent ou expiré (401) : on vide la session et on renvoie vers la connexion
+   */
+  private sessionExpiree(err: HttpErrorResponse): boolean {
+    if (err.status !== 401) {
+      return false;
+    }
+    localStorage.removeItem('adminToken');
+    localStorage.removeItem('adminData');
+    this.router.navigate(['/login']);
+    return true;
+  }
+
+  /**
    * Charge toutes les données nécessaires
    */
   chargerToutesLesDonnees(): void {
@@ -142,7 +159,7 @@ export class DashboardComponent implements OnInit {
     if (this.estSuperAdmin) {
       this.http.get<Requete[]>(this.urlRequete, { headers: this.authHeaders() }).subscribe({
         next: (data) => {
-          this.toutesLesRequetes = data.sort((a, b) =>
+          this.toutesLesRequetes = (Array.isArray(data) ? data : []).sort((a, b) =>
             new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
           );
           this.dernieresRequetes = this.toutesLesRequetes.slice(0, 5);
@@ -151,8 +168,10 @@ export class DashboardComponent implements OnInit {
         },
         error: (err) => {
           console.error('Erreur lors du chargement des requêtes:', err);
-          this.erreur = 'Impossible de charger les données. Veuillez réessayer.';
-          this.chargement = false;
+          // Un échec des requêtes ne doit pas masquer tout le dashboard
+          if (!this.sessionExpiree(err)) {
+            verifierFinChargement();
+          }
         }
       });
     }
@@ -199,6 +218,7 @@ export class DashboardComponent implements OnInit {
     this.http.get<any[]>(this.urlDonation, { headers: this.authHeaders() }).subscribe({
       next: (data) => {
         this.paiements = Array.isArray(data) ? data : [];
+        this.calculerStatsOperateurs();
 
         // Seuls les paiements réussis comptent dans les totaux
         const donations = this.paiements.filter(d => d.statut === 'reussi');
@@ -212,30 +232,35 @@ export class DashboardComponent implements OnInit {
       },
       error: (err) => {
         console.error('Erreur lors du chargement des donations:', err);
-        verifierFinChargement();
+        if (!this.sessionExpiree(err)) {
+          verifierFinChargement();
+        }
       }
     });
   }
 
   /**
-   * Transactions prises en compte dans l'analyse par opérateur
+   * Bascule l'analyse entre toutes les transactions et les réussies uniquement
    */
-  get paiementsAnalyses(): Paiement[] {
-    return this.analyseReussiesSeulement
-      ? this.paiements.filter(p => p.statut === 'reussi')
-      : this.paiements;
+  changerFiltreAnalyse(reussiesSeulement: boolean): void {
+    this.analyseReussiesSeulement = reussiesSeulement;
+    this.calculerStatsOperateurs();
   }
 
   /**
-   * Répartition des transactions par opérateur, en pourcentage, de la plus utilisée à la moins utilisée
+   * Calcule la répartition des transactions par opérateur, une seule fois par changement de données ou de filtre.
+   * (Des getters recréant ces objets à chaque détection de changements figeaient la page.)
    */
-  get statsOperateurs(): StatOperateur[] {
-    const analyses = this.paiementsAnalyses;
-    const total = analyses.length;
+  private calculerStatsOperateurs(): void {
+    this.paiementsAnalyses = this.analyseReussiesSeulement
+      ? this.paiements.filter(p => p.statut === 'reussi')
+      : this.paiements;
 
-    return OPERATEURS
+    const total = this.paiementsAnalyses.length;
+
+    this.statsOperateurs = OPERATEURS
       .map(({ valeur, libelle }) => {
-        const nombre = analyses.filter(p => p.operateur === valeur).length;
+        const nombre = this.paiementsAnalyses.filter(p => p.operateur === valeur).length;
         const tentatives = this.paiements.filter(p => p.operateur === valeur);
         const reussies = tentatives.filter(p => p.statut === 'reussi').length;
 
@@ -250,17 +275,11 @@ export class DashboardComponent implements OnInit {
         };
       })
       .sort((a, b) => b.nombre - a.nombre);
-  }
 
-  /**
-   * Opérateur le plus utilisé (null s'il n'y a aucune transaction ou en cas d'égalité en tête)
-   */
-  get operateurLeader(): StatOperateur | null {
+    // Opérateur le plus utilisé (null s'il n'y a aucune transaction ou en cas d'égalité en tête)
     const [premier, second] = this.statsOperateurs;
-    if (!premier || premier.nombre === 0 || (second && second.nombre === premier.nombre)) {
-      return null;
-    }
-    return premier;
+    this.operateurLeader =
+      !premier || premier.nombre === 0 || (second && second.nombre === premier.nombre) ? null : premier;
   }
 
   /**

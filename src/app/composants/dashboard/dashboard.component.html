@@ -213,98 +213,6 @@
 
 </div>
 
-<!-- ======================================================= -->
-<!-- TRANSACTIONS PAR OPÉRATEUR                               -->
-<!-- ======================================================= -->
-
-<div *ngIf="!chargement && !erreur" class="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden min-w-0 mb-5">
-
-  <!-- HEADER -->
-  <div class="px-4 sm:px-5 py-3.5 border-b border-gray-100 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-    <div class="flex items-center gap-2.5 min-w-0">
-      <div class="w-8 h-8 min-w-[32px] rounded-lg bg-orange-50 text-orange-600 flex items-center justify-center">
-        <i class="fa-solid fa-mobile-screen text-xs"></i>
-      </div>
-      <div class="min-w-0">
-        <h2 class="font-semibold text-sm sm:text-base text-gray-800">Transactions par opérateur</h2>
-        <p class="text-[11px] text-gray-400 mt-0.5">
-          Part de chaque opérateur Mobile Money ·
-          {{ paiementsAnalyses.length | number }} transaction{{ paiementsAnalyses.length > 1 ? 's' : '' }}
-        </p>
-      </div>
-    </div>
-
-    <!-- Toutes / Réussies -->
-    <div class="inline-flex p-1 rounded-lg bg-gray-100 text-xs font-medium self-start sm:self-auto">
-      <button type="button" (click)="analyseReussiesSeulement = false"
-              class="px-3 py-1.5 rounded-md transition"
-              [ngClass]="!analyseReussiesSeulement ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500 hover:text-gray-700'">
-        Toutes
-      </button>
-      <button type="button" (click)="analyseReussiesSeulement = true"
-              class="px-3 py-1.5 rounded-md transition"
-              [ngClass]="analyseReussiesSeulement ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500 hover:text-gray-700'">
-        Réussies
-      </button>
-    </div>
-  </div>
-
-  <!-- Aucune transaction -->
-  <div *ngIf="paiementsAnalyses.length === 0" class="p-8 text-center">
-    <i class="fa-solid fa-chart-simple text-3xl text-gray-300 mb-2"></i>
-    <p class="text-sm text-gray-500">
-      {{ analyseReussiesSeulement ? 'Aucune transaction réussie pour le moment.' : 'Aucune transaction pour le moment.' }}
-    </p>
-  </div>
-
-  <div *ngIf="paiementsAnalyses.length > 0" class="p-4 sm:p-5">
-
-    <!-- Opérateur le plus utilisé -->
-    <div *ngIf="operateurLeader as leader"
-         class="flex items-center gap-3 rounded-xl border p-3 mb-5"
-         [style.borderColor]="leader.couleur + '33'"
-         [style.backgroundColor]="leader.couleur + '0D'">
-      <div class="w-9 h-9 min-w-[36px] rounded-lg text-white flex items-center justify-center"
-           [style.backgroundColor]="leader.couleur">
-        <i class="fa-solid fa-trophy text-sm"></i>
-      </div>
-      <p class="text-sm text-gray-700">
-        <span class="font-semibold text-gray-900">{{ leader.libelle }}</span>
-        est l'opérateur le plus utilisé avec
-        <span class="font-semibold text-gray-900">{{ leader.pourcentage | number:'1.0-1' }} %</span>
-        des transactions{{ analyseReussiesSeulement ? ' réussies' : '' }}.
-      </p>
-    </div>
-
-    <!-- Barres -->
-    <div class="space-y-4">
-      <div *ngFor="let op of statsOperateurs">
-        <div class="flex items-baseline justify-between gap-3 mb-1.5">
-          <div class="flex items-center gap-2 min-w-0">
-            <span class="w-2.5 h-2.5 rounded-full flex-shrink-0" [style.backgroundColor]="op.couleur"></span>
-            <span class="text-sm font-medium text-gray-800 truncate">{{ op.libelle }}</span>
-          </div>
-          <div class="text-right flex-shrink-0">
-            <span class="text-sm font-bold text-gray-900">{{ op.pourcentage | number:'1.0-1' }} %</span>
-            <span class="text-[11px] text-gray-400 ml-1">({{ op.nombre | number }})</span>
-          </div>
-        </div>
-        <div class="h-2.5 rounded-full bg-gray-100 overflow-hidden">
-          <div class="h-full rounded-full transition-all duration-500"
-               [style.width.%]="op.pourcentage"
-               [style.backgroundColor]="op.couleur"></div>
-        </div>
-        <p class="text-[11px] text-gray-400 mt-1">
-          {{ op.reussies | number }} réussie{{ op.reussies > 1 ? 's' : '' }}
-          · taux de réussite {{ op.tauxReussite | number:'1.0-0' }} %
-        </p>
-      </div>
-    </div>
-
-  </div>
-
-</div>
-
 <!-- CONTENU PRINCIPAL -->
 <div *ngIf="!chargement && !erreur" class="grid grid-cols-1 xl:grid-cols-3 gap-4">
 
@@ -315,8 +223,8 @@
     <!-- HEADER GRAPHIQUE -->
     <div class="px-4 sm:px-5 py-3.5 border-b border-gray-100 flex items-center justify-between gap-3">
       <div>
-        <h2 class="font-semibold text-gray-800 text-sm sm:text-base">Activité de la plateforme</h2>
-        <p class="text-[11px] text-gray-400 mt-0.5">Évolution de l'activité</p>
+        <h2 class="font-semibold text-gray-800 text-sm sm:text-base">Analyse des utilisateurs par sexe</h2>
+        <p class="text-[11px] text-gray-400 mt-0.5">Répartition des fidèles inscrits selon leur sexe</p>
       </div>
       <button type="button" class="w-8 h-8 rounded-lg bg-orange-50 text-orange-600 flex items-center justify-center hover:bg-orange-100 transition">
         <i class="fa-solid fa-ellipsis text-xs"></i>
@@ -376,6 +284,98 @@
         </div>
       </div>
 
+    </div>
+
+  </div>
+
+</div>
+
+<!-- ======================================================= -->
+<!-- TRANSACTIONS PAR OPÉRATEUR                               -->
+<!-- ======================================================= -->
+
+<div *ngIf="!chargement && !erreur" class="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden min-w-0 mt-4">
+
+  <!-- HEADER -->
+  <div class="px-4 sm:px-5 py-3.5 border-b border-gray-100 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+    <div class="flex items-center gap-2.5 min-w-0">
+      <div class="w-8 h-8 min-w-[32px] rounded-lg bg-orange-50 text-orange-600 flex items-center justify-center">
+        <i class="fa-solid fa-mobile-screen text-xs"></i>
+      </div>
+      <div class="min-w-0">
+        <h2 class="font-semibold text-sm sm:text-base text-gray-800">Transactions par opérateur</h2>
+        <p class="text-[11px] text-gray-400 mt-0.5">
+          Part de chaque opérateur Mobile Money ·
+          {{ paiementsAnalyses.length | number }} transaction{{ paiementsAnalyses.length > 1 ? 's' : '' }}
+        </p>
+      </div>
+    </div>
+
+    <!-- Toutes / Réussies -->
+    <div class="inline-flex p-1 rounded-lg bg-gray-100 text-xs font-medium self-start sm:self-auto">
+      <button type="button" (click)="changerFiltreAnalyse(false)"
+              class="px-3 py-1.5 rounded-md transition"
+              [ngClass]="!analyseReussiesSeulement ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500 hover:text-gray-700'">
+        Toutes
+      </button>
+      <button type="button" (click)="changerFiltreAnalyse(true)"
+              class="px-3 py-1.5 rounded-md transition"
+              [ngClass]="analyseReussiesSeulement ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500 hover:text-gray-700'">
+        Réussies
+      </button>
+    </div>
+  </div>
+
+  <!-- Aucune transaction -->
+  <div *ngIf="paiementsAnalyses.length === 0" class="p-8 text-center">
+    <i class="fa-solid fa-chart-simple text-3xl text-gray-300 mb-2"></i>
+    <p class="text-sm text-gray-500">
+      {{ analyseReussiesSeulement ? 'Aucune transaction réussie pour le moment.' : 'Aucune transaction pour le moment.' }}
+    </p>
+  </div>
+
+  <div *ngIf="paiementsAnalyses.length > 0" class="p-4 sm:p-5">
+
+    <!-- Opérateur le plus utilisé -->
+    <div *ngIf="operateurLeader as leader"
+         class="flex items-center gap-3 rounded-xl border p-3 mb-5"
+         [style.borderColor]="leader.couleur + '33'"
+         [style.backgroundColor]="leader.couleur + '0D'">
+      <div class="w-9 h-9 min-w-[36px] rounded-lg text-white flex items-center justify-center"
+           [style.backgroundColor]="leader.couleur">
+        <i class="fa-solid fa-trophy text-sm"></i>
+      </div>
+      <p class="text-sm text-gray-700">
+        <span class="font-semibold text-gray-900">{{ leader.libelle }}</span>
+        est l'opérateur le plus utilisé avec
+        <span class="font-semibold text-gray-900">{{ leader.pourcentage | number:'1.0-1' }} %</span>
+        des transactions{{ analyseReussiesSeulement ? ' réussies' : '' }}.
+      </p>
+    </div>
+
+    <!-- Barres -->
+    <div class="space-y-4">
+      <div *ngFor="let op of statsOperateurs">
+        <div class="flex items-baseline justify-between gap-3 mb-1.5">
+          <div class="flex items-center gap-2 min-w-0">
+            <span class="w-2.5 h-2.5 rounded-full flex-shrink-0" [style.backgroundColor]="op.couleur"></span>
+            <span class="text-sm font-medium text-gray-800 truncate">{{ op.libelle }}</span>
+          </div>
+          <div class="text-right flex-shrink-0">
+            <span class="text-sm font-bold text-gray-900">{{ op.pourcentage | number:'1.0-1' }} %</span>
+            <span class="text-[11px] text-gray-400 ml-1">({{ op.nombre | number }})</span>
+          </div>
+        </div>
+        <div class="h-2.5 rounded-full bg-gray-100 overflow-hidden">
+          <div class="h-full rounded-full transition-all duration-500"
+               [style.width.%]="op.pourcentage"
+               [style.backgroundColor]="op.couleur"></div>
+        </div>
+        <p class="text-[11px] text-gray-400 mt-1">
+          {{ op.reussies | number }} réussie{{ op.reussies > 1 ? 's' : '' }}
+          · taux de réussite {{ op.tauxReussite | number:'1.0-0' }} %
+        </p>
+      </div>
     </div>
 
   </div>
