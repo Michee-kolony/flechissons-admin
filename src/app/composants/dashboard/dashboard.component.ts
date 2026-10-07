@@ -2,6 +2,7 @@
 import { Component, OnInit } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { isSuperAdmin } from '../../shared/auth.util';
+import { Paiement, OperateurPaiement, OPERATEURS } from '../../shared/paiement.util';
 
 export interface Requete {
   _id: string;
@@ -11,6 +12,16 @@ export interface Requete {
   message: string;
   createdAt: string;
   __v: number;
+}
+
+export interface StatOperateur {
+  operateur: OperateurPaiement;
+  libelle: string;
+  couleur: string;
+  nombre: number;
+  pourcentage: number;
+  reussies: number;
+  tauxReussite: number;
 }
 
 export interface Statistiques {
@@ -31,7 +42,7 @@ export class DashboardComponent implements OnInit {
   private urlRequete = "https://flechissons.com/requete/";
   private urlArticle = "https://flechissons.com/article";
   private urlUser = "https://flechissons.com/user";
-  private urlDonation = "https://flechissons.com/donation";
+  private urlDonation = "https://flechissons.com/api/pawapay/admin/paiements";
 
   // Liste des requêtes
   toutesLesRequetes: Requete[] = [];
@@ -45,6 +56,17 @@ export class DashboardComponent implements OnInit {
     totalRequetesPriere: 0,
     totalDonsUSD: 0,
     totalDonsCDF: 0
+  };
+
+  // Analyse des transactions par opérateur
+  paiements: Paiement[] = [];
+  analyseReussiesSeulement: boolean = false;
+
+  // Couleurs des opérateurs
+  private readonly couleursOperateurs: Record<OperateurPaiement, string> = {
+    mpesa: '#16A34A',
+    orange: '#F97316',
+    airtel: '#DC2626'
   };
 
   // Date du jour
@@ -176,7 +198,10 @@ export class DashboardComponent implements OnInit {
     // Charger les donations
     this.http.get<any[]>(this.urlDonation, { headers: this.authHeaders() }).subscribe({
       next: (data) => {
-        const donations = Array.isArray(data) ? data : [];
+        this.paiements = Array.isArray(data) ? data : [];
+
+        // Seuls les paiements réussis comptent dans les totaux
+        const donations = this.paiements.filter(d => d.statut === 'reussi');
         this.statistiques.totalDonsUSD = donations
           .filter(d => d.devise === 'USD')
           .reduce((somme, d) => somme + (d.montant || 0), 0);
@@ -190,6 +215,52 @@ export class DashboardComponent implements OnInit {
         verifierFinChargement();
       }
     });
+  }
+
+  /**
+   * Transactions prises en compte dans l'analyse par opérateur
+   */
+  get paiementsAnalyses(): Paiement[] {
+    return this.analyseReussiesSeulement
+      ? this.paiements.filter(p => p.statut === 'reussi')
+      : this.paiements;
+  }
+
+  /**
+   * Répartition des transactions par opérateur, en pourcentage, de la plus utilisée à la moins utilisée
+   */
+  get statsOperateurs(): StatOperateur[] {
+    const analyses = this.paiementsAnalyses;
+    const total = analyses.length;
+
+    return OPERATEURS
+      .map(({ valeur, libelle }) => {
+        const nombre = analyses.filter(p => p.operateur === valeur).length;
+        const tentatives = this.paiements.filter(p => p.operateur === valeur);
+        const reussies = tentatives.filter(p => p.statut === 'reussi').length;
+
+        return {
+          operateur: valeur,
+          libelle,
+          couleur: this.couleursOperateurs[valeur],
+          nombre,
+          pourcentage: total ? (nombre / total) * 100 : 0,
+          reussies,
+          tauxReussite: tentatives.length ? (reussies / tentatives.length) * 100 : 0
+        };
+      })
+      .sort((a, b) => b.nombre - a.nombre);
+  }
+
+  /**
+   * Opérateur le plus utilisé (null s'il n'y a aucune transaction ou en cas d'égalité en tête)
+   */
+  get operateurLeader(): StatOperateur | null {
+    const [premier, second] = this.statsOperateurs;
+    if (!premier || premier.nombre === 0 || (second && second.nombre === premier.nombre)) {
+      return null;
+    }
+    return premier;
   }
 
   /**
