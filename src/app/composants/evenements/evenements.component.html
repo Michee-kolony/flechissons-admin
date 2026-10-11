@@ -1,0 +1,337 @@
+<div class="min-h-screen p-4 sm:p-6 lg:p-8">
+
+  <!-- =====================================================
+       HEADER
+  ====================================================== -->
+
+  <div class="mb-8 flex flex-col gap-5 md:flex-row md:items-center md:justify-between">
+
+    <div>
+
+      <div class="mb-3 flex items-center gap-2">
+
+        <div class="flex h-9 w-9 items-center justify-center rounded-xl bg-orange-100 text-orange-600">
+          <i class="fa-solid fa-calendar-days"></i>
+        </div>
+
+        <span class="text-sm font-bold uppercase tracking-wider text-orange-600">
+          Fléchissons
+        </span>
+
+      </div>
+
+      <h1 class="text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">
+        Calendrier des évènements
+      </h1>
+
+      <p class="mt-1 text-sm text-slate-500">
+        Les dates ajoutées apparaissent en orange dans le calendrier de l'application.
+      </p>
+
+    </div>
+
+
+    <div class="flex flex-wrap gap-3">
+
+      <div class="flex w-fit items-center gap-3 rounded-2xl border border-slate-200 bg-white px-4 py-3 shadow-sm">
+        <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-orange-50 text-orange-600">
+          <i class="fa-solid fa-calendar-check"></i>
+        </div>
+        <div>
+          <p class="text-xs text-slate-400">À venir</p>
+          <p class="font-bold text-slate-800">{{ evenementsAVenir.length }}</p>
+        </div>
+      </div>
+
+      <div class="flex w-fit items-center gap-3 rounded-2xl border border-slate-200 bg-white px-4 py-3 shadow-sm">
+        <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-slate-100 text-slate-500">
+          <i class="fa-solid fa-clock-rotate-left"></i>
+        </div>
+        <div>
+          <p class="text-xs text-slate-400">Passés</p>
+          <p class="font-bold text-slate-800">{{ nombrePasses }}</p>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+
+
+
+  <!-- =====================================================
+       MESSAGES
+  ====================================================== -->
+
+  <div
+    *ngIf="message"
+    class="mb-5 flex items-center gap-2 rounded-xl border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-700">
+    <i class="fa-solid fa-circle-check"></i>
+    {{ message }}
+  </div>
+
+  <div
+    *ngIf="errorMessage"
+    class="mb-5 flex items-center gap-2 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+    <i class="fa-solid fa-circle-exclamation"></i>
+    {{ errorMessage }}
+  </div>
+
+
+
+  <div class="grid gap-6 xl:grid-cols-5">
+
+    <!-- =====================================================
+         FORMULAIRE
+    ====================================================== -->
+
+    <form
+      (ngSubmit)="enregistrer()"
+      class="h-fit rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6 xl:col-span-2">
+
+      <h2 class="mb-5 flex items-center gap-2 text-lg font-bold text-slate-800">
+        <i class="fa-solid" [ngClass]="evenementEnEditionId ? 'fa-pen text-orange-500' : 'fa-plus text-orange-500'"></i>
+        {{ evenementEnEditionId ? "Modifier l'évènement" : 'Ajouter un évènement' }}
+      </h2>
+
+
+      <!-- TITRE -->
+
+      <label for="titre" class="mb-2 block text-sm font-semibold text-slate-700">
+        Titre
+      </label>
+
+      <input
+        id="titre"
+        name="titre"
+        type="text"
+        [(ngModel)]="formData.titre"
+        placeholder="Ex : Veillée de prière"
+        class="mb-5 w-full rounded-xl border border-slate-200 px-4 py-3 text-sm outline-none transition focus:border-orange-500 focus:ring-2 focus:ring-orange-100">
+
+
+      <!-- DATE + HEURE -->
+
+      <div class="mb-5 grid grid-cols-2 gap-3">
+
+        <div>
+          <label for="date" class="mb-2 block text-sm font-semibold text-slate-700">
+            Date
+          </label>
+          <input
+            id="date"
+            name="date"
+            type="date"
+            [(ngModel)]="formData.date"
+            class="w-full rounded-xl border border-slate-200 px-4 py-3 text-sm outline-none transition focus:border-orange-500 focus:ring-2 focus:ring-orange-100">
+        </div>
+
+        <div>
+          <label for="heure" class="mb-2 block text-sm font-semibold text-slate-700">
+            Heure <span class="font-normal text-slate-400">(option.)</span>
+          </label>
+          <input
+            id="heure"
+            name="heure"
+            type="time"
+            [(ngModel)]="formData.heure"
+            class="w-full rounded-xl border border-slate-200 px-4 py-3 text-sm outline-none transition focus:border-orange-500 focus:ring-2 focus:ring-orange-100">
+        </div>
+
+      </div>
+
+
+      <!-- DESCRIPTION -->
+
+      <label for="description" class="mb-2 block text-sm font-semibold text-slate-700">
+        Description <span class="font-normal text-slate-400">(optionnelle)</span>
+      </label>
+
+      <textarea
+        id="description"
+        name="description"
+        rows="3"
+        [(ngModel)]="formData.description"
+        placeholder="Ex : Au temple, ouvert à tous"
+        class="mb-6 w-full resize-none rounded-xl border border-slate-200 px-4 py-3 text-sm outline-none transition focus:border-orange-500 focus:ring-2 focus:ring-orange-100"></textarea>
+
+
+      <!-- BOUTONS -->
+
+      <div class="flex gap-3">
+
+        <button
+          type="submit"
+          [disabled]="loading"
+          class="flex flex-1 items-center justify-center gap-2 rounded-xl bg-orange-500 px-4 py-3 text-sm font-semibold text-white shadow-lg shadow-orange-200 transition hover:bg-orange-600 disabled:opacity-60">
+          <i class="fa-solid" [ngClass]="loading ? 'fa-spinner fa-spin' : 'fa-floppy-disk'"></i>
+          {{ evenementEnEditionId ? 'Enregistrer' : "Ajouter l'évènement" }}
+        </button>
+
+        <button
+          *ngIf="evenementEnEditionId"
+          type="button"
+          (click)="annulerEdition()"
+          class="rounded-xl border border-slate-200 px-4 py-3 text-sm font-semibold text-slate-600 transition hover:bg-slate-50">
+          Annuler
+        </button>
+
+      </div>
+
+    </form>
+
+
+
+    <!-- =====================================================
+         LISTE
+    ====================================================== -->
+
+    <div class="xl:col-span-3">
+
+      <label
+        *ngIf="nombrePasses > 0"
+        class="mb-4 flex w-fit cursor-pointer items-center gap-2 text-sm text-slate-600">
+        <input type="checkbox" [(ngModel)]="afficherPasses" class="h-4 w-4 accent-orange-500">
+        Afficher les évènements passés ({{ nombrePasses }})
+      </label>
+
+
+      <div *ngIf="loadingEvenements" class="flex items-center justify-center gap-2 py-16 text-sm text-slate-400">
+        <i class="fa-solid fa-spinner fa-spin"></i>
+        Chargement des évènements...
+      </div>
+
+
+      <div
+        *ngIf="!loadingEvenements && evenementsAffiches.length === 0"
+        class="rounded-2xl border border-dashed border-slate-300 bg-white px-6 py-16 text-center">
+        <i class="fa-solid fa-calendar-days mb-3 text-3xl text-slate-300"></i>
+        <p class="font-semibold text-slate-600">Aucun évènement à venir</p>
+        <p class="mt-1 text-sm text-slate-400">Ajoutez une date avec le formulaire.</p>
+      </div>
+
+
+      <div *ngIf="!loadingEvenements && evenementsAffiches.length > 0" class="space-y-3">
+
+        <div
+          *ngFor="let evenement of evenementsAffiches"
+          class="flex flex-col gap-4 rounded-2xl border bg-white p-4 shadow-sm transition sm:flex-row sm:items-center"
+          [ngClass]="evenementEnEditionId === evenement._id ? 'border-orange-400 ring-2 ring-orange-100' : 'border-slate-200'"
+          [class.opacity-60]="estPasse(evenement)">
+
+          <!-- DATE -->
+
+          <div
+            class="flex h-14 w-14 shrink-0 flex-col items-center justify-center rounded-xl text-white"
+            [ngClass]="estPasse(evenement) ? 'bg-slate-400' : 'bg-orange-500'">
+            <span class="text-lg font-bold leading-none">{{ versDate(evenement.date) | date:'dd' }}</span>
+            <span class="text-[10px] font-semibold uppercase">{{ versDate(evenement.date) | date:'MMM':'':'fr' }}</span>
+          </div>
+
+
+          <!-- INFOS -->
+
+          <div class="min-w-0 flex-1">
+
+            <div class="flex flex-wrap items-center gap-2">
+
+              <h3 class="truncate font-bold text-slate-800">{{ evenement.titre }}</h3>
+
+              <span
+                *ngIf="estPasse(evenement)"
+                class="rounded-full bg-slate-100 px-2 py-0.5 text-[10px] font-bold text-slate-500">
+                PASSÉ
+              </span>
+
+            </div>
+
+            <p class="text-xs text-slate-400">
+              {{ versDate(evenement.date) | date:'EEEE d MMMM y':'':'fr' }}
+              <span *ngIf="evenement.heure"> · {{ evenement.heure }}</span>
+            </p>
+
+            <p *ngIf="evenement.description" class="mt-1 line-clamp-2 text-sm text-slate-500">
+              {{ evenement.description }}
+            </p>
+
+          </div>
+
+
+          <!-- ACTIONS -->
+
+          <div class="flex shrink-0 items-center gap-2">
+
+            <button
+              type="button"
+              (click)="modifier(evenement)"
+              title="Modifier"
+              class="flex h-9 w-9 items-center justify-center rounded-lg bg-orange-50 text-orange-600 transition hover:bg-orange-100">
+              <i class="fa-solid fa-pen"></i>
+            </button>
+
+            <button
+              type="button"
+              (click)="ouvrirModalSuppression(evenement._id)"
+              title="Supprimer"
+              class="flex h-9 w-9 items-center justify-center rounded-lg bg-red-50 text-red-600 transition hover:bg-red-100">
+              <i class="fa-solid fa-trash"></i>
+            </button>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+
+
+  <!-- =====================================================
+       MODAL SUPPRESSION
+  ====================================================== -->
+
+  <div
+    *ngIf="modalSuppressionOuvert"
+    class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm"
+    (click)="fermerModalSuppression()">
+
+    <div class="w-full max-w-sm rounded-2xl bg-white p-6 text-center shadow-xl" (click)="$event.stopPropagation()">
+
+      <div class="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-red-50 text-red-600">
+        <i class="fa-solid fa-trash"></i>
+      </div>
+
+      <h3 class="text-lg font-bold text-slate-800">Supprimer cet évènement ?</h3>
+
+      <p class="mt-1 text-sm text-slate-500">
+        La date ne sera plus marquée dans le calendrier de l'application.
+      </p>
+
+      <div class="mt-6 flex gap-3">
+
+        <button
+          type="button"
+          (click)="fermerModalSuppression()"
+          class="flex-1 rounded-xl border border-slate-200 px-4 py-2.5 text-sm font-semibold text-slate-600 hover:bg-slate-50">
+          Annuler
+        </button>
+
+        <button
+          type="button"
+          (click)="confirmerSuppression()"
+          [disabled]="loadingSuppression"
+          class="flex flex-1 items-center justify-center gap-2 rounded-xl bg-red-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-red-700 disabled:opacity-60">
+          <i *ngIf="loadingSuppression" class="fa-solid fa-spinner fa-spin"></i>
+          Supprimer
+        </button>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</div>

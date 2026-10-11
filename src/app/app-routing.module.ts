@@ -11,6 +11,7 @@ import { DetailsarticlesComponent } from './composants/detailsarticles/detailsar
 import { AudioComponent } from './composants/audio/audio.component';
 import { LivesComponent } from './composants/lives/lives.component';
 import { EgliseComponent } from './composants/eglise/eglise.component';
+import { EvenementsComponent } from './composants/evenements/evenements.component';
 import { DonationsComponent } from './composants/donations/donations.component';
 import { DetailspaiementComponent } from './composants/detailspaiement/detailspaiement.component';
 import { UtilisateursComponent } from './composants/utilisateurs/utilisateurs.component';
@@ -31,6 +32,7 @@ const routes: Routes = [
       {path:'audios', component: AudioComponent},
       {path:'lives', component: LivesComponent},
       {path:'eglise', component: EgliseComponent},
+      {path:'evenements', component: EvenementsComponent},
       {path:'donations', component: DonationsComponent},
       {path:'donations/:id', component: DetailspaiementComponent},
       {path:'utilisateurs', component: UtilisateursComponent},

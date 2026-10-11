@@ -1,4 +1,6 @@
 import { NgModule } from '@angular/core';
+import { registerLocaleData } from '@angular/common';
+import localeFr from '@angular/common/locales/fr';
 import { BrowserModule } from '@angular/platform-browser';
 
 import { AppRoutingModule } from './app-routing.module';
@@ -23,6 +25,10 @@ import { DetailsarticlesComponent } from './composants/detailsarticles/detailsar
 import { AudioComponent } from './composants/audio/audio.component';
 import { LivesComponent } from './composants/lives/lives.component';
 import { EgliseComponent } from './composants/eglise/eglise.component';
+import { EvenementsComponent } from './composants/evenements/evenements.component';
+
+// Dates en français (pipe date avec la locale 'fr')
+registerLocaleData(localeFr, 'fr');
 
 @NgModule({
   declarations: [
@@ -43,7 +49,8 @@ import { EgliseComponent } from './composants/eglise/eglise.component';
     UtilisateursComponent,
     DetailsutilisateurComponent,
     LivesComponent,
-    EgliseComponent
+    EgliseComponent,
+    EvenementsComponent
   ],
 
   imports: [

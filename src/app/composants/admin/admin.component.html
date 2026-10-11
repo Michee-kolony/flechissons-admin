@@ -295,6 +295,37 @@
 
 
     <!-- ===================================================== -->
+    <!-- ÉVÈNEMENTS                                              -->
+    <!-- ===================================================== -->
+
+    <a
+      routerLink="/admin/evenements"
+      (click)="closeMobileMenu()"
+      routerLinkActive
+      #rlaEvenements="routerLinkActive"
+      [ngClass]="rlaEvenements.isActive ? 'bg-white text-orange-600 font-semibold' : 'text-white/90 hover:bg-white/10'"
+      class="flex items-center gap-3
+             px-3 py-2.5 mb-1
+             rounded-lg
+             text-decoration-none
+             text-sm
+             transition-all duration-150">
+
+      <i class="fa-solid fa-calendar-days text-[15px] w-5 text-center flex-shrink-0"></i>
+
+      <span
+        *ngIf="afficherLabels"
+        class="whitespace-nowrap">
+
+        Évènements
+
+      </span>
+
+    </a>
+
+
+
+    <!-- ===================================================== -->
     <!-- ÉGLISE                                                  -->
     <!-- ===================================================== -->
 
