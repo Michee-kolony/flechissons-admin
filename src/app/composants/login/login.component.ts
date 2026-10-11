@@ -2,6 +2,7 @@
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
+import { ThemeService } from '../../shared/theme.service';
 
 @Component({
   selector: 'app-login',
@@ -28,8 +29,17 @@ export class LoginComponent {
 
   constructor(
     private http: HttpClient,
-    private router: Router
+    private router: Router,
+    private themeService: ThemeService
   ) {}
+
+  get estSombre(): boolean {
+    return this.themeService.estSombre;
+  }
+
+  basculerTheme(): void {
+    this.themeService.basculer();
+  }
 
   // Méthode pour afficher le toast
   showToastMessage(message: string, type: 'success' | 'error' = 'success') {

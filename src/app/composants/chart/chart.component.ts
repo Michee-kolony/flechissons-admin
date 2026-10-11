@@ -1,6 +1,8 @@
 import { Component, AfterViewInit, OnDestroy } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import Chart from 'chart.js/auto';
+import { Subscription, skip } from 'rxjs';
+import { ThemeService, couleursGraphique } from '../../shared/theme.service';
 
 interface User {
   id: string;
@@ -18,6 +20,7 @@ interface User {
 export class ChartComponent implements AfterViewInit, OnDestroy {
 
   private chart?: Chart;
+  private abonnementTheme?: Subscription;
   private urlUser = "https://flechissons.com/user";
   
   // Statistiques des utilisateurs
@@ -26,10 +29,15 @@ export class ChartComponent implements AfterViewInit, OnDestroy {
   nonPrecise: number = 0;
   total: number = 0;
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient, private themeService: ThemeService) {}
 
   ngAfterViewInit(): void {
     this.chargerUtilisateurs();
+
+    // Redessine le graphique quand on bascule clair / sombre
+    this.abonnementTheme = this.themeService.changements
+      .pipe(skip(1))
+      .subscribe(() => this.creerGraphique());
   }
 
   /**
@@ -102,6 +110,8 @@ export class ChartComponent implements AfterViewInit, OnDestroy {
       this.chart.destroy();
     }
 
+    const couleurs = couleursGraphique(this.themeService.estSombre);
+
     // Préparer les données pour le graphique
     const labels: string[] = [];
     const data: number[] = [];
@@ -137,8 +147,8 @@ export class ChartComponent implements AfterViewInit, OnDestroy {
     if (vide) {
       labels.push('Aucune donnée');
       data.push(1);
-      backgroundColors.push('#E5E7EB');
-      hoverBackgroundColors.push('#D1D5DB');
+      backgroundColors.push(couleurs.vide);
+      hoverBackgroundColors.push(couleurs.videSurvol);
     }
 
     this.chart = new Chart(canvas, {
@@ -150,7 +160,7 @@ export class ChartComponent implements AfterViewInit, OnDestroy {
             data: data,
             backgroundColor: backgroundColors,
             hoverBackgroundColor: hoverBackgroundColors,
-            borderColor: '#ffffff',
+            borderColor: couleurs.separation,
             borderWidth: 5,
             hoverOffset: 8
           }
@@ -175,11 +185,13 @@ export class ChartComponent implements AfterViewInit, OnDestroy {
                 size: 13,
                 weight: 500
               },
-              color: '#4B5563'
+              color: couleurs.texte
             }
           },
           tooltip: {
-            backgroundColor: '#111827',
+            backgroundColor: couleurs.infobulleFond,
+            borderColor: couleurs.infobulleBordure,
+            borderWidth: 1,
             titleColor: '#ffffff',
             bodyColor: '#E5E7EB',
             padding: 12,
@@ -212,14 +224,14 @@ export class ChartComponent implements AfterViewInit, OnDestroy {
 
             // Total
             ctx.font = '700 40px Inter, sans-serif';
-            ctx.fillStyle = '#111827';
+            ctx.fillStyle = couleurs.texteFort;
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
             ctx.fillText(total.toString(), centerX, centerY - 12);
 
             // Label
             ctx.font = '500 14px Inter, sans-serif';
-            ctx.fillStyle = '#9CA3AF';
+            ctx.fillStyle = couleurs.texteDoux;
             ctx.fillText('Utilisateurs', centerX, centerY + 22);
 
             ctx.restore();
@@ -230,6 +242,7 @@ export class ChartComponent implements AfterViewInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
+    this.abonnementTheme?.unsubscribe();
     this.chart?.destroy();
   }
 }

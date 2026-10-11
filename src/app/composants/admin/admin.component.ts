@@ -2,6 +2,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { isSuperAdmin } from '../../shared/auth.util';
+import { ThemeService } from '../../shared/theme.service';
 
 @Component({
   selector: 'app-admin',
@@ -21,7 +22,18 @@ export class AdminComponent implements OnInit {
   adminEmail: string = '';
   estSuperAdmin: boolean = false;
 
-  constructor(private router: Router) {}
+  constructor(private router: Router, private themeService: ThemeService) {}
+
+  get estSombre(): boolean {
+    return this.themeService.estSombre;
+  }
+
+  /**
+   * Bascule entre le mode clair et le mode sombre
+   */
+  basculerTheme(): void {
+    this.themeService.basculer();
+  }
 
   ngOnInit(): void {
     // Récupérer les données de l'administrateur depuis localStorage

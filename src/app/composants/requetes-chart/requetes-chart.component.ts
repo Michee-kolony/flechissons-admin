@@ -1,5 +1,7 @@
 import { Component, Input, OnChanges, AfterViewInit, OnDestroy, SimpleChanges } from '@angular/core';
 import Chart from 'chart.js/auto';
+import { Subscription, skip } from 'rxjs';
+import { ThemeService, couleursGraphique } from '../../shared/theme.service';
 
 interface RequeteDate {
   createdAt: string;
@@ -16,13 +18,21 @@ export class RequetesChartComponent implements AfterViewInit, OnChanges, OnDestr
 
   private chart?: Chart;
   private vueInitialisee = false;
+  private abonnementTheme?: Subscription;
 
   private readonly moisLabels = ['Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Jun', 'Jul', 'Aoû', 'Sep', 'Oct', 'Nov', 'Déc'];
   private readonly palette = ['#F97316', '#0EA5E9', '#A855F7', '#22C55E', '#EF4444', '#EAB308', '#64748B'];
 
+  constructor(private themeService: ThemeService) {}
+
   ngAfterViewInit(): void {
     this.vueInitialisee = true;
     this.construireGraphique();
+
+    // Redessine le graphique quand on bascule clair / sombre
+    this.abonnementTheme = this.themeService.changements
+      .pipe(skip(1))
+      .subscribe(() => this.construireGraphique());
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -32,6 +42,7 @@ export class RequetesChartComponent implements AfterViewInit, OnChanges, OnDestr
   }
 
   ngOnDestroy(): void {
+    this.abonnementTheme?.unsubscribe();
     this.chart?.destroy();
   }
 
@@ -49,6 +60,8 @@ export class RequetesChartComponent implements AfterViewInit, OnChanges, OnDestr
     if (this.chart) {
       this.chart.destroy();
     }
+
+    const couleurs = couleursGraphique(this.themeService.estSombre);
 
     const parAnnee = new Map<number, number[]>();
 
@@ -75,7 +88,7 @@ export class RequetesChartComponent implements AfterViewInit, OnChanges, OnDestr
         borderColor: couleur,
         backgroundColor: couleur + '1A',
         pointBackgroundColor: couleur,
-        pointBorderColor: '#ffffff',
+        pointBorderColor: couleurs.separation,
         pointBorderWidth: 2,
         pointRadius: 4,
         pointHoverRadius: 6,
@@ -92,8 +105,8 @@ export class RequetesChartComponent implements AfterViewInit, OnChanges, OnDestr
         datasets: datasets.length > 0 ? datasets : [{
           label: 'Aucune donnée',
           data: new Array(12).fill(0),
-          borderColor: '#E5E7EB',
-          backgroundColor: '#E5E7EB33',
+          borderColor: couleurs.vide,
+          backgroundColor: couleurs.vide + '33',
           tension: 0.35
         }]
       },
@@ -113,14 +126,14 @@ export class RequetesChartComponent implements AfterViewInit, OnChanges, OnDestr
             beginAtZero: true,
             ticks: {
               precision: 0,
-              color: '#9CA3AF',
+              color: couleurs.texteDoux,
               font: { size: 11 }
             },
-            grid: { color: '#F3F4F6' }
+            grid: { color: couleurs.grille }
           },
           x: {
             ticks: {
-              color: '#9CA3AF',
+              color: couleurs.texteDoux,
               font: { size: 11 }
             },
             grid: { display: false }
@@ -135,11 +148,13 @@ export class RequetesChartComponent implements AfterViewInit, OnChanges, OnDestr
               pointStyle: 'circle',
               padding: 16,
               font: { size: 12, weight: 500 },
-              color: '#4B5563'
+              color: couleurs.texte
             }
           },
           tooltip: {
-            backgroundColor: '#111827',
+            backgroundColor: couleurs.infobulleFond,
+            borderColor: couleurs.infobulleBordure,
+            borderWidth: 1,
             titleColor: '#ffffff',
             bodyColor: '#E5E7EB',
             padding: 12,

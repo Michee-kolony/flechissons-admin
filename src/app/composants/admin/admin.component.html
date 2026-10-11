@@ -12,7 +12,7 @@
 </div>
 
 <!-- ======================================================= -->
-<!-- SIDEBAR (STYLE HOSTINGER : FOND PLAT, ÉPURÉ)             -->
+<!-- SIDEBAR (VERRE ORANGE, ÉPURÉ)                            -->
 <!-- ======================================================= -->
 
 <div
@@ -20,8 +20,7 @@
          h-screen w-72
          z-40
          flex flex-col
-         bg-orange-600
-         border-r border-black/10
+         glass-sidebar
          text-white
          transition-all duration-300 ease-in-out
          lg:translate-x-0"
@@ -45,7 +44,7 @@
 
     <div
       class="w-9 h-9 min-w-[36px]
-             bg-white rounded-lg
+             bg-white rounded-lg shadow-md shadow-orange-900/20
              flex items-center justify-center">
 
       <img
@@ -560,7 +559,7 @@
 <!-- ======================================================= -->
 
 <div
-  class="transition-all duration-300"
+  class="glass-scope transition-all duration-300"
   [ngClass]="{
 
     'lg:ml-72': sidebarExpanded,
@@ -576,8 +575,7 @@
 
   <header
     class="h-20
-           bg-white
-           border-b border-gray-200
+           glass-header
            flex items-center
            justify-between
            px-4 sm:px-6 lg:px-8
@@ -635,6 +633,21 @@
 
 
       <!-- =================================================== -->
+      <!-- THÈME CLAIR / SOMBRE                                 -->
+      <!-- =================================================== -->
+      <button
+        type="button"
+        (click)="basculerTheme()"
+        [attr.aria-label]="estSombre ? 'Passer en mode clair' : 'Passer en mode sombre'"
+        [title]="estSombre ? 'Mode clair' : 'Mode sombre'"
+        class="theme-toggle"
+        [class.is-dark]="estSombre">
+        <span class="theme-toggle-thumb">
+          <i class="fa-solid" [ngClass]="estSombre ? 'fa-moon' : 'fa-sun'"></i>
+        </span>
+      </button>
+
+      <!-- =================================================== -->
       <!-- NOTIFICATION                                         -->
       <!-- =================================================== -->
 
@@ -642,7 +655,8 @@
         class="relative
                w-11 h-11
                rounded-xl
-               bg-gray-50
+               bg-white/60
+               ring-1 ring-white/80
                text-gray-600
                hover:bg-orange-50
                hover:text-orange-600
@@ -675,7 +689,9 @@
         <div
           class="w-10 h-10
                  rounded-full
-                 bg-orange-600
+                 bg-gradient-to-br from-orange-500 to-orange-700
+                 shadow-md shadow-orange-600/30
+                 ring-2 ring-white/80
                  text-white
                  flex items-center
                  justify-center">
