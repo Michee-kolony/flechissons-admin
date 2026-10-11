@@ -21,6 +21,7 @@ import { HttpClientModule } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
 import { DetailsarticlesComponent } from './composants/detailsarticles/detailsarticles.component';
 import { AudioComponent } from './composants/audio/audio.component';
+import { LivesComponent } from './composants/lives/lives.component';
 
 @NgModule({
   declarations: [
@@ -39,7 +40,8 @@ import { AudioComponent } from './composants/audio/audio.component';
     DonationsComponent,
     DetailspaiementComponent,
     UtilisateursComponent,
-    DetailsutilisateurComponent
+    DetailsutilisateurComponent,
+    LivesComponent
   ],
 
   imports: [

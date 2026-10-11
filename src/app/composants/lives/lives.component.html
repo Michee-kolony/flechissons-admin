@@ -1,0 +1,407 @@
+<div class="min-h-screen p-4 sm:p-6 lg:p-8">
+
+  <!-- =====================================================
+       HEADER
+  ====================================================== -->
+
+  <div class="mb-8 flex flex-col gap-5 md:flex-row md:items-center md:justify-between">
+
+    <div>
+
+      <div class="mb-3 flex items-center gap-2">
+
+        <div class="flex h-9 w-9 items-center justify-center rounded-xl bg-orange-100 text-orange-600">
+          <i class="fa-solid fa-tower-broadcast"></i>
+        </div>
+
+        <span class="text-sm font-bold uppercase tracking-wider text-orange-600">
+          Fléchissons
+        </span>
+
+      </div>
+
+      <h1 class="text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">
+        Gestion des lives
+      </h1>
+
+      <p class="mt-1 text-sm text-slate-500">
+        Ajoutez les liens de vos directs sur chaque réseau social.
+      </p>
+
+    </div>
+
+
+    <div class="flex flex-wrap gap-3">
+
+      <div class="flex w-fit items-center gap-3 rounded-2xl border border-slate-200 bg-white px-4 py-3 shadow-sm">
+        <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-orange-50 text-orange-600">
+          <i class="fa-solid fa-link"></i>
+        </div>
+        <div>
+          <p class="text-xs text-slate-400">Total</p>
+          <p class="font-bold text-slate-800">
+            {{ lives.length }} lien{{ lives.length > 1 ? 's' : '' }}
+          </p>
+        </div>
+      </div>
+
+      <div class="flex w-fit items-center gap-3 rounded-2xl border border-slate-200 bg-white px-4 py-3 shadow-sm">
+        <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-red-50 text-red-600">
+          <i class="fa-solid fa-circle text-[10px] animate-pulse"></i>
+        </div>
+        <div>
+          <p class="text-xs text-slate-400">En direct</p>
+          <p class="font-bold text-slate-800">{{ nombreEnDirect }}</p>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+
+
+
+  <!-- =====================================================
+       MESSAGES
+  ====================================================== -->
+
+  <div
+    *ngIf="message"
+    class="mb-5 flex items-center gap-2 rounded-xl border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-700">
+    <i class="fa-solid fa-circle-check"></i>
+    {{ message }}
+  </div>
+
+  <div
+    *ngIf="errorMessage"
+    class="mb-5 flex items-center gap-2 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+    <i class="fa-solid fa-circle-exclamation"></i>
+    {{ errorMessage }}
+  </div>
+
+
+
+  <div class="grid gap-6 xl:grid-cols-5">
+
+    <!-- =====================================================
+         FORMULAIRE
+    ====================================================== -->
+
+    <form
+      (ngSubmit)="enregistrer()"
+      class="h-fit rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6 xl:col-span-2">
+
+      <h2 class="mb-5 flex items-center gap-2 text-lg font-bold text-slate-800">
+        <i class="fa-solid" [ngClass]="liveEnEditionId ? 'fa-pen text-orange-500' : 'fa-plus text-orange-500'"></i>
+        {{ liveEnEditionId ? 'Modifier le live' : 'Ajouter un live' }}
+      </h2>
+
+
+      <!-- PLATEFORME -->
+
+      <label class="mb-2 block text-sm font-semibold text-slate-700">
+        Plateforme
+      </label>
+
+      <div class="mb-5 grid grid-cols-3 gap-2 sm:grid-cols-5 xl:grid-cols-3 2xl:grid-cols-5">
+
+        <button
+          *ngFor="let p of plateformes"
+          type="button"
+          (click)="formData.plateforme = p.value"
+          class="flex flex-col items-center gap-1.5 rounded-xl border-2 px-2 py-3 text-xs font-semibold transition"
+          [ngClass]="formData.plateforme === p.value
+            ? 'border-orange-500 bg-orange-50 text-orange-600'
+            : 'border-slate-200 text-slate-500 hover:border-orange-200'">
+
+          <span class="flex h-8 w-8 items-center justify-center rounded-lg text-white" [ngClass]="p.couleur">
+            <i [class]="p.icon"></i>
+          </span>
+
+          {{ p.label }}
+
+        </button>
+
+      </div>
+
+
+      <!-- TITRE -->
+
+      <label for="titre" class="mb-2 block text-sm font-semibold text-slate-700">
+        Titre
+      </label>
+
+      <input
+        id="titre"
+        name="titre"
+        type="text"
+        [(ngModel)]="formData.titre"
+        placeholder="Ex : Culte du dimanche"
+        class="mb-5 w-full rounded-xl border border-slate-200 px-4 py-3 text-sm outline-none transition focus:border-orange-500 focus:ring-2 focus:ring-orange-100">
+
+
+      <!-- LIEN -->
+
+      <label for="lien" class="mb-2 block text-sm font-semibold text-slate-700">
+        Lien du live
+      </label>
+
+      <input
+        id="lien"
+        name="lien"
+        type="url"
+        [(ngModel)]="formData.lien"
+        placeholder="https://www.youtube.com/@flechissons/live"
+        class="mb-5 w-full rounded-xl border border-slate-200 px-4 py-3 text-sm outline-none transition focus:border-orange-500 focus:ring-2 focus:ring-orange-100">
+
+
+      <!-- DESCRIPTION -->
+
+      <label for="description" class="mb-2 block text-sm font-semibold text-slate-700">
+        Description <span class="font-normal text-slate-400">(optionnelle)</span>
+      </label>
+
+      <textarea
+        id="description"
+        name="description"
+        rows="2"
+        [(ngModel)]="formData.description"
+        placeholder="Ex : Suivez le culte en direct"
+        class="mb-5 w-full resize-none rounded-xl border border-slate-200 px-4 py-3 text-sm outline-none transition focus:border-orange-500 focus:ring-2 focus:ring-orange-100"></textarea>
+
+
+      <!-- ORDRE -->
+
+      <label for="ordre" class="mb-2 block text-sm font-semibold text-slate-700">
+        Ordre d'affichage
+      </label>
+
+      <input
+        id="ordre"
+        name="ordre"
+        type="number"
+        [(ngModel)]="formData.ordre"
+        class="mb-5 w-full rounded-xl border border-slate-200 px-4 py-3 text-sm outline-none transition focus:border-orange-500 focus:ring-2 focus:ring-orange-100">
+
+
+      <!-- OPTIONS -->
+
+      <div class="mb-6 space-y-3">
+
+        <label class="flex cursor-pointer items-center justify-between rounded-xl border border-slate-200 px-4 py-3">
+          <span>
+            <span class="block text-sm font-semibold text-slate-700">En direct maintenant</span>
+            <span class="block text-xs text-slate-400">Affiche le badge LIVE et notifie les utilisateurs</span>
+          </span>
+          <input type="checkbox" name="enDirect" [(ngModel)]="formData.enDirect" class="h-5 w-5 accent-red-600">
+        </label>
+
+        <label class="flex cursor-pointer items-center justify-between rounded-xl border border-slate-200 px-4 py-3">
+          <span>
+            <span class="block text-sm font-semibold text-slate-700">Visible dans l'application</span>
+            <span class="block text-xs text-slate-400">Décochez pour masquer ce lien</span>
+          </span>
+          <input type="checkbox" name="actif" [(ngModel)]="formData.actif" class="h-5 w-5 accent-orange-500">
+        </label>
+
+      </div>
+
+
+      <!-- BOUTONS -->
+
+      <div class="flex gap-3">
+
+        <button
+          type="submit"
+          [disabled]="loading"
+          class="flex flex-1 items-center justify-center gap-2 rounded-xl bg-orange-500 px-4 py-3 text-sm font-semibold text-white shadow-lg shadow-orange-200 transition hover:bg-orange-600 disabled:opacity-60">
+          <i class="fa-solid" [ngClass]="loading ? 'fa-spinner fa-spin' : 'fa-floppy-disk'"></i>
+          {{ liveEnEditionId ? 'Enregistrer' : 'Ajouter le live' }}
+        </button>
+
+        <button
+          *ngIf="liveEnEditionId"
+          type="button"
+          (click)="annulerEdition()"
+          class="rounded-xl border border-slate-200 px-4 py-3 text-sm font-semibold text-slate-600 transition hover:bg-slate-50">
+          Annuler
+        </button>
+
+      </div>
+
+    </form>
+
+
+
+    <!-- =====================================================
+         LISTE
+    ====================================================== -->
+
+    <div class="xl:col-span-3">
+
+      <div *ngIf="loadingLives" class="flex items-center justify-center gap-2 py-16 text-sm text-slate-400">
+        <i class="fa-solid fa-spinner fa-spin"></i>
+        Chargement des lives...
+      </div>
+
+
+      <div
+        *ngIf="!loadingLives && lives.length === 0"
+        class="rounded-2xl border border-dashed border-slate-300 bg-white px-6 py-16 text-center">
+        <i class="fa-solid fa-tower-broadcast mb-3 text-3xl text-slate-300"></i>
+        <p class="font-semibold text-slate-600">Aucun live pour le moment</p>
+        <p class="mt-1 text-sm text-slate-400">Ajoutez votre premier lien avec le formulaire.</p>
+      </div>
+
+
+      <div *ngIf="!loadingLives && lives.length > 0" class="space-y-3">
+
+        <div
+          *ngFor="let live of lives"
+          class="flex flex-col gap-4 rounded-2xl border bg-white p-4 shadow-sm transition sm:flex-row sm:items-center"
+          [ngClass]="liveEnEditionId === live._id ? 'border-orange-400 ring-2 ring-orange-100' : 'border-slate-200'"
+          [class.opacity-60]="!live.actif">
+
+          <!-- ICÔNE -->
+
+          <div
+            class="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl text-xl text-white"
+            [ngClass]="infoPlateforme(live.plateforme).couleur">
+            <i [class]="infoPlateforme(live.plateforme).icon"></i>
+          </div>
+
+
+          <!-- INFOS -->
+
+          <div class="min-w-0 flex-1">
+
+            <div class="flex flex-wrap items-center gap-2">
+
+              <h3 class="truncate font-bold text-slate-800">{{ live.titre }}</h3>
+
+              <span
+                *ngIf="live.enDirect"
+                class="flex items-center gap-1 rounded-full bg-red-600 px-2 py-0.5 text-[10px] font-bold text-white">
+                <span class="h-1.5 w-1.5 animate-pulse rounded-full bg-white"></span>
+                LIVE
+              </span>
+
+              <span
+                *ngIf="!live.actif"
+                class="rounded-full bg-slate-100 px-2 py-0.5 text-[10px] font-bold text-slate-500">
+                MASQUÉ
+              </span>
+
+            </div>
+
+            <p class="text-xs text-slate-400">
+              {{ infoPlateforme(live.plateforme).label }} · ordre {{ live.ordre }}
+            </p>
+
+            <a
+              [href]="live.lien"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="mt-1 block truncate text-sm text-orange-600 hover:underline">
+              {{ live.lien }}
+            </a>
+
+          </div>
+
+
+          <!-- ACTIONS -->
+
+          <div class="flex shrink-0 flex-wrap items-center gap-2">
+
+            <button
+              type="button"
+              (click)="basculer(live, 'enDirect')"
+              [title]="live.enDirect ? 'Terminer le direct' : 'Passer en direct'"
+              class="flex h-9 items-center gap-1.5 rounded-lg px-3 text-xs font-semibold transition"
+              [ngClass]="live.enDirect ? 'bg-red-50 text-red-600 hover:bg-red-100' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'">
+              <i class="fa-solid" [ngClass]="live.enDirect ? 'fa-stop' : 'fa-tower-broadcast'"></i>
+              {{ live.enDirect ? 'Terminer' : 'En direct' }}
+            </button>
+
+            <button
+              type="button"
+              (click)="basculer(live, 'actif')"
+              [title]="live.actif ? 'Masquer' : 'Afficher'"
+              class="flex h-9 w-9 items-center justify-center rounded-lg bg-slate-100 text-slate-600 transition hover:bg-slate-200">
+              <i class="fa-solid" [ngClass]="live.actif ? 'fa-eye' : 'fa-eye-slash'"></i>
+            </button>
+
+            <button
+              type="button"
+              (click)="modifier(live)"
+              title="Modifier"
+              class="flex h-9 w-9 items-center justify-center rounded-lg bg-orange-50 text-orange-600 transition hover:bg-orange-100">
+              <i class="fa-solid fa-pen"></i>
+            </button>
+
+            <button
+              type="button"
+              (click)="ouvrirModalSuppression(live._id)"
+              title="Supprimer"
+              class="flex h-9 w-9 items-center justify-center rounded-lg bg-red-50 text-red-600 transition hover:bg-red-100">
+              <i class="fa-solid fa-trash"></i>
+            </button>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+
+
+  <!-- =====================================================
+       MODAL SUPPRESSION
+  ====================================================== -->
+
+  <div
+    *ngIf="modalSuppressionOuvert"
+    class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm"
+    (click)="fermerModalSuppression()">
+
+    <div class="w-full max-w-sm rounded-2xl bg-white p-6 text-center shadow-xl" (click)="$event.stopPropagation()">
+
+      <div class="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-red-50 text-red-600">
+        <i class="fa-solid fa-trash"></i>
+      </div>
+
+      <h3 class="text-lg font-bold text-slate-800">Supprimer ce live ?</h3>
+
+      <p class="mt-1 text-sm text-slate-500">
+        Le lien ne sera plus visible dans l'application.
+      </p>
+
+      <div class="mt-6 flex gap-3">
+
+        <button
+          type="button"
+          (click)="fermerModalSuppression()"
+          class="flex-1 rounded-xl border border-slate-200 px-4 py-2.5 text-sm font-semibold text-slate-600 hover:bg-slate-50">
+          Annuler
+        </button>
+
+        <button
+          type="button"
+          (click)="confirmerSuppression()"
+          [disabled]="loadingSuppression"
+          class="flex flex-1 items-center justify-center gap-2 rounded-xl bg-red-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-red-700 disabled:opacity-60">
+          <i *ngIf="loadingSuppression" class="fa-solid fa-spinner fa-spin"></i>
+          Supprimer
+        </button>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</div>

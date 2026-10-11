@@ -9,6 +9,7 @@ import { AdministrateursComponent } from './composants/administrateurs/administr
 import { RequetesComponent } from './composants/requetes/requetes.component';
 import { DetailsarticlesComponent } from './composants/detailsarticles/detailsarticles.component';
 import { AudioComponent } from './composants/audio/audio.component';
+import { LivesComponent } from './composants/lives/lives.component';
 import { DonationsComponent } from './composants/donations/donations.component';
 import { DetailspaiementComponent } from './composants/detailspaiement/detailspaiement.component';
 import { UtilisateursComponent } from './composants/utilisateurs/utilisateurs.component';
@@ -27,6 +28,7 @@ const routes: Routes = [
       {path:'requetes-de-priere', component: RequetesComponent, canActivate: [superAdminGuard]},
       {path:'detailsarticles/:id', component: DetailsarticlesComponent},
       {path:'audios', component: AudioComponent},
+      {path:'lives', component: LivesComponent},
       {path:'donations', component: DonationsComponent},
       {path:'donations/:id', component: DetailspaiementComponent},
       {path:'utilisateurs', component: UtilisateursComponent},
