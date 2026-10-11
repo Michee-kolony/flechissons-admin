@@ -1,0 +1,35 @@
+/* Marqueur de l'église (divIcon Leaflet, hors encapsulation du composant) */
+:host ::ng-deep .eglise-marqueur {
+  background: transparent;
+  border: none;
+}
+
+:host ::ng-deep .eglise-marqueur span {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50% 50% 50% 0;
+  transform: rotate(-45deg);
+  background: #f97316;
+  border: 3px solid #fff;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+}
+
+:host ::ng-deep .eglise-marqueur i {
+  transform: rotate(45deg);
+  color: #fff;
+  font-size: 15px;
+}
+
+.carte {
+  height: 460px;
+  z-index: 0;
+}
+
+@media (max-width: 640px) {
+  .carte {
+    height: 320px;
+  }
+}

@@ -713,6 +713,72 @@ html.dark .login-shell .theme-toggle--on-color {
 
 
 /* ------------------------------------------------------- */
+/* CARTE LEAFLET (PAGE ÉGLISE)                              */
+/* ------------------------------------------------------- */
+
+/* Pas de flou derrière la carte : il serait recalculé à chaque déplacement */
+.carte-conteneur.carte-conteneur {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+.leaflet-container {
+  background: #f2efe9;
+  font-family: inherit;
+}
+
+.leaflet-bar a {
+  color: #374151;
+}
+
+html.dark .leaflet-container {
+  background: #0a0a0a;
+}
+
+/* Carte sombre : inversion des tuiles OpenStreetMap (le fond clair devient quasi noir,
+   la rotation de teinte garde l'eau bleue et la végétation verte). Marqueurs non concernés. */
+html.dark .leaflet-tile-pane {
+  filter: invert(1) hue-rotate(180deg) brightness(0.88) contrast(1.15) saturate(0.55);
+}
+
+html.dark .leaflet-bar {
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  box-shadow: 0 8px 20px -8px rgba(0, 0, 0, 0.8) !important;
+}
+
+html.dark .leaflet-bar a {
+  background-color: rgba(23, 23, 23, 0.92);
+  border-bottom-color: rgba(255, 255, 255, 0.08);
+  color: var(--ink-2);
+}
+
+html.dark .leaflet-bar a:hover {
+  background-color: #262626;
+  color: var(--brand-400);
+}
+
+html.dark .leaflet-bar a.leaflet-disabled {
+  background-color: rgba(23, 23, 23, 0.92);
+  color: var(--ink-6);
+}
+
+html.dark .leaflet-control-attribution {
+  background: rgba(10, 10, 10, 0.75) !important;
+  color: var(--ink-5);
+}
+
+html.dark .leaflet-control-attribution a {
+  color: var(--ink-3);
+}
+
+/* Contour du marqueur assorti au fond sombre */
+html.dark .eglise-marqueur span {
+  border-color: #0a0a0a !important;
+  box-shadow: 0 4px 14px rgba(249, 115, 22, 0.45) !important;
+}
+
+
+/* ------------------------------------------------------- */
 /* ACCESSIBILITÉ ET COMPATIBILITÉ                           */
 /* ------------------------------------------------------- */
 

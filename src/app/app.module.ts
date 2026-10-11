@@ -22,6 +22,7 @@ import { FormsModule } from '@angular/forms';
 import { DetailsarticlesComponent } from './composants/detailsarticles/detailsarticles.component';
 import { AudioComponent } from './composants/audio/audio.component';
 import { LivesComponent } from './composants/lives/lives.component';
+import { EgliseComponent } from './composants/eglise/eglise.component';
 
 @NgModule({
   declarations: [
@@ -41,7 +42,8 @@ import { LivesComponent } from './composants/lives/lives.component';
     DetailspaiementComponent,
     UtilisateursComponent,
     DetailsutilisateurComponent,
-    LivesComponent
+    LivesComponent,
+    EgliseComponent
   ],
 
   imports: [

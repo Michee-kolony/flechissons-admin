@@ -1,0 +1,236 @@
+<div class="min-h-screen p-4 sm:p-6 lg:p-8">
+
+  <!-- =====================================================
+       HEADER
+  ====================================================== -->
+
+  <div class="mb-8 flex flex-col gap-5 md:flex-row md:items-center md:justify-between">
+
+    <div>
+
+      <div class="mb-3 flex items-center gap-2">
+
+        <div class="flex h-9 w-9 items-center justify-center rounded-xl bg-orange-100 text-orange-600">
+          <i class="fa-solid fa-church"></i>
+        </div>
+
+        <span class="text-sm font-bold uppercase tracking-wider text-orange-600">
+          Fléchissons
+        </span>
+
+      </div>
+
+      <h1 class="text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">
+        Adresse de l'église
+      </h1>
+
+      <p class="mt-1 text-sm text-slate-500">
+        Les utilisateurs voient cette position dans leur profil et peuvent lancer l'itinéraire.
+      </p>
+
+    </div>
+
+
+    <div
+      *ngIf="eglise?.updatedAt"
+      class="flex w-fit items-center gap-3 rounded-2xl border border-slate-200 bg-white px-4 py-3 shadow-sm">
+      <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-orange-50 text-orange-600">
+        <i class="fa-solid fa-clock-rotate-left"></i>
+      </div>
+      <div>
+        <p class="text-xs text-slate-400">Dernière mise à jour</p>
+        <p class="font-bold text-slate-800">{{ eglise?.updatedAt | date:'dd/MM/yyyy HH:mm' }}</p>
+      </div>
+    </div>
+
+  </div>
+
+
+
+  <!-- =====================================================
+       MESSAGES
+  ====================================================== -->
+
+  <div
+    *ngIf="message"
+    class="mb-5 flex items-center gap-2 rounded-xl border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-700">
+    <i class="fa-solid fa-circle-check"></i>
+    {{ message }}
+  </div>
+
+  <div
+    *ngIf="errorMessage"
+    class="mb-5 flex items-center gap-2 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+    <i class="fa-solid fa-circle-exclamation"></i>
+    {{ errorMessage }}
+  </div>
+
+
+
+  <div class="grid gap-6 xl:grid-cols-5">
+
+    <!-- =====================================================
+         FORMULAIRE
+    ====================================================== -->
+
+    <form
+      (ngSubmit)="enregistrer()"
+      class="h-fit rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6 xl:col-span-2">
+
+      <h2 class="mb-5 flex items-center gap-2 text-lg font-bold text-slate-800">
+        <i class="fa-solid fa-location-dot text-orange-500"></i>
+        {{ eglise ? 'Modifier la position' : 'Ajouter la position' }}
+      </h2>
+
+
+      <!-- NOM -->
+
+      <label for="nom" class="mb-2 block text-sm font-semibold text-slate-700">
+        Nom de l'église
+      </label>
+
+      <input
+        id="nom"
+        name="nom"
+        type="text"
+        [(ngModel)]="formData.nom"
+        placeholder="Ex : Église Fléchissons"
+        class="mb-5 w-full rounded-xl border border-slate-200 px-4 py-3 text-sm outline-none transition focus:border-orange-500 focus:ring-2 focus:ring-orange-100">
+
+
+      <!-- ADRESSE + RECHERCHE -->
+
+      <label for="adresse" class="mb-2 block text-sm font-semibold text-slate-700">
+        Adresse
+      </label>
+
+      <div class="mb-2 flex gap-2">
+
+        <input
+          id="adresse"
+          name="adresse"
+          type="text"
+          [(ngModel)]="formData.adresse"
+          placeholder="Ex : 12 avenue de la Paix, Gombe, Kinshasa"
+          class="min-w-0 flex-1 rounded-xl border border-slate-200 px-4 py-3 text-sm outline-none transition focus:border-orange-500 focus:ring-2 focus:ring-orange-100">
+
+        <button
+          type="button"
+          (click)="rechercherAdresse()"
+          [disabled]="loadingRecherche"
+          title="Trouver l'adresse sur la carte"
+          class="flex shrink-0 items-center gap-2 rounded-xl bg-slate-100 px-4 text-sm font-semibold text-slate-600 transition hover:bg-slate-200 disabled:opacity-60">
+          <i class="fa-solid" [ngClass]="loadingRecherche ? 'fa-spinner fa-spin' : 'fa-magnifying-glass'"></i>
+        </button>
+
+      </div>
+
+      <div *ngIf="resultatsRecherche.length > 0" class="mb-3 overflow-hidden rounded-xl border border-slate-200">
+        <button
+          *ngFor="let r of resultatsRecherche"
+          type="button"
+          (click)="choisirResultat(r)"
+          class="block w-full border-b border-slate-100 px-4 py-2.5 text-left text-xs text-slate-600 transition last:border-b-0 hover:bg-orange-50">
+          <i class="fa-solid fa-location-dot mr-1 text-orange-500"></i>
+          {{ r.display_name }}
+        </button>
+      </div>
+
+      <p class="mb-5 text-xs text-slate-400">
+        Recherchez l'adresse, ou cliquez sur la carte / déplacez le marqueur pour une position précise.
+      </p>
+
+
+      <!-- COORDONNÉES -->
+
+      <div class="mb-5 grid grid-cols-2 gap-3">
+
+        <div>
+          <label for="latitude" class="mb-2 block text-sm font-semibold text-slate-700">
+            Latitude
+          </label>
+          <input
+            id="latitude"
+            name="latitude"
+            type="number"
+            step="any"
+            [(ngModel)]="formData.latitude"
+            (ngModelChange)="placerMarqueur()"
+            placeholder="-4.3217"
+            class="w-full rounded-xl border border-slate-200 px-4 py-3 text-sm outline-none transition focus:border-orange-500 focus:ring-2 focus:ring-orange-100">
+        </div>
+
+        <div>
+          <label for="longitude" class="mb-2 block text-sm font-semibold text-slate-700">
+            Longitude
+          </label>
+          <input
+            id="longitude"
+            name="longitude"
+            type="number"
+            step="any"
+            [(ngModel)]="formData.longitude"
+            (ngModelChange)="placerMarqueur()"
+            placeholder="15.3125"
+            class="w-full rounded-xl border border-slate-200 px-4 py-3 text-sm outline-none transition focus:border-orange-500 focus:ring-2 focus:ring-orange-100">
+        </div>
+
+      </div>
+
+
+      <!-- DESCRIPTION -->
+
+      <label for="description" class="mb-2 block text-sm font-semibold text-slate-700">
+        Informations <span class="font-normal text-slate-400">(optionnelles)</span>
+      </label>
+
+      <textarea
+        id="description"
+        name="description"
+        rows="2"
+        [(ngModel)]="formData.description"
+        placeholder="Ex : Cultes le dimanche à 9h, en face de la pharmacie"
+        class="mb-6 w-full resize-none rounded-xl border border-slate-200 px-4 py-3 text-sm outline-none transition focus:border-orange-500 focus:ring-2 focus:ring-orange-100"></textarea>
+
+
+      <!-- BOUTON -->
+
+      <button
+        type="submit"
+        [disabled]="loading || loadingEglise"
+        class="flex w-full items-center justify-center gap-2 rounded-xl bg-orange-500 px-4 py-3 text-sm font-semibold text-white shadow-lg shadow-orange-200 transition hover:bg-orange-600 disabled:opacity-60">
+        <i class="fa-solid" [ngClass]="loading ? 'fa-spinner fa-spin' : 'fa-floppy-disk'"></i>
+        Enregistrer la position
+      </button>
+
+    </form>
+
+
+
+    <!-- =====================================================
+         CARTE
+    ====================================================== -->
+
+    <div class="xl:col-span-3">
+
+      <div class="carte-conteneur overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+
+        <div #carte class="carte w-full"></div>
+
+        <div class="flex items-center gap-2 px-4 py-3 text-xs text-slate-500">
+          <i class="fa-solid fa-hand-pointer text-orange-500"></i>
+          <span *ngIf="positionValide">
+            Position : {{ formData.latitude }}, {{ formData.longitude }}
+          </span>
+          <span *ngIf="!positionValide">
+            Cliquez sur la carte pour placer l'église.
+          </span>
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
