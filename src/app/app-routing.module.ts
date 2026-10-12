@@ -16,11 +16,14 @@ import { DonationsComponent } from './composants/donations/donations.component';
 import { DetailspaiementComponent } from './composants/detailspaiement/detailspaiement.component';
 import { UtilisateursComponent } from './composants/utilisateurs/utilisateurs.component';
 import { DetailsutilisateurComponent } from './composants/detailsutilisateur/detailsutilisateur.component';
+import { ConfidentialiteComponent } from './composants/confidentialite/confidentialite.component';
 import { superAdminGuard } from './guards/super-admin.guard';
 
 const routes: Routes = [
   {path:'', redirectTo: 'login', pathMatch: 'full'},
   {path:'login', component: LoginComponent},
+  // Page publique (sans connexion) : lien donné à l'App Store et au Google Play
+  {path:'confidentialite', component: ConfidentialiteComponent},
   {path:'admin', component: AdminComponent,
     children:[
       {path:'', redirectTo: 'dashboard', pathMatch:'full'},

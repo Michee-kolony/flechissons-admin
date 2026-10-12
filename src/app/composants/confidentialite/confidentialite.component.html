@@ -1,0 +1,259 @@
+<!-- confidentialite.component.html -->
+<div class="page">
+
+  <!-- ======================================================= -->
+  <!-- BARRE DE NAVIGATION                                      -->
+  <!-- ======================================================= -->
+
+  <header class="topbar">
+    <div class="wrap">
+      <a class="brand" href="#" (click)="allerA('haut', $event)" aria-label="Fléchissons, haut de la page">
+        <span class="brand-logo"><img src="images/logo-160.png" alt="Logo Fléchissons nos genoux" width="40" height="40"></span>
+        <span class="brand-name">Fléchissons<small>Nos genoux</small></span>
+      </a>
+
+      <ul class="nav-links" id="nav-links" [class.open]="menuOuvert">
+        <li *ngFor="let lien of liensNavigation">
+          <a [href]="'#' + lien.id" (click)="allerA(lien.id, $event)">{{ lien.libelle }}</a>
+        </li>
+      </ul>
+
+      <button class="icon-btn" type="button" (click)="themeService.basculer()"
+              [attr.aria-label]="themeService.estSombre ? 'Passer en mode clair' : 'Passer en mode sombre'">
+        <svg *ngIf="!themeService.estSombre" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
+        <svg *ngIf="themeService.estSombre" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
+      </button>
+
+      <button class="icon-btn menu-btn" type="button" (click)="basculerMenu()"
+              [attr.aria-expanded]="menuOuvert" aria-controls="nav-links" aria-label="Ouvrir le menu">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+      </button>
+    </div>
+  </header>
+
+  <main>
+
+    <!-- ======================================================= -->
+    <!-- EN-TÊTE + RÉSUMÉ                                         -->
+    <!-- ======================================================= -->
+
+    <div class="wrap hero">
+      <span class="eyebrow">Politique de confidentialité</span>
+      <h1>Vos données dans l'application Fléchissons</h1>
+      <p class="lede">Cette page explique quelles informations l'application Fléchissons recueille quand vous l'utilisez, pourquoi nous en avons besoin, avec qui elles sont partagées et comment vous pouvez les consulter ou les supprimer.</p>
+      <div class="meta">
+        <span>Dernière mise à jour : <strong>{{ dateMiseAJour }}</strong></span>
+        <span>S'applique à : <strong>Fléchissons sur iOS et Android</strong></span>
+      </div>
+
+      <div class="summary">
+        <div>
+          <span class="dot"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></span>
+          <h2>Le strict nécessaire</h2>
+          <p>Nous recueillons ce qu'il faut pour votre compte, vos dons et vos requêtes.</p>
+        </div>
+        <div>
+          <span class="dot"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="m5.6 5.6 12.8 12.8"/></svg></span>
+          <h2>Aucune vente</h2>
+          <p>Vos données ne sont ni vendues, ni louées, ni utilisées pour de la publicité.</p>
+        </div>
+        <div>
+          <span class="dot"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg></span>
+          <h2>Dons sécurisés</h2>
+          <p>Les paiements Mobile Money passent par pawaPay. Nous ne voyons jamais votre code PIN.</p>
+        </div>
+        <div>
+          <span class="dot"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M8 6V4h8v2M6 6l1 14h10l1-14"/></svg></span>
+          <h2>Vous décidez</h2>
+          <p>Vous pouvez consulter, corriger ou supprimer votre compte à tout moment.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ======================================================= -->
+    <!-- SOMMAIRE + CONTENU                                       -->
+    <!-- ======================================================= -->
+
+    <div class="wrap layout">
+      <nav class="toc" aria-label="Sommaire">
+        <p>Sommaire</p>
+        <ol>
+          <li *ngFor="let section of sections">
+            <a [href]="'#' + section.id" [class.active]="sectionActive === section.id"
+               (click)="allerA(section.id, $event)">{{ section.titre }}</a>
+          </li>
+        </ol>
+      </nav>
+
+      <article>
+        <section id="qui">
+          <span class="num">01</span>
+          <h2 class="sec">Qui sommes-nous</h2>
+          <p>Fléchissons (« Fléchissons nos genoux ») est une application chrétienne qui permet de suivre les cultes en direct, d'écouter des enseignements audio, de lire des articles, de consulter les événements de l'église, de déposer des requêtes de prière et de faire des dons.</p>
+          <p>Fléchissons est responsable des données traitées par l'application et par son serveur, hébergé sous le domaine <strong>flechissons.com</strong>.</p>
+        </section>
+
+        <section id="donnees">
+          <span class="num">02</span>
+          <h2 class="sec">Les données que nous recueillons</h2>
+          <p>Nous ne recueillons que les informations que vous nous donnez vous-même ou qui sont nécessaires au fonctionnement de l'application.</p>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr><th>Catégorie</th><th>Données</th><th>Quand</th></tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Compte <span class="tag req">obligatoire</span></td>
+                  <td>Nom, adresse e-mail, mot de passe</td>
+                  <td>À l'inscription</td>
+                </tr>
+                <tr>
+                  <td>Profil <span class="tag">facultatif</span></td>
+                  <td>Prénom, photo, sexe, date de naissance, numéro de téléphone, ville</td>
+                  <td>Quand vous complétez votre profil</td>
+                </tr>
+                <tr>
+                  <td>Préférences</td>
+                  <td>Thèmes de contenu préférés, activation des notifications, langue (français ou lingala)</td>
+                  <td>Dans les réglages</td>
+                </tr>
+                <tr>
+                  <td>Dons</td>
+                  <td>Nom, numéro Mobile Money, opérateur (M-Pesa, Orange Money, Airtel Money), montant, devise (USD ou CDF), type de don (offrande, dîme, action de grâces, mission…), objet, statut et référence de la transaction</td>
+                  <td>Quand vous faites un don</td>
+                </tr>
+                <tr>
+                  <td>Requêtes</td>
+                  <td>Nom, adresse e-mail, sujet et message</td>
+                  <td>Quand vous envoyez une requête</td>
+                </tr>
+                <tr>
+                  <td>Activité du compte</td>
+                  <td>Date de création du compte, date de dernière connexion, dates de mise à jour du profil</td>
+                  <td>Automatiquement</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="note"><strong>Ce que nous ne recueillons pas.</strong> Nous n'avons accès ni à votre code PIN Mobile Money, ni à vos contacts, ni à vos photos en dehors de celle que vous choisissez pour votre profil.</div>
+        </section>
+
+        <section id="utilisation">
+          <span class="num">03</span>
+          <h2 class="sec">Comment nous utilisons vos données</h2>
+          <ul class="list">
+            <li><strong>Gérer votre compte</strong> : vous connecter, garder votre profil et vos préférences.</li>
+            <li><strong>Personnaliser l'application</strong> : afficher les contenus dans votre langue et mettre en avant les thèmes que vous avez choisis.</li>
+            <li><strong>Traiter vos dons</strong> : lancer le paiement auprès de votre opérateur, vous confirmer le résultat et tenir la comptabilité de l'église.</li>
+            <li><strong>Répondre à vos requêtes</strong> : l'équipe pastorale lit votre message et peut vous répondre par e-mail.</li>
+            <li><strong>Vous informer</strong> : vous envoyer des notifications sur les cultes en direct et les événements, uniquement si vous les avez activées.</li>
+            <li><strong>Améliorer le service</strong> : suivre des statistiques globales (nombre d'inscrits, répartition par langue ou par ville) pour mieux organiser les contenus.</li>
+          </ul>
+          <p>Nous traitons ces données parce qu'elles sont nécessaires au service que vous demandez (compte, dons, requêtes), parce que vous y avez consenti (profil facultatif, notifications) ou pour respecter nos obligations comptables liées aux dons.</p>
+        </section>
+
+        <section id="partage">
+          <span class="num">04</span>
+          <h2 class="sec">Avec qui nous partageons vos données</h2>
+          <p>Vos données ne sont jamais vendues. Seuls les administrateurs autorisés de l'église y ont accès, ainsi que les prestataires ci-dessous, pour ce qui est nécessaire à leur mission.</p>
+          <div class="partners">
+            <div class="partner">
+              <strong>pawaPay</strong>
+              <span>Traite les paiements Mobile Money. Reçoit votre numéro, l'opérateur et le montant du don.</span>
+            </div>
+            <div class="partner">
+              <strong>M-Pesa, Orange Money, Airtel Money</strong>
+              <span>Votre opérateur valide le paiement sur votre téléphone, selon ses propres conditions.</span>
+            </div>
+            <div class="partner">
+              <strong>YouTube</strong>
+              <span>Diffuse les cultes en direct et les vidéos. Quand vous regardez une vidéo, YouTube applique sa propre politique.</span>
+            </div>
+            <div class="partner">
+              <strong>OpenStreetMap</strong>
+              <span>Affiche la carte qui situe l'église. Aucune donnée de votre compte ne lui est transmise.</span>
+            </div>
+          </div>
+          <p>Nous pouvons aussi communiquer des données si la loi l'exige, par exemple sur demande d'une autorité judiciaire.</p>
+        </section>
+
+        <section id="conservation">
+          <span class="num">05</span>
+          <h2 class="sec">Combien de temps nous les gardons</h2>
+          <ul class="list">
+            <li><strong>Compte et profil</strong> : tant que votre compte existe. Ils sont effacés quand vous supprimez votre compte.</li>
+            <li><strong>Requêtes</strong> : le temps de les traiter, puis elles peuvent être supprimées par l'équipe.</li>
+            <li><strong>Dons</strong> : les traces des transactions sont conservées aussi longtemps que l'exigent les obligations comptables, même après la suppression du compte. Elles ne sont alors plus rattachées à votre profil.</li>
+          </ul>
+        </section>
+
+        <section id="securite">
+          <span class="num">06</span>
+          <h2 class="sec">Sécurité</h2>
+          <p>Toutes les communications entre l'application et notre serveur sont chiffrées en HTTPS. Votre mot de passe est enregistré sous forme chiffrée et personne ne peut le lire, pas même nos administrateurs. L'accès aux données est réservé aux administrateurs de l'église, avec des niveaux de droits différents.</p>
+          <p>Aucun système n'est parfaitement sûr. Si une fuite touchait vos données, nous vous préviendrions dans les meilleurs délais.</p>
+        </section>
+
+        <section id="droits">
+          <span class="num">07</span>
+          <h2 class="sec">Vos droits</h2>
+          <p>À tout moment, vous pouvez :</p>
+          <ul class="list">
+            <li><strong>Consulter</strong> les données que nous avons sur vous.</li>
+            <li><strong>Corriger</strong> votre profil directement dans l'application.</li>
+            <li><strong>Supprimer votre compte</strong> et les données qui y sont liées.</li>
+            <li><strong>Désactiver les notifications</strong> dans les réglages de l'application ou de votre téléphone.</li>
+            <li><strong>Retirer votre consentement</strong> pour les informations facultatives, en les effaçant de votre profil.</li>
+          </ul>
+          <h3>Supprimer votre compte</h3>
+          <p>Envoyez-nous une demande à l'adresse indiquée dans la rubrique Contact, depuis l'adresse e-mail de votre compte. Nous supprimons votre compte et vos données personnelles dans un délai de 30 jours et vous confirmons la suppression par e-mail.</p>
+        </section>
+
+        <section id="enfants">
+          <span class="num">08</span>
+          <h2 class="sec">Enfants</h2>
+          <p>L'application ne s'adresse pas aux enfants de moins de 13 ans sans l'accord d'un parent. Si vous pensez qu'un enfant nous a donné des informations sans cet accord, contactez-nous et nous les supprimerons.</p>
+        </section>
+
+        <section id="modifications">
+          <span class="num">09</span>
+          <h2 class="sec">Modifications de cette politique</h2>
+          <p>Nous pouvons mettre à jour cette page, par exemple quand une nouvelle fonction arrive dans l'application. La date de mise à jour en haut de la page change alors. Si le changement est important, nous vous prévenons dans l'application.</p>
+        </section>
+
+        <section id="contact">
+          <span class="num">10</span>
+          <h2 class="sec">Nous contacter</h2>
+          <p>Pour toute question sur vos données, ou pour exercer vos droits, écrivez-nous :</p>
+          <div class="contact">
+            <span class="label">Adresse e-mail</span>
+            <span class="addr" #adresseEmail>{{ emailContact }}</span>
+            <button class="copy-btn" type="button" (click)="copierEmail(adresseEmail)">
+              {{ emailCopie ? 'Adresse copiée' : "Copier l'adresse" }}
+            </button>
+          </div>
+          <p>Site web : <a href="https://flechissons.com" target="_blank" rel="noopener">flechissons.com</a></p>
+        </section>
+      </article>
+    </div>
+  </main>
+
+  <!-- ======================================================= -->
+  <!-- PIED DE PAGE                                             -->
+  <!-- ======================================================= -->
+
+  <footer>
+    <div class="wrap">
+      <a class="brand" href="#" (click)="allerA('haut', $event)">
+        <span class="brand-logo"><img src="images/logo-160.png" alt="" width="40" height="40"></span>
+        <span class="brand-name">Fléchissons<small>© {{ annee }} Fléchissons nos genoux</small></span>
+      </a>
+      <nav aria-label="Liens de bas de page">
+        <a href="#donnees" (click)="allerA('donnees', $event)">Données</a>
+        <a href="#droits" (click)="allerA('droits', $event)">Vos droits</a>
+        <a href="#contact" (click)="allerA('contact', $event)">Contact</a>
+      </nav>
+    </div>
+  </footer>
+</div>
