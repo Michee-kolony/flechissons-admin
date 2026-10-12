@@ -11,7 +11,6 @@ import { ThemeService } from '../../shared/theme.service';
 })
 export class ConfidentialiteComponent implements AfterViewInit, OnDestroy {
 
-  readonly emailContact = 'contact@flechissons.com';
   readonly dateMiseAJour = '12 octobre 2026';
   readonly annee = new Date().getFullYear();
 
@@ -38,10 +37,8 @@ export class ConfidentialiteComponent implements AfterViewInit, OnDestroy {
 
   menuOuvert = false;
   sectionActive = 'qui';
-  emailCopie = false;
 
   private observateur?: IntersectionObserver;
-  private minuterieCopie: any;
 
   constructor(
     public themeService: ThemeService,
@@ -64,7 +61,6 @@ export class ConfidentialiteComponent implements AfterViewInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.observateur?.disconnect();
-    clearTimeout(this.minuterieCopie);
   }
 
   // Défilement manuel : avec <base href="/">, un simple href="#id" renverrait vers la racine du site
@@ -83,23 +79,4 @@ export class ConfidentialiteComponent implements AfterViewInit, OnDestroy {
     this.menuOuvert = !this.menuOuvert;
   }
 
-  copierEmail(element: HTMLElement): void {
-    const selectionnerTexte = () => {
-      const plage = document.createRange();
-      plage.selectNodeContents(element);
-      const selection = window.getSelection();
-      selection?.removeAllRanges();
-      selection?.addRange(plage);
-    };
-
-    if (!navigator.clipboard?.writeText) {
-      selectionnerTexte();
-      return;
-    }
-    navigator.clipboard.writeText(this.emailContact).then(() => {
-      this.emailCopie = true;
-      clearTimeout(this.minuterieCopie);
-      this.minuterieCopie = setTimeout(() => this.emailCopie = false, 2000);
-    }, selectionnerTexte);
-  }
 }

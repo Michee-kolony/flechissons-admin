@@ -12,7 +12,6 @@
   --accent: #ea580c;
   --accent-strong: #c2410c;
   --accent-soft: #ffedd5;
-  --on-accent: #ffffff;
   --nav-bg: rgba(253, 248, 244, 0.86);
   --radius: 14px;
   --nav-h: 64px;
@@ -30,7 +29,6 @@
   --accent: #fb923c;
   --accent-strong: #fdba74;
   --accent-soft: #33200f;
-  --on-accent: #1b120b;
   --nav-bg: rgba(12, 9, 7, 0.86);
 }
 
@@ -187,19 +185,25 @@ td:first-child { font-weight: 700; white-space: nowrap; }
 .note { border-radius: var(--radius); padding: 16px 18px; margin: 16px 0; background: var(--accent-soft); color: var(--fg); font-size: 0.95rem; }
 .note strong { color: var(--accent-strong); }
 
-.contact {
-  display: flex; flex-wrap: wrap; align-items: center; gap: 12px;
-  border: 1px solid var(--line); background: var(--surface); border-radius: var(--radius);
-  padding: 16px 18px; margin: 12px 0 16px;
+.contact { display: grid; grid-template-columns: minmax(0, 1fr) 240px; gap: 32px; align-items: start; }
+.contact-texte { min-width: 0; }
+.etapes { margin: 0 0 14px; padding-left: 1.3em; }
+.etapes li { margin-bottom: 8px; padding-left: 4px; }
+.etapes li::marker { color: var(--accent); font-weight: 800; }
+
+.capture { margin: 0; display: flex; flex-direction: column; align-items: center; gap: 10px; }
+.capture img {
+  width: 100%; max-width: 240px; height: auto; display: block;
+  border-radius: 28px;
+  border: 6px solid var(--fg);
+  box-shadow: 0 24px 48px -24px rgba(124, 45, 18, 0.45);
 }
-.contact .label { font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.07em; color: var(--muted); font-weight: 700; width: 100%; }
-.contact .addr { font-weight: 700; font-size: 1.05rem; user-select: all; word-break: break-all; margin-right: auto; }
-.copy-btn {
-  border: 1px solid var(--accent); background: var(--accent); color: var(--on-accent);
-  font: inherit; font-weight: 700; font-size: 0.88rem;
-  padding: 8px 16px; border-radius: 999px; cursor: pointer;
+.capture figcaption { font-size: 0.82rem; color: var(--muted); text-align: center; }
+
+@media (max-width: 640px) {
+  .contact { grid-template-columns: minmax(0, 1fr); }
+  .capture img { max-width: 220px; }
 }
-.copy-btn:hover { background: var(--accent-strong); border-color: var(--accent-strong); }
 
 /* ---------- Pied de page ---------- */
 

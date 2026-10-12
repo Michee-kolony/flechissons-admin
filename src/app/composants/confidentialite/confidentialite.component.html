@@ -90,7 +90,7 @@
           <span class="num">01</span>
           <h2 class="sec">Qui sommes-nous</h2>
           <p>Fléchissons (« Fléchissons nos genoux ») est une application chrétienne qui permet de suivre les cultes en direct, d'écouter des enseignements audio, de lire des articles, de consulter les événements de l'église, de déposer des requêtes de prière et de faire des dons.</p>
-          <p>Fléchissons est responsable des données traitées par l'application et par son serveur, hébergé sous le domaine <strong>flechissons.com</strong>.</p>
+          <p>Fléchissons est responsable des données traitées par l'application et par son serveur.</p>
         </section>
 
         <section id="donnees">
@@ -207,7 +207,7 @@
             <li><strong>Retirer votre consentement</strong> pour les informations facultatives, en les effaçant de votre profil.</li>
           </ul>
           <h3>Supprimer votre compte</h3>
-          <p>Envoyez-nous une demande à l'adresse indiquée dans la rubrique Contact, depuis l'adresse e-mail de votre compte. Nous supprimons votre compte et vos données personnelles dans un délai de 30 jours et vous confirmons la suppression par e-mail.</p>
+          <p>Envoyez-nous une demande depuis la page Contact de l'application (voir la rubrique Contact ci-dessous), avec l'adresse e-mail de votre compte. Nous supprimons votre compte et vos données personnelles dans un délai de 30 jours et vous confirmons la suppression par e-mail.</p>
         </section>
 
         <section id="enfants">
@@ -224,16 +224,24 @@
 
         <section id="contact">
           <span class="num">10</span>
-          <h2 class="sec">Nous contacter</h2>
-          <p>Pour toute question sur vos données, ou pour exercer vos droits, écrivez-nous :</p>
+          <h2 class="sec">Contact</h2>
           <div class="contact">
-            <span class="label">Adresse e-mail</span>
-            <span class="addr" #adresseEmail>{{ emailContact }}</span>
-            <button class="copy-btn" type="button" (click)="copierEmail(adresseEmail)">
-              {{ emailCopie ? 'Adresse copiée' : "Copier l'adresse" }}
-            </button>
+            <div class="contact-texte">
+              <p>Pour toute question sur vos données, ou pour exercer vos droits, écrivez-nous directement depuis l'application :</p>
+              <ol class="etapes">
+                <li>Ouvrez l'onglet <strong>Contact</strong> dans la barre du bas.</li>
+                <li>Indiquez votre nom et votre e-mail ou votre téléphone.</li>
+                <li>Choisissez un sujet, écrivez votre message, puis appuyez sur <strong>Envoyer</strong>.</li>
+              </ol>
+              <p>L'équipe lit chaque message et vous répond rapidement.</p>
+            </div>
+            <figure class="capture">
+              <img [src]="themeService.estSombre ? 'images/contact-sombre.png' : 'images/contact-clair.png'"
+                   alt="Page Contact de l'application Fléchissons : champs nom, e-mail ou téléphone, sujet, message et bouton Envoyer"
+                   width="590" height="1279" loading="lazy">
+              <figcaption>La page Contact dans l'application</figcaption>
+            </figure>
           </div>
-          <p>Site web : <a href="https://flechissons.com" target="_blank" rel="noopener">flechissons.com</a></p>
         </section>
       </article>
     </div>
