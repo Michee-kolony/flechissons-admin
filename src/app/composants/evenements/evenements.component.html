@@ -1,10 +1,10 @@
-<div class="min-h-screen p-4 sm:p-6 lg:p-8">
+<div class="w-full min-w-0">
 
   <!-- =====================================================
        HEADER
   ====================================================== -->
 
-  <div class="mb-8 flex flex-col gap-5 md:flex-row md:items-center md:justify-between">
+  <div class="mb-6 flex flex-col gap-5 sm:mb-8 md:flex-row md:items-center md:justify-between">
 
     <div>
 
@@ -31,10 +31,10 @@
     </div>
 
 
-    <div class="flex flex-wrap gap-3">
+    <div class="grid grid-cols-2 gap-3 sm:flex sm:flex-wrap">
 
-      <div class="flex w-fit items-center gap-3 rounded-2xl border border-slate-200 bg-white px-4 py-3 shadow-sm">
-        <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-orange-50 text-orange-600">
+      <div class="flex min-w-0 items-center gap-3 rounded-2xl border border-slate-200 bg-white px-3 py-3 shadow-sm sm:w-fit sm:px-4">
+        <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-orange-50 text-orange-600">
           <i class="fa-solid fa-calendar-check"></i>
         </div>
         <div>
@@ -43,8 +43,8 @@
         </div>
       </div>
 
-      <div class="flex w-fit items-center gap-3 rounded-2xl border border-slate-200 bg-white px-4 py-3 shadow-sm">
-        <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-slate-100 text-slate-500">
+      <div class="flex min-w-0 items-center gap-3 rounded-2xl border border-slate-200 bg-white px-3 py-3 shadow-sm sm:w-fit sm:px-4">
+        <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-slate-100 text-slate-500">
           <i class="fa-solid fa-clock-rotate-left"></i>
         </div>
         <div>
@@ -79,7 +79,7 @@
 
 
 
-  <div class="grid gap-6 xl:grid-cols-5">
+  <div class="grid min-w-0 grid-cols-1 gap-6 xl:grid-cols-5">
 
     <!-- =====================================================
          FORMULAIRE
@@ -87,7 +87,7 @@
 
     <form
       (ngSubmit)="enregistrer()"
-      class="h-fit rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6 xl:col-span-2">
+      class="h-fit min-w-0 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm sm:p-6 xl:col-span-2">
 
       <h2 class="mb-5 flex items-center gap-2 text-lg font-bold text-slate-800">
         <i class="fa-solid" [ngClass]="evenementEnEditionId ? 'fa-pen text-orange-500' : 'fa-plus text-orange-500'"></i>
@@ -112,9 +112,9 @@
 
       <!-- DATE + HEURE -->
 
-      <div class="mb-5 grid grid-cols-2 gap-3">
+      <div class="mb-5 grid grid-cols-1 gap-3 sm:grid-cols-2">
 
-        <div>
+        <div class="min-w-0">
           <label for="date" class="mb-2 block text-sm font-semibold text-slate-700">
             Date
           </label>
@@ -123,10 +123,10 @@
             name="date"
             type="date"
             [(ngModel)]="formData.date"
-            class="w-full rounded-xl border border-slate-200 px-4 py-3 text-sm outline-none transition focus:border-orange-500 focus:ring-2 focus:ring-orange-100">
+            class="block min-h-[46px] w-full min-w-0 appearance-none rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none transition focus:border-orange-500 focus:ring-2 focus:ring-orange-100">
         </div>
 
-        <div>
+        <div class="min-w-0">
           <label for="heure" class="mb-2 block text-sm font-semibold text-slate-700">
             Heure <span class="font-normal text-slate-400">(option.)</span>
           </label>
@@ -135,7 +135,7 @@
             name="heure"
             type="time"
             [(ngModel)]="formData.heure"
-            class="w-full rounded-xl border border-slate-200 px-4 py-3 text-sm outline-none transition focus:border-orange-500 focus:ring-2 focus:ring-orange-100">
+            class="block min-h-[46px] w-full min-w-0 appearance-none rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none transition focus:border-orange-500 focus:ring-2 focus:ring-orange-100">
         </div>
 
       </div>
@@ -158,7 +158,7 @@
 
       <!-- BOUTONS -->
 
-      <div class="flex gap-3">
+      <div class="flex flex-col gap-3 sm:flex-row">
 
         <button
           type="submit"
@@ -186,7 +186,7 @@
          LISTE
     ====================================================== -->
 
-    <div class="xl:col-span-3">
+    <div class="min-w-0 xl:col-span-3">
 
       <label
         *ngIf="nombrePasses > 0"
@@ -215,14 +215,14 @@
 
         <div
           *ngFor="let evenement of evenementsAffiches"
-          class="flex flex-col gap-4 rounded-2xl border bg-white p-4 shadow-sm transition sm:flex-row sm:items-center"
+          class="flex items-start gap-3 rounded-2xl border bg-white p-3 shadow-sm transition sm:items-center sm:gap-4 sm:p-4"
           [ngClass]="evenementEnEditionId === evenement._id ? 'border-orange-400 ring-2 ring-orange-100' : 'border-slate-200'"
           [class.opacity-60]="estPasse(evenement)">
 
           <!-- DATE -->
 
           <div
-            class="flex h-14 w-14 shrink-0 flex-col items-center justify-center rounded-xl text-white"
+            class="flex h-12 w-12 shrink-0 flex-col items-center justify-center rounded-xl text-white sm:h-14 sm:w-14"
             [ngClass]="estPasse(evenement) ? 'bg-slate-400' : 'bg-orange-500'">
             <span class="text-lg font-bold leading-none">{{ versDate(evenement.date) | date:'dd' }}</span>
             <span class="text-[10px] font-semibold uppercase">{{ versDate(evenement.date) | date:'MMM':'':'fr' }}</span>
@@ -235,7 +235,7 @@
 
             <div class="flex flex-wrap items-center gap-2">
 
-              <h3 class="truncate font-bold text-slate-800">{{ evenement.titre }}</h3>
+              <h3 class="min-w-0 break-words font-bold text-slate-800">{{ evenement.titre }}</h3>
 
               <span
                 *ngIf="estPasse(evenement)"
@@ -250,7 +250,7 @@
               <span *ngIf="evenement.heure"> · {{ evenement.heure }}</span>
             </p>
 
-            <p *ngIf="evenement.description" class="mt-1 line-clamp-2 text-sm text-slate-500">
+            <p *ngIf="evenement.description" class="mt-1 line-clamp-2 break-words text-sm text-slate-500">
               {{ evenement.description }}
             </p>
 
@@ -259,7 +259,7 @@
 
           <!-- ACTIONS -->
 
-          <div class="flex shrink-0 items-center gap-2">
+          <div class="flex shrink-0 flex-col items-center gap-2 sm:flex-row">
 
             <button
               type="button"

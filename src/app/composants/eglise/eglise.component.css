@@ -28,8 +28,20 @@
   z-index: 0;
 }
 
+@media (max-width: 1279px) {
+  .carte {
+    height: 400px;
+  }
+}
+
 @media (max-width: 640px) {
   .carte {
-    height: 320px;
+    height: 300px;
+  }
+}
+
+@media (max-width: 380px) {
+  .carte {
+    height: 260px;
   }
 }

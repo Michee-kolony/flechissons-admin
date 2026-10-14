@@ -480,54 +480,6 @@
 
     </a>
 
-
-
-    <!-- ===================================================== -->
-    <!-- CONFIGURATION                                           -->
-    <!-- ===================================================== -->
-
-    <p
-      *ngIf="afficherLabels"
-      class="px-3 mb-2 mt-6
-             text-[11px] font-semibold
-             text-white/60
-             uppercase tracking-wider">
-
-      Configuration
-
-    </p>
-
-
-
-    <!-- ===================================================== -->
-    <!-- PARAMETRES                                               -->
-    <!-- ===================================================== -->
-
-    <a
-      routerLink="/admin/parametres"
-      (click)="closeMobileMenu()"
-      routerLinkActive
-      #rlaParametres="routerLinkActive"
-      [ngClass]="rlaParametres.isActive ? 'bg-white text-orange-600 font-semibold' : 'text-white/90 hover:bg-white/10'"
-      class="flex items-center gap-3
-             px-3 py-2.5 mb-1
-             rounded-lg
-             text-decoration-none
-             text-sm
-             transition-all duration-150">
-
-      <i class="fa-solid fa-gear text-[15px] w-5 text-center flex-shrink-0"></i>
-
-      <span
-        *ngIf="afficherLabels"
-        class="whitespace-nowrap">
-
-        Paramètres
-
-      </span>
-
-    </a>
-
   </nav>
 
 
@@ -708,35 +660,6 @@
           <i class="fa-solid" [ngClass]="estSombre ? 'fa-moon' : 'fa-sun'"></i>
         </span>
       </button>
-
-      <!-- =================================================== -->
-      <!-- NOTIFICATION                                         -->
-      <!-- =================================================== -->
-
-      <button
-        class="relative
-               w-11 h-11
-               rounded-xl
-               bg-white/60
-               ring-1 ring-white/80
-               text-gray-600
-               hover:bg-orange-50
-               hover:text-orange-600
-               transition">
-
-        <i class="fa-solid fa-bell"></i>
-
-        <span
-          class="absolute top-2 right-2
-                 w-2.5 h-2.5
-                 bg-red-500
-                 rounded-full
-                 border-2 border-white">
-        </span>
-
-      </button>
-
-
 
       <!-- =================================================== -->
       <!-- PROFIL                                                -->

@@ -27,8 +27,6 @@ const CENTRE_PAR_DEFAUT: LatLngTuple = [-4.3217, 15.3125];
 // Le mode sombre est obtenu par un filtre CSS sur les tuiles (voir styles.css) : bascule instantanée.
 const URL_TUILES = 'https://tile.openstreetmap.org/{z}/{x}/{y}.png';
 
-const ATTRIBUTION = '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>';
-
 // Dernière position connue de l'église : la carte s'y place sans attendre l'API
 const CLE_POSITION = 'eglisePosition';
 
@@ -134,11 +132,11 @@ export class EgliseComponent implements AfterViewInit, OnDestroy {
     // Hors zone Angular : déplacements et zooms ne relancent pas la détection de changements
     this.zone.runOutsideAngular(() => {
 
-      this.carte = L.map(this.carteRef.nativeElement);
+      // Bandeau « Leaflet | © OpenStreetMap » masqué
+      this.carte = L.map(this.carteRef.nativeElement, { attributionControl: false });
 
       L.tileLayer(URL_TUILES, {
         maxZoom: 19,
-        attribution: ATTRIBUTION,
         // Pas de requêtes à chaque étape du zoom animé ; tuiles voisines gardées en mémoire.
         // (updateWhenIdle reste à sa valeur par défaut : les tuiles se chargent pendant le glissement)
         updateWhenZooming: false,
