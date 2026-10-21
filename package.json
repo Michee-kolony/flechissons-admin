@@ -1,12 +1,19 @@
 {
   "name": "fleshissons-admin",
-  "version": "0.0.0",
+  "productName": "Fléchissons Admin",
+  "version": "1.0.0",
+  "description": "Interface d'administration Fléchissons",
+  "author": "Fléchissons",
+  "main": "electron/main.js",
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
-    "test": "ng test"
+    "test": "ng test",
+    "electron": "ng build && electron .",
+    "electron:start": "electron .",
+    "dist:win": "ng build && electron-builder --win"
   },
   "private": true,
   "dependencies": {
@@ -32,6 +39,8 @@
     "@types/jasmine": "~5.1.0",
     "@types/leaflet": "^1.9.12",
     "autoprefixer": "^10.5.4",
+    "electron": "^44.9.0",
+    "electron-builder": "^26.15.3",
     "jasmine-core": "~5.1.0",
     "karma": "~6.4.0",
     "karma-chrome-launcher": "~3.2.0",
@@ -48,5 +57,38 @@
     "lmdb@3.0.13": true,
     "msgpackr-extract@3.0.4": true,
     "nice-napi@1.0.2": true
+  },
+  "build": {
+    "appId": "com.flechissons.admin",
+    "productName": "Fléchissons Admin",
+    "directories": {
+      "output": "release"
+    },
+    "files": [
+      "electron/**/*",
+      "dist/fleshissons-admin/browser/**/*",
+      "package.json",
+      "!node_modules/**/*"
+    ],
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
+      "icon": "electron/icon.png"
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "Fléchissons Admin",
+      "artifactName": "Flechissons-Admin-Setup-${version}.exe"
+    }
   }
 }
