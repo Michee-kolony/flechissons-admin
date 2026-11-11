@@ -80,8 +80,39 @@
             </textarea>
           </div>
 
+          <!-- MÉDIA DE LA PRÉDICATION : TÉLÉVERSEMENT DIRECT VERS R2 -->
+          <!-- Masqué (et non détruit) pour ne pas perdre un transfert en changeant de type -->
+          <div [class.hidden]="!estPredication">
+            <div class="flex items-center justify-between mb-2">
+              <label class="text-sm font-medium text-gray-700">
+                Fichier audio ou vidéo
+                <span class="ml-1 text-xs font-normal text-gray-400">(facultatif)</span>
+              </label>
+              <button
+                type="button"
+                (click)="basculerLienManuel()"
+                [disabled]="isSubmitting || televersementEnCours"
+                class="text-xs font-medium text-orange-600 hover:text-orange-700 transition disabled:opacity-50 disabled:cursor-not-allowed">
+                {{ utiliserLienManuel ? 'Téléverser un fichier' : 'Coller un lien existant' }}
+              </button>
+            </div>
+
+            <div [class.hidden]="utiliserLienManuel">
+              <app-televersement-media
+                [desactive]="isSubmitting"
+                (termine)="onMediaTermine($event)"
+                (reinitialise)="onMediaReinitialise()"
+                (occupe)="onTeleversementOccupe($event)">
+              </app-televersement-media>
+
+              <p class="text-xs text-gray-400 mt-2">
+                Le fichier est envoyé directement sur le stockage Fléchissons. Son lien est ajouté automatiquement à la prédication.
+              </p>
+            </div>
+          </div>
+
           <!-- LIEN YOUTUBE - FACULTATIF -->
-          <div>
+          <div *ngIf="!estPredication || utiliserLienManuel">
             <label for="youtube" class="block text-sm font-medium text-gray-700 mb-2">
               Vidéo YouTube
               <span class="ml-1 text-xs font-normal text-gray-400">(facultatif)</span>
@@ -262,7 +293,7 @@
         Annuler
       </button>
 
-      <button type="button" (click)="onSubmit()" [disabled]="isSubmitting" class="w-full sm:w-auto px-6 py-2.5 rounded-xl text-sm font-semibold text-white bg-orange-600 hover:bg-orange-700 active:bg-orange-800 shadow-sm shadow-orange-600/20 transition flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed">
+      <button type="button" (click)="onSubmit()" [disabled]="isSubmitting || (modeTeleversement && televersementEnCours)" class="w-full sm:w-auto px-6 py-2.5 rounded-xl text-sm font-semibold text-white bg-orange-600 hover:bg-orange-700 active:bg-orange-800 shadow-sm shadow-orange-600/20 transition flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed">
 
         <svg *ngIf="isSubmitting" class="animate-spin h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
           <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>

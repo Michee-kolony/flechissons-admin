@@ -1,7 +1,9 @@
 // publier.component.ts
-import { Component } from '@angular/core';
-import { HttpClient, HttpErrorResponse } from '@angular/common/http';
+import { Component, ViewChild } from '@angular/core';
+import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
 import { Router } from '@angular/router';
+import { ResultatTeleversement } from '../../shared/televersement-r2.service';
+import { TeleversementMediaComponent } from '../televersement-media/televersement-media.component';
 
 @Component({
   selector: 'app-publier',
@@ -26,6 +28,13 @@ export class PublierComponent {
   selectedFiles: File[] = [];
   imagePreviews: string[] = [];
   isSubmitting: boolean = false;
+
+  // Média (audio / vidéo) téléversé directement sur Cloudflare R2
+  @ViewChild(TeleversementMediaComponent) televersementMedia?: TeleversementMediaComponent;
+  media: ResultatTeleversement | null = null;
+  televersementEnCours: boolean = false;
+  // Prédication : coller un lien existant au lieu de téléverser un fichier
+  utiliserLienManuel: boolean = false;
 
   // Toast
   toastMessage: string = '';
@@ -83,6 +92,50 @@ export class PublierComponent {
   }
 
   // =====================================================
+  // MÉDIA DE LA PRÉDICATION (TÉLÉVERSEMENT R2)
+  // =====================================================
+
+  get estPredication(): boolean {
+    return this.articleData.type === 'predications';
+  }
+
+  /** Le téléversement direct est utilisé (et non un lien collé à la main) */
+  get modeTeleversement(): boolean {
+    return this.estPredication && !this.utiliserLienManuel;
+  }
+
+  onMediaTermine(resultat: ResultatTeleversement): void {
+    this.media = resultat;
+    // Lien public renseigné automatiquement (le serveur le confirme à la publication)
+    this.articleData.youtube = resultat.url;
+  }
+
+  onMediaReinitialise(): void {
+    if (this.media && this.articleData.youtube === this.media.url) {
+      this.articleData.youtube = '';
+    }
+    this.media = null;
+  }
+
+  onTeleversementOccupe(occupe: boolean): void {
+    this.televersementEnCours = occupe;
+  }
+
+  basculerLienManuel(): void {
+    this.utiliserLienManuel = !this.utiliserLienManuel;
+    if (this.utiliserLienManuel && this.media && this.articleData.youtube === this.media.url) {
+      this.articleData.youtube = '';
+    } else if (!this.utiliserLienManuel && this.media) {
+      this.articleData.youtube = this.media.url;
+    }
+  }
+
+  private entetesAuth(): HttpHeaders {
+    const token = localStorage.getItem('adminToken');
+    return new HttpHeaders(token ? { Authorization: `Bearer ${token}` } : {});
+  }
+
+  // =====================================================
   // SOUMISSION DU FORMULAIRE
   // =====================================================
 
@@ -94,6 +147,12 @@ export class PublierComponent {
       return;
     }
 
+    // Jamais de publication avant la finalisation réussie du téléversement
+    if (this.modeTeleversement && this.televersementEnCours) {
+      this.showToastMessage("Patientez jusqu'à la fin du téléversement du fichier avant de publier.", 'error');
+      return;
+    }
+
     this.isSubmitting = true;
 
     const formData = new FormData();
@@ -102,8 +161,12 @@ export class PublierComponent {
     formData.append('type', this.articleData.type);
     formData.append('theme', this.articleData.theme);
     
+    // Prédication téléversée : le serveur vérifie le fichier et renseigne lui-même le lien
+    if (this.modeTeleversement && this.media) {
+      formData.append('televersementId', this.media.televersementId);
+    }
     // YouTube est facultatif - on l'envoie seulement s'il est rempli
-    if (this.articleData.youtube && this.articleData.youtube.trim() !== '') {
+    else if (this.articleData.youtube && this.articleData.youtube.trim() !== '') {
       formData.append('youtube', this.articleData.youtube.trim());
     }
     
@@ -123,14 +186,17 @@ export class PublierComponent {
       type: this.articleData.type,
       theme: this.articleData.theme,
       youtube: this.articleData.youtube || '(vide)',
+      televersementId: this.modeTeleversement && this.media ? this.media.televersementId : '(aucun)',
       lien: this.articleData.lien || '(vide)',
       images: this.selectedFiles.length
     });
 
-    this.http.post(this.urlArticle, formData).subscribe({
+    this.http.post(this.urlArticle, formData, { headers: this.entetesAuth() }).subscribe({
       next: (response: any) => {
         const successMessage = response.message || 'Publication créée avec succès !';
         this.showToastMessage(successMessage, 'success');
+        // Le fichier appartient désormais à la publication
+        this.media = null;
         
         setTimeout(() => {
           this.resetForm();
@@ -163,7 +229,11 @@ export class PublierComponent {
         } else if (error.status === 500) {
           errorMessage = 'Erreur serveur. Veuillez réessayer plus tard.';
         }
-        
+
+        if (error.status === 401) {
+          errorMessage = 'Votre session a expiré. Reconnectez-vous pour publier.';
+        }
+
         this.showToastMessage(errorMessage, 'error');
       },
       complete: () => {
@@ -188,6 +258,9 @@ export class PublierComponent {
     this.selectedFiles = [];
     this.imagePreviews = [];
     this.isSubmitting = false;
+    this.media = null;
+    this.televersementEnCours = false;
+    this.utiliserLienManuel = false;
     
     const fileInput = document.getElementById('fileInput') as HTMLInputElement;
     if (fileInput) {
@@ -221,6 +294,8 @@ export class PublierComponent {
   }
 
   annuler(): void {
+    // Fichier téléversé mais non publié (ou transfert en cours) : supprimé de R2
+    this.televersementMedia?.abandonner();
     this.resetForm();
     this.router.navigate(['/admin/gestion']);
   }

@@ -10,6 +10,8 @@ const HOTE = 'fleshissons';
 const ORIGINE = `${SCHEMA}://${HOTE}`;
 const DOSSIER_APP = path.join(__dirname, '..', 'dist', 'fleshissons-admin', 'browser');
 const API = ['https://flechissons.com/*', 'https://*.flechissons.com/*'];
+// Téléversement direct des prédications vers Cloudflare R2 (URL présignées)
+const R2 = ['https://*.r2.cloudflarestorage.com/*'];
 
 // Schéma "app://" se comportant comme https (localStorage, fetch, routes Angular…)
 protocol.registerSchemesAsPrivileged([
@@ -65,7 +67,8 @@ function servirFichiers() {
 // L'API n'autorise que les origines web connues : on accepte les réponses
 // pour l'origine app:// (l'auth se fait par jeton Bearer, sans cookies).
 function autoriserApi() {
-  session.defaultSession.webRequest.onHeadersReceived({ urls: API }, (details, callback) => {
+  // Un seul écouteur par session Electron : l'API et R2 sont gérés ensemble
+  session.defaultSession.webRequest.onHeadersReceived({ urls: [...API, ...R2] }, (details, callback) => {
     const entetes = {};
     for (const [cle, valeur] of Object.entries(details.responseHeaders || {})) {
       if (!cle.toLowerCase().startsWith('access-control-')) entetes[cle] = valeur;
@@ -73,6 +76,8 @@ function autoriserApi() {
     entetes['Access-Control-Allow-Origin'] = [ORIGINE];
     entetes['Access-Control-Allow-Methods'] = ['GET, POST, PUT, PATCH, DELETE, OPTIONS'];
     entetes['Access-Control-Allow-Headers'] = ['Authorization, Content-Type, Accept, X-Requested-With'];
+    // Le navigateur doit lire l'ETag de chaque partie envoyée à R2
+    entetes['Access-Control-Expose-Headers'] = ['ETag'];
 
     const reponse = { responseHeaders: entetes };
     if (details.method === 'OPTIONS') reponse.statusLine = 'HTTP/1.1 204 No Content';

@@ -27,6 +27,7 @@ import { LivesComponent } from './composants/lives/lives.component';
 import { EgliseComponent } from './composants/eglise/eglise.component';
 import { EvenementsComponent } from './composants/evenements/evenements.component';
 import { ConfidentialiteComponent } from './composants/confidentialite/confidentialite.component';
+import { TeleversementMediaComponent } from './composants/televersement-media/televersement-media.component';
 
 // Dates en français (pipe date avec la locale 'fr')
 registerLocaleData(localeFr, 'fr');
@@ -52,7 +53,8 @@ registerLocaleData(localeFr, 'fr');
     LivesComponent,
     EgliseComponent,
     EvenementsComponent,
-    ConfidentialiteComponent
+    ConfidentialiteComponent,
+    TeleversementMediaComponent
   ],
 
   imports: [
