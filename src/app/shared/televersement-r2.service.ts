@@ -99,6 +99,15 @@ interface Reprise {
 /** Erreur à ne pas retenter (refus du serveur, CORS mal configuré…) */
 class ErreurDefinitive extends Error {}
 
+/** La requête vers R2 a échoué avant qu'un seul octet parte (CORS bloqué, R2 injoignable…) */
+class ErreurConnexionR2 extends Error {}
+
+// Nombre d'URL signées demandées en un seul appel (maximum accepté par le backend : 20)
+const URLS_PAR_LOT = 20;
+
+// Une URL est redemandée si elle expire dans moins de 2 minutes
+const MARGE_EXPIRATION_MS = 2 * 60 * 1000;
+
 const attendre = (ms: number) => new Promise<void>(r => setTimeout(r, ms));
 
 
@@ -116,6 +125,11 @@ export class TacheTeleversement {
   private readonly chargeEnVol = new Map<number, number>();
   private readonly xhrs = new Set<XMLHttpRequest>();
   private readonly attenteReseau = new Set<() => void>();
+  /** URL présignées déjà obtenues (signées par lots pour limiter les allers-retours) */
+  private readonly urls = new Map<number, { url: string; expire: number }>();
+  /** Parties pas encore envoyées, pour signer les suivantes en avance */
+  private fileAttente: number[] = [];
+  private signatureEnCours: Promise<void> | null = null;
 
   private execution: Promise<void> | null = null;
   private arrete = false;
@@ -269,6 +283,7 @@ export class TacheTeleversement {
   /** Envoie les parties en parallèle ; la première erreur définitive arrête tout */
   private async envoyerParties(numeros: number[]): Promise<void> {
     const fileAttente = [...numeros];
+    this.fileAttente = fileAttente;
     let erreur: unknown = null;
     this.lotEnErreur = false;
 
@@ -302,19 +317,31 @@ export class TacheTeleversement {
     while (true) {
       essai++;
       try {
-        const url = await this.service.signer(this.session!.televersementId, numero);
+        const url = await this.urlPartie(numero);
         const etag = await this.envoyerPartie(url, numero);
 
         this.etags.set(numero, etag);
         this.chargeEnVol.delete(numero);
+        this.urls.delete(numero);
         this.rafraichir();
         return;
 
       } catch (err) {
         this.chargeEnVol.delete(numero);
+        // URL peut-être expirée ou refusée : une nouvelle sera signée au prochain essai
+        this.urls.delete(numero);
 
         if (this.arrete || this.lotEnErreur || err instanceof ErreurDefinitive || this.estRefusServeur(err)) {
           throw err;
+        }
+
+        // R2 bloque la connexion dès le départ alors qu'Internet fonctionne et
+        // qu'aucune partie n'est jamais passée : c'est une configuration, pas le réseau
+        if (err instanceof ErreurConnexionR2 && navigator.onLine && this.etags.size === 0 && essai >= 2) {
+          throw new ErreurDefinitive(
+            "Cloudflare R2 refuse la connexion depuis cette application. " +
+            "Vérifiez que l'origine de l'admin est autorisée dans la règle CORS du bucket."
+          );
         }
 
         // Coupure réseau : pause, reprise automatique au retour de la connexion
@@ -334,6 +361,40 @@ export class TacheTeleversement {
     }
   }
 
+  /** URL présignée de la partie ; les suivantes de la file sont signées dans le même appel */
+  private async urlPartie(numero: number): Promise<string> {
+    for (let i = 0; i < 2; i++) {
+      const connue = this.urls.get(numero);
+      if (connue && connue.expire - Date.now() > MARGE_EXPIRATION_MS) {
+        return connue.url;
+      }
+
+      // Un seul appel de signature à la fois : les autres envois attendent son résultat
+      if (this.signatureEnCours) {
+        await this.signatureEnCours.catch(() => undefined);
+        continue;
+      }
+
+      const lot = [numero, ...this.fileAttente.filter(n => n !== numero && !this.urls.has(n))]
+        .slice(0, URLS_PAR_LOT);
+
+      this.signatureEnCours = this.service.signerLot(this.session!.televersementId, lot)
+        .then(({ urls, expireDans }) => {
+          const expire = Date.now() + expireDans * 1000;
+          for (const u of urls) this.urls.set(u.numeroPartie, { url: u.url, expire });
+        })
+        .finally(() => { this.signatureEnCours = null; });
+
+      await this.signatureEnCours;
+    }
+
+    const url = this.urls.get(numero)?.url;
+    if (url) return url;
+
+    // Lot signé sans cette partie (cas improbable) : demande individuelle
+    return this.service.signer(this.session!.televersementId, numero);
+  }
+
   /** PUT direct vers R2 ; renvoie l'ETag de la partie */
   private envoyerPartie(url: string, numero: number): Promise<string> {
     const session = this.session!;
@@ -349,11 +410,13 @@ export class TacheTeleversement {
         this.xhrs.add(xhr);
 
         const finir = () => this.xhrs.delete(xhr);
+        let progression = false;
 
         xhr.open('PUT', url, true);
         xhr.timeout = DELAI_PARTIE_MS;
 
         xhr.upload.onprogress = (e) => {
+          if (e.loaded > 0) progression = true;
           this.chargeEnVol.set(numero, e.loaded);
           this.rafraichir();
         };
@@ -375,7 +438,12 @@ export class TacheTeleversement {
           }
         };
 
-        xhr.onerror = () => { finir(); reject(new Error('Erreur réseau pendant le transfert.')); };
+        xhr.onerror = () => {
+          finir();
+          reject(progression
+            ? new Error('Erreur réseau pendant le transfert.')
+            : new ErreurConnexionR2('Connexion à Cloudflare R2 impossible.'));
+        };
         xhr.ontimeout = () => { finir(); reject(new Error('Délai dépassé pendant le transfert.')); };
         xhr.onabort = () => { finir(); reject(new Error('Transfert interrompu.')); };
 
@@ -602,6 +670,16 @@ export class TeleversementR2Service {
     return firstValueFrom(this.http.post<SessionServeur>(
       `${URL_API}/initiate`,
       { nomFichier: fichier.name, taille: fichier.size, typeMime: fichier.type || '' },
+      { headers: this.entetes() }
+    ));
+  }
+
+  /** Signe plusieurs parties en un seul appel */
+  signerLot(televersementId: string, numerosParties: number[])
+    : Promise<{ expireDans: number; urls: { numeroPartie: number; url: string }[] }> {
+    return firstValueFrom(this.http.post<{ expireDans: number; urls: { numeroPartie: number; url: string }[] }>(
+      `${URL_API}/presign-part`,
+      { televersementId, numerosParties },
       { headers: this.entetes() }
     ));
   }
