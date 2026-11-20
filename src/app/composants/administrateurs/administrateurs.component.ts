@@ -1,12 +1,13 @@
 // administrateurs.component.ts
 import { Component, OnInit } from '@angular/core';
 import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
+import { RoleAdmin, ROLES_ADMIN } from '../../shared/auth.util';
 
 export interface Admin {
   _id?: string;
   nom: string;
   email: string;
-  role?: 'admin' | 'superadmin';
+  role?: RoleAdmin;
   date?: string;
 }
 
@@ -32,8 +33,13 @@ export class AdministrateursComponent implements OnInit {
     nom: '',
     email: '',
     password: '',
-    role: 'admin' as 'admin' | 'superadmin'
+    role: 'admin' as RoleAdmin
   };
+
+  readonly roles = ROLES_ADMIN;
+
+  // Changement de rôle en cours (id de l'administrateur)
+  roleEnCoursId: string | null = null;
 
   confirmPassword: string = '';
 
@@ -112,7 +118,7 @@ export class AdministrateursComponent implements OnInit {
   }
 
   resetForm(): void {
-    this.newAdmin = { nom: '', email: '', password: '', role: 'admin' };
+    this.newAdmin = { nom: '', email: '', password: '', role: 'admin' as RoleAdmin };
     this.confirmPassword = '';
   }
 
@@ -152,6 +158,34 @@ export class AdministrateursComponent implements OnInit {
         this.isSubmitting = false;
       }
     });
+  }
+
+  // =====================================================
+  // CHANGEMENT DE RÔLE
+  // =====================================================
+
+  changerRole(admin: Admin, role: RoleAdmin): void {
+    if (!admin._id || admin.role === role) return;
+
+    const ancienRole = admin.role;
+    admin.role = role;
+    this.roleEnCoursId = admin._id;
+
+    this.http.patch(`${this.UrlAuth}${admin._id}/role`, { role }, { headers: this.authHeaders() }).subscribe({
+      next: () => {
+        this.roleEnCoursId = null;
+        this.showToastMessage(`${admin.nom} est maintenant ${this.libelleRole(role).toLowerCase()}`, 'success');
+      },
+      error: (error: HttpErrorResponse) => {
+        admin.role = ancienRole;
+        this.roleEnCoursId = null;
+        this.showToastMessage(error.error?.message || 'Erreur lors du changement de rôle', 'error');
+      }
+    });
+  }
+
+  libelleRole(role?: RoleAdmin): string {
+    return this.roles.find(r => r.valeur === role)?.libelle || 'Administrateur';
   }
 
   // =====================================================

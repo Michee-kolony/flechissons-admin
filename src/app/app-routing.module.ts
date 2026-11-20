@@ -18,6 +18,8 @@ import { UtilisateursComponent } from './composants/utilisateurs/utilisateurs.co
 import { DetailsutilisateurComponent } from './composants/detailsutilisateur/detailsutilisateur.component';
 import { ConfidentialiteComponent } from './composants/confidentialite/confidentialite.component';
 import { superAdminGuard } from './guards/super-admin.guard';
+import { tresorierGuard } from './guards/tresorier.guard';
+import { TresorerieComponent } from './composants/tresorerie/tresorerie.component';
 
 const routes: Routes = [
   {path:'', redirectTo: 'login', pathMatch: 'full'},
@@ -40,6 +42,8 @@ const routes: Routes = [
       {path:'donations/:id', component: DetailspaiementComponent},
       {path:'utilisateurs', component: UtilisateursComponent},
       {path:'utilisateurs/:id', component: DetailsutilisateurComponent},
+      // Trésorerie : gérée par le trésorier, consultée par le superadmin (vérifié aussi par le backend)
+      {path:'tresorerie', component: TresorerieComponent, canActivate: [tresorierGuard]},
       {path:'administrateurs', component: AdministrateursComponent, canActivate: [superAdminGuard]}
     ]
   }

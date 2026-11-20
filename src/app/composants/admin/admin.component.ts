@@ -1,7 +1,8 @@
 // admin.component.ts
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { isSuperAdmin } from '../../shared/auth.util';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { isSuperAdmin, peutVoirTresorerie } from '../../shared/auth.util';
 import { ThemeService } from '../../shared/theme.service';
 
 @Component({
@@ -21,8 +22,13 @@ export class AdminComponent implements OnInit {
   adminName: string = '';
   adminEmail: string = '';
   estSuperAdmin: boolean = false;
+  voitTresorerie: boolean = false;
 
-  constructor(private router: Router, private themeService: ThemeService) {}
+  constructor(
+    private router: Router,
+    private themeService: ThemeService,
+    private http: HttpClient
+  ) {}
 
   get estSombre(): boolean {
     return this.themeService.estSombre;
@@ -38,7 +44,36 @@ export class AdminComponent implements OnInit {
   ngOnInit(): void {
     // Récupérer les données de l'administrateur depuis localStorage
     this.loadAdminData();
+    this.appliquerRole();
+    this.rafraichirRole();
+  }
+
+  private appliquerRole(): void {
     this.estSuperAdmin = isSuperAdmin();
+    this.voitTresorerie = peutVoirTresorerie();
+  }
+
+  /**
+   * Relit le rôle à jour sur le serveur : un administrateur promu trésorier
+   * (ou dont le rôle a été retiré) voit le bon menu sans se reconnecter.
+   */
+  private rafraichirRole(): void {
+    const token = localStorage.getItem('adminToken');
+    if (!token) return;
+
+    this.http.get<{ id: string; nom: string; email: string; role: string }>(
+      'https://flechissons.com/auth/moi',
+      { headers: new HttpHeaders({ Authorization: `Bearer ${token}` }) }
+    ).subscribe({
+      next: (admin) => {
+        const donnees = { ...(this.adminData || {}), ...admin };
+        localStorage.setItem('adminData', JSON.stringify(donnees));
+        this.loadAdminData();
+        this.appliquerRole();
+      },
+      // Hors ligne ou ancien serveur : on garde le rôle enregistré à la connexion
+      error: () => {}
+    });
   }
 
   loadAdminData(): void {

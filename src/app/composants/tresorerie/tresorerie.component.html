@@ -1,0 +1,637 @@
+<div class="w-full min-w-0">
+
+  <!-- =====================================================
+       HEADER
+  ====================================================== -->
+
+  <div class="mb-6 flex flex-col gap-5 md:flex-row md:items-end md:justify-between">
+
+    <div>
+
+      <div class="mb-3 flex items-center gap-2">
+        <div class="flex h-9 w-9 items-center justify-center rounded-xl bg-orange-100 text-orange-600">
+          <i class="fa-solid fa-sack-dollar"></i>
+        </div>
+        <span class="text-sm font-bold uppercase tracking-wider text-orange-600">
+          Fléchissons
+        </span>
+      </div>
+
+      <h1 class="text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">
+        Trésorerie de l'église
+      </h1>
+
+      <p class="mt-1 text-sm text-slate-500">
+        {{ lectureSeule ? "Consultez les entrées et sorties d'argent de l'église." : "Enregistrez les entrées et sorties d'argent." }}
+        Les caisses USD et CDF sont tenues séparément.
+      </p>
+
+      <span
+        *ngIf="lectureSeule"
+        class="mt-3 inline-flex items-center gap-2 rounded-full bg-purple-50 px-3 py-1 text-xs font-semibold text-purple-600">
+        <i class="fa-solid fa-eye"></i>
+        Lecture seule — seul le trésorier peut modifier les opérations
+      </span>
+
+    </div>
+
+    <button
+      type="button"
+      (click)="exporter()"
+      [disabled]="loadingExport"
+      class="flex w-fit items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 shadow-sm transition hover:bg-slate-50 disabled:opacity-60">
+      <i class="fa-solid" [ngClass]="loadingExport ? 'fa-spinner fa-spin' : 'fa-file-excel text-green-600'"></i>
+      Exporter (Excel)
+    </button>
+
+  </div>
+
+
+
+  <!-- =====================================================
+       PÉRIODE
+  ====================================================== -->
+
+  <div class="mb-6 flex flex-col gap-3 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm lg:flex-row lg:items-center lg:justify-between">
+
+    <div class="flex flex-wrap gap-2">
+      <button
+        *ngFor="let p of [
+          { v: 'mois', l: 'Ce mois' },
+          { v: 'mois_precedent', l: 'Mois précédent' },
+          { v: 'annee', l: 'Cette année' },
+          { v: 'tout', l: 'Tout' }
+        ]"
+        type="button"
+        (click)="choisirPeriode($any(p.v))"
+        [ngClass]="periode === p.v ? 'bg-orange-500 text-white shadow-orange-200 shadow' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'"
+        class="rounded-lg px-3 py-2 text-sm font-semibold transition">
+        {{ p.l }}
+      </button>
+    </div>
+
+    <div class="flex flex-wrap items-center gap-2 text-sm">
+      <input
+        type="date"
+        name="debut"
+        [(ngModel)]="debut"
+        (change)="appliquerDatesPersonnalisees()"
+        class="min-h-[40px] rounded-lg border border-slate-200 px-3 py-2 outline-none focus:border-orange-500">
+      <span class="text-slate-400">au</span>
+      <input
+        type="date"
+        name="fin"
+        [(ngModel)]="fin"
+        (change)="appliquerDatesPersonnalisees()"
+        class="min-h-[40px] rounded-lg border border-slate-200 px-3 py-2 outline-none focus:border-orange-500">
+    </div>
+
+  </div>
+
+
+
+  <!-- =====================================================
+       MESSAGES
+  ====================================================== -->
+
+  <div
+    *ngIf="message"
+    class="mb-5 flex items-center gap-2 rounded-xl border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-700">
+    <i class="fa-solid fa-circle-check"></i>
+    {{ message }}
+  </div>
+
+  <div
+    *ngIf="errorMessage"
+    class="mb-5 flex items-center gap-2 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+    <i class="fa-solid fa-circle-exclamation"></i>
+    {{ errorMessage }}
+  </div>
+
+
+
+  <!-- =====================================================
+       RÉSUMÉ
+  ====================================================== -->
+
+  <div class="mb-3 flex items-center justify-between">
+    <h2 class="text-lg font-bold text-slate-800">Résumé</h2>
+
+    <div class="flex rounded-lg bg-slate-100 p-1">
+      <button
+        *ngFor="let d of devises"
+        type="button"
+        (click)="deviseResume = d"
+        [ngClass]="deviseResume === d ? 'bg-white text-orange-600 shadow-sm' : 'text-slate-500'"
+        class="rounded-md px-3 py-1 text-sm font-bold transition">
+        {{ d }}
+      </button>
+    </div>
+  </div>
+
+  <div *ngIf="loadingResume && !resume" class="flex items-center justify-center gap-2 py-10 text-sm text-slate-400">
+    <i class="fa-solid fa-spinner fa-spin"></i>
+    Chargement du résumé...
+  </div>
+
+  <ng-container *ngIf="resumeDevise as r">
+
+    <div class="mb-6 grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
+
+      <div class="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+        <div class="flex items-center gap-3">
+          <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-orange-50 text-orange-600">
+            <i class="fa-solid fa-vault"></i>
+          </div>
+          <div class="min-w-0">
+            <p class="text-xs text-slate-400">Solde de caisse{{ fin ? ' au ' + (versDate(fin) | date:'d MMM y':'':'fr') : '' }}</p>
+            <p class="truncate text-lg font-bold" [ngClass]="r.solde < 0 ? 'text-red-600' : 'text-slate-800'">
+              {{ formatMontant(r.solde, deviseResume) }}
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div class="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+        <div class="flex items-center gap-3">
+          <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-green-50 text-green-600">
+            <i class="fa-solid fa-arrow-down"></i>
+          </div>
+          <div class="min-w-0">
+            <p class="text-xs text-slate-400">Entrées ({{ r.nombreEntrees }})</p>
+            <p class="truncate text-lg font-bold text-green-600">{{ formatMontant(r.entrees, deviseResume) }}</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+        <div class="flex items-center gap-3">
+          <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-red-50 text-red-600">
+            <i class="fa-solid fa-arrow-up"></i>
+          </div>
+          <div class="min-w-0">
+            <p class="text-xs text-slate-400">Sorties ({{ r.nombreSorties }})</p>
+            <p class="truncate text-lg font-bold text-red-600">{{ formatMontant(r.sorties, deviseResume) }}</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+        <div class="flex items-center gap-3">
+          <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-slate-100 text-slate-600">
+            <i class="fa-solid fa-scale-balanced"></i>
+          </div>
+          <div class="min-w-0">
+            <p class="text-xs text-slate-400">Résultat de la période</p>
+            <p class="truncate text-lg font-bold" [ngClass]="r.resultat < 0 ? 'text-red-600' : 'text-slate-800'">
+              {{ formatMontant(r.resultat, deviseResume) }}
+            </p>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <div
+      *ngIf="r.donsEnLigne.nombre > 0"
+      class="mb-6 flex items-start gap-2 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
+      <i class="fa-solid fa-mobile-screen-button mt-0.5"></i>
+      <span>
+        Dons en ligne (Mobile Money) reçus sur la période :
+        <strong>{{ formatMontant(r.donsEnLigne.total, deviseResume) }}</strong> ({{ r.donsEnLigne.nombre }}).
+        Ils ne sont pas comptés dans la caisse tant que le trésorier ne les a pas saisis comme entrée.
+      </span>
+    </div>
+
+  </ng-container>
+
+
+
+  <div class="grid min-w-0 grid-cols-1 gap-6 xl:grid-cols-5">
+
+    <!-- =====================================================
+         FORMULAIRE
+    ====================================================== -->
+
+    <form
+      *ngIf="!lectureSeule"
+      (ngSubmit)="enregistrer()"
+      class="h-fit min-w-0 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm sm:p-6 xl:col-span-2">
+
+      <h2 class="mb-5 flex items-center gap-2 text-lg font-bold text-slate-800">
+        <i class="fa-solid text-orange-500" [ngClass]="operationEnEditionId ? 'fa-pen' : 'fa-plus'"></i>
+        {{ operationEnEditionId ? "Modifier l'opération" : 'Nouvelle opération' }}
+      </h2>
+
+
+      <!-- TYPE -->
+
+      <div class="mb-5 grid grid-cols-2 gap-2">
+        <button
+          type="button"
+          (click)="changerType('entree')"
+          [ngClass]="formData.type === 'entree' ? 'border-green-500 bg-green-50 text-green-700' : 'border-slate-200 text-slate-500 hover:bg-slate-50'"
+          class="flex items-center justify-center gap-2 rounded-xl border-2 px-3 py-2.5 text-sm font-bold transition">
+          <i class="fa-solid fa-arrow-down"></i>
+          Entrée
+        </button>
+        <button
+          type="button"
+          (click)="changerType('sortie')"
+          [ngClass]="formData.type === 'sortie' ? 'border-red-500 bg-red-50 text-red-700' : 'border-slate-200 text-slate-500 hover:bg-slate-50'"
+          class="flex items-center justify-center gap-2 rounded-xl border-2 px-3 py-2.5 text-sm font-bold transition">
+          <i class="fa-solid fa-arrow-up"></i>
+          Sortie
+        </button>
+      </div>
+
+
+      <!-- CATÉGORIE -->
+
+      <label for="categorie" class="mb-2 block text-sm font-semibold text-slate-700">Catégorie</label>
+      <select
+        id="categorie"
+        name="categorie"
+        [(ngModel)]="formData.categorie"
+        class="mb-5 w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none transition focus:border-orange-500 focus:ring-2 focus:ring-orange-100">
+        <option *ngFor="let c of categories[formData.type]" [value]="c.valeur">{{ c.libelle }}</option>
+      </select>
+
+
+      <!-- LIBELLÉ -->
+
+      <label for="libelle" class="mb-2 block text-sm font-semibold text-slate-700">Libellé</label>
+      <input
+        id="libelle"
+        name="libelle"
+        type="text"
+        maxlength="150"
+        [(ngModel)]="formData.libelle"
+        [placeholder]="formData.type === 'entree' ? 'Ex : Offrandes du culte du dimanche' : 'Ex : Facture d\'électricité novembre'"
+        class="mb-5 w-full rounded-xl border border-slate-200 px-4 py-3 text-sm outline-none transition focus:border-orange-500 focus:ring-2 focus:ring-orange-100">
+
+
+      <!-- MONTANT + DEVISE -->
+
+      <div class="mb-5 grid grid-cols-3 gap-3">
+        <div class="col-span-2 min-w-0">
+          <label for="montant" class="mb-2 block text-sm font-semibold text-slate-700">Montant</label>
+          <input
+            id="montant"
+            name="montant"
+            type="number"
+            min="0.01"
+            step="0.01"
+            [(ngModel)]="formData.montant"
+            placeholder="0,00"
+            class="w-full rounded-xl border border-slate-200 px-4 py-3 text-sm outline-none transition focus:border-orange-500 focus:ring-2 focus:ring-orange-100">
+        </div>
+        <div class="min-w-0">
+          <label for="devise" class="mb-2 block text-sm font-semibold text-slate-700">Devise</label>
+          <select
+            id="devise"
+            name="devise"
+            [(ngModel)]="formData.devise"
+            class="w-full rounded-xl border border-slate-200 bg-white px-3 py-3 text-sm outline-none transition focus:border-orange-500 focus:ring-2 focus:ring-orange-100">
+            <option *ngFor="let d of devises" [value]="d">{{ d }}</option>
+          </select>
+        </div>
+      </div>
+
+
+      <!-- DATE + MODE -->
+
+      <div class="mb-5 grid grid-cols-1 gap-3 sm:grid-cols-2">
+        <div class="min-w-0">
+          <label for="date" class="mb-2 block text-sm font-semibold text-slate-700">Date</label>
+          <input
+            id="date"
+            name="date"
+            type="date"
+            [(ngModel)]="formData.date"
+            class="block min-h-[46px] w-full min-w-0 appearance-none rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none transition focus:border-orange-500 focus:ring-2 focus:ring-orange-100">
+        </div>
+        <div class="min-w-0">
+          <label for="modePaiement" class="mb-2 block text-sm font-semibold text-slate-700">Mode de paiement</label>
+          <select
+            id="modePaiement"
+            name="modePaiement"
+            [(ngModel)]="formData.modePaiement"
+            class="min-h-[46px] w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none transition focus:border-orange-500 focus:ring-2 focus:ring-orange-100">
+            <option *ngFor="let m of modesPaiement" [value]="m.valeur">{{ m.libelle }}</option>
+          </select>
+        </div>
+      </div>
+
+
+      <!-- RÉFÉRENCE -->
+
+      <label for="reference" class="mb-2 block text-sm font-semibold text-slate-700">
+        N° de reçu / pièce justificative <span class="font-normal text-slate-400">(option.)</span>
+      </label>
+      <input
+        id="reference"
+        name="reference"
+        type="text"
+        maxlength="100"
+        [(ngModel)]="formData.reference"
+        placeholder="Ex : REÇU-0042"
+        class="mb-5 w-full rounded-xl border border-slate-200 px-4 py-3 text-sm outline-none transition focus:border-orange-500 focus:ring-2 focus:ring-orange-100">
+
+
+      <!-- DESCRIPTION -->
+
+      <label for="description" class="mb-2 block text-sm font-semibold text-slate-700">
+        Note <span class="font-normal text-slate-400">(optionnelle)</span>
+      </label>
+      <textarea
+        id="description"
+        name="description"
+        rows="2"
+        maxlength="1000"
+        [(ngModel)]="formData.description"
+        class="mb-6 w-full resize-none rounded-xl border border-slate-200 px-4 py-3 text-sm outline-none transition focus:border-orange-500 focus:ring-2 focus:ring-orange-100"></textarea>
+
+
+      <!-- BOUTONS -->
+
+      <div class="flex flex-col gap-3 sm:flex-row">
+        <button
+          type="submit"
+          [disabled]="loading"
+          class="flex flex-1 items-center justify-center gap-2 rounded-xl bg-orange-500 px-4 py-3 text-sm font-semibold text-white shadow-lg shadow-orange-200 transition hover:bg-orange-600 disabled:opacity-60">
+          <i class="fa-solid" [ngClass]="loading ? 'fa-spinner fa-spin' : 'fa-floppy-disk'"></i>
+          {{ operationEnEditionId ? 'Enregistrer' : "Ajouter l'opération" }}
+        </button>
+        <button
+          *ngIf="operationEnEditionId"
+          type="button"
+          (click)="annulerEdition()"
+          class="rounded-xl border border-slate-200 px-4 py-3 text-sm font-semibold text-slate-600 transition hover:bg-slate-50">
+          Annuler
+        </button>
+      </div>
+
+    </form>
+
+
+
+    <!-- =====================================================
+         OPÉRATIONS
+    ====================================================== -->
+
+    <div class="min-w-0" [ngClass]="lectureSeule ? 'xl:col-span-5' : 'xl:col-span-3'">
+
+      <!-- FILTRES -->
+
+      <div class="mb-4 flex flex-col gap-2 sm:flex-row">
+        <div class="relative flex-1">
+          <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-sm text-slate-400"></i>
+          <input
+            type="text"
+            name="recherche"
+            [(ngModel)]="recherche"
+            (ngModelChange)="rechercher()"
+            placeholder="Rechercher (libellé, référence, note)"
+            class="w-full rounded-xl border border-slate-200 bg-white py-2.5 pl-9 pr-3 text-sm outline-none focus:border-orange-500">
+        </div>
+        <select
+          name="filtreType"
+          [(ngModel)]="filtreType"
+          (ngModelChange)="filtrer()"
+          class="rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm outline-none focus:border-orange-500">
+          <option value="">Entrées et sorties</option>
+          <option value="entree">Entrées</option>
+          <option value="sortie">Sorties</option>
+        </select>
+        <select
+          name="filtreDevise"
+          [(ngModel)]="filtreDevise"
+          (ngModelChange)="filtrer()"
+          class="rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm outline-none focus:border-orange-500">
+          <option value="">USD et CDF</option>
+          <option *ngFor="let d of devises" [value]="d">{{ d }}</option>
+        </select>
+      </div>
+
+      <p class="mb-3 text-sm text-slate-500">
+        {{ total }} opération{{ total > 1 ? 's' : '' }}
+      </p>
+
+
+      <div *ngIf="loadingOperations" class="flex items-center justify-center gap-2 py-16 text-sm text-slate-400">
+        <i class="fa-solid fa-spinner fa-spin"></i>
+        Chargement des opérations...
+      </div>
+
+
+      <div
+        *ngIf="!loadingOperations && operations.length === 0"
+        class="rounded-2xl border border-dashed border-slate-300 bg-white px-6 py-16 text-center">
+        <i class="fa-solid fa-receipt mb-3 text-3xl text-slate-300"></i>
+        <p class="font-semibold text-slate-600">Aucune opération sur cette période</p>
+        <p *ngIf="!lectureSeule" class="mt-1 text-sm text-slate-400">Ajoutez une entrée ou une sortie avec le formulaire.</p>
+      </div>
+
+
+      <div *ngIf="!loadingOperations && operations.length > 0" class="space-y-2">
+
+        <div
+          *ngFor="let op of operations"
+          class="flex items-start gap-3 rounded-2xl border bg-white p-3 shadow-sm transition sm:items-center sm:p-4"
+          [ngClass]="operationEnEditionId === op._id ? 'border-orange-400 ring-2 ring-orange-100' : 'border-slate-200'">
+
+          <div
+            class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl"
+            [ngClass]="op.type === 'entree' ? 'bg-green-50 text-green-600' : 'bg-red-50 text-red-600'">
+            <i class="fa-solid" [ngClass]="op.type === 'entree' ? 'fa-arrow-down' : 'fa-arrow-up'"></i>
+          </div>
+
+          <div class="min-w-0 flex-1">
+            <p class="break-words font-semibold text-slate-800">{{ op.libelle }}</p>
+            <p class="text-xs text-slate-400">
+              {{ versDate(op.date) | date:'d MMM y':'':'fr' }}
+              · {{ libelleCategorie(op.type, op.categorie) }}
+              · {{ libelleMode(op.modePaiement) }}
+              <span *ngIf="op.reference"> · {{ op.reference }}</span>
+            </p>
+            <p *ngIf="op.description" class="mt-1 line-clamp-2 break-words text-sm text-slate-500">{{ op.description }}</p>
+            <p class="mt-1 text-[11px] text-slate-400">
+              Saisi par {{ op.creeParNom || '—' }}
+              <span *ngIf="op.modifieParNom"> · modifié par {{ op.modifieParNom }}</span>
+            </p>
+          </div>
+
+          <div class="flex shrink-0 flex-col items-end gap-2">
+            <p class="whitespace-nowrap font-bold" [ngClass]="op.type === 'entree' ? 'text-green-600' : 'text-red-600'">
+              {{ op.type === 'entree' ? '+' : '−' }} {{ formatMontant(op.montant, op.devise) }}
+            </p>
+            <div *ngIf="!lectureSeule" class="flex gap-2">
+              <button
+                type="button"
+                (click)="modifier(op)"
+                title="Modifier"
+                class="flex h-8 w-8 items-center justify-center rounded-lg bg-orange-50 text-orange-600 transition hover:bg-orange-100">
+                <i class="fa-solid fa-pen text-xs"></i>
+              </button>
+              <button
+                type="button"
+                (click)="ouvrirModalSuppression(op)"
+                title="Supprimer"
+                class="flex h-8 w-8 items-center justify-center rounded-lg bg-red-50 text-red-600 transition hover:bg-red-100">
+                <i class="fa-solid fa-trash text-xs"></i>
+              </button>
+            </div>
+          </div>
+
+        </div>
+
+
+        <!-- PAGINATION -->
+
+        <div *ngIf="pages > 1" class="flex items-center justify-center gap-3 pt-3 text-sm">
+          <button
+            type="button"
+            (click)="allerPage(page - 1)"
+            [disabled]="page <= 1"
+            class="rounded-lg border border-slate-200 bg-white px-3 py-1.5 font-semibold text-slate-600 hover:bg-slate-50 disabled:opacity-40">
+            <i class="fa-solid fa-chevron-left"></i>
+          </button>
+          <span class="text-slate-500">Page {{ page }} / {{ pages }}</span>
+          <button
+            type="button"
+            (click)="allerPage(page + 1)"
+            [disabled]="page >= pages"
+            class="rounded-lg border border-slate-200 bg-white px-3 py-1.5 font-semibold text-slate-600 hover:bg-slate-50 disabled:opacity-40">
+            <i class="fa-solid fa-chevron-right"></i>
+          </button>
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+
+
+  <!-- =====================================================
+       RÉPARTITION PAR CATÉGORIE ET PAR MOIS
+  ====================================================== -->
+
+  <div *ngIf="resumeDevise as r" class="mt-8 grid min-w-0 grid-cols-1 gap-6 lg:grid-cols-2">
+
+    <div class="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm sm:p-6">
+
+      <h2 class="mb-4 text-lg font-bold text-slate-800">Par catégorie ({{ deviseResume }})</h2>
+
+      <p *ngIf="r.parCategorie.length === 0" class="py-6 text-center text-sm text-slate-400">
+        Aucune opération en {{ deviseResume }} sur cette période.
+      </p>
+
+      <ng-container *ngFor="let type of $any(['entree', 'sortie'])">
+        <div *ngIf="categoriesResume(type).length" class="mb-5">
+          <p class="mb-2 text-xs font-bold uppercase tracking-wider"
+             [ngClass]="type === 'entree' ? 'text-green-600' : 'text-red-600'">
+            {{ type === 'entree' ? 'Entrées' : 'Sorties' }}
+          </p>
+          <div *ngFor="let c of categoriesResume(type)" class="mb-2">
+            <div class="mb-1 flex justify-between gap-2 text-sm">
+              <span class="truncate text-slate-600">{{ libelleCategorie(type, c.categorie) }} <span class="text-slate-400">({{ c.nombre }})</span></span>
+              <span class="whitespace-nowrap font-semibold text-slate-800">{{ formatMontant(c.total, deviseResume) }}</span>
+            </div>
+            <div class="h-2 overflow-hidden rounded-full bg-slate-100">
+              <div class="h-full rounded-full"
+                   [ngClass]="type === 'entree' ? 'bg-green-500' : 'bg-red-500'"
+                   [style.width.%]="pourcentage(c.total, type)"></div>
+            </div>
+          </div>
+        </div>
+      </ng-container>
+
+    </div>
+
+    <div class="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm sm:p-6">
+
+      <h2 class="mb-4 text-lg font-bold text-slate-800">Par mois ({{ deviseResume }})</h2>
+
+      <p *ngIf="r.parMois.length === 0" class="py-6 text-center text-sm text-slate-400">
+        Aucune opération en {{ deviseResume }} sur cette période.
+      </p>
+
+      <div *ngIf="r.parMois.length" class="overflow-x-auto">
+        <table class="w-full text-sm">
+          <thead>
+            <tr class="border-b border-slate-100 text-left text-xs uppercase tracking-wider text-slate-400">
+              <th class="py-2 pr-3 font-semibold">Mois</th>
+              <th class="py-2 pr-3 text-right font-semibold">Entrées</th>
+              <th class="py-2 pr-3 text-right font-semibold">Sorties</th>
+              <th class="py-2 text-right font-semibold">Résultat</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let m of r.parMois" class="border-b border-slate-50">
+              <td class="py-2 pr-3 capitalize text-slate-600">{{ libelleMois(m.mois) }}</td>
+              <td class="whitespace-nowrap py-2 pr-3 text-right text-green-600">{{ formatMontant(m.entrees, deviseResume) }}</td>
+              <td class="whitespace-nowrap py-2 pr-3 text-right text-red-600">{{ formatMontant(m.sorties, deviseResume) }}</td>
+              <td class="whitespace-nowrap py-2 text-right font-semibold"
+                  [ngClass]="m.resultat < 0 ? 'text-red-600' : 'text-slate-800'">
+                {{ formatMontant(m.resultat, deviseResume) }}
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+    </div>
+
+  </div>
+
+
+
+  <!-- =====================================================
+       MODAL SUPPRESSION
+  ====================================================== -->
+
+  <div
+    *ngIf="operationASupprimer"
+    class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm"
+    (click)="!loadingSuppression && fermerModalSuppression()">
+
+    <div class="w-full max-w-sm rounded-2xl bg-white p-6 text-center shadow-xl" (click)="$event.stopPropagation()">
+
+      <div class="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-red-50 text-red-600">
+        <i class="fa-solid fa-trash"></i>
+      </div>
+
+      <h3 class="text-lg font-bold text-slate-800">Supprimer cette opération ?</h3>
+
+      <p class="mt-1 text-sm text-slate-500">
+        « {{ operationASupprimer.libelle }} » —
+        {{ formatMontant(operationASupprimer.montant, operationASupprimer.devise) }}.
+        Les soldes seront recalculés. Cette action est irréversible.
+      </p>
+
+      <div class="mt-6 flex gap-3">
+        <button
+          type="button"
+          (click)="fermerModalSuppression()"
+          [disabled]="loadingSuppression"
+          class="flex-1 rounded-xl border border-slate-200 px-4 py-2.5 text-sm font-semibold text-slate-600 hover:bg-slate-50">
+          Annuler
+        </button>
+        <button
+          type="button"
+          (click)="confirmerSuppression()"
+          [disabled]="loadingSuppression"
+          class="flex flex-1 items-center justify-center gap-2 rounded-xl bg-red-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-red-700 disabled:opacity-60">
+          <i *ngIf="loadingSuppression" class="fa-solid fa-spinner fa-spin"></i>
+          Supprimer
+        </button>
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
