@@ -48,6 +48,11 @@ export class MessagerieComponent implements OnInit, OnDestroy {
   envoiEnCours = false;
   erreur = '';
 
+  // Photo jointe (aperçu avant envoi) et photo agrandie
+  photo: File | null = null;
+  apercuPhoto = '';
+  visionneuse: string | null = null;
+
   private actualisation?: Subscription;
   private actualisationListe?: Subscription;
   private routeSub?: Subscription;
@@ -238,22 +243,55 @@ export class MessagerieComponent implements OnInit, OnDestroy {
     });
   }
 
+  choisirPhoto(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const fichier = input.files?.[0];
+    input.value = '';
+    if (!fichier) return;
+
+    if (!fichier.type.startsWith('image/') || /gif|svg/i.test(fichier.type)) {
+      this.erreur = 'Choisissez une photo (JPG, PNG, WEBP, HEIC).';
+      return;
+    }
+    if (fichier.size > 10 * 1024 * 1024) {
+      this.erreur = 'La photo ne doit pas dépasser 10 Mo.';
+      return;
+    }
+    this.retirerPhoto();
+    this.erreur = '';
+    this.photo = fichier;
+    this.apercuPhoto = URL.createObjectURL(fichier);
+  }
+
+  retirerPhoto(): void {
+    if (this.apercuPhoto) URL.revokeObjectURL(this.apercuPhoto);
+    this.photo = null;
+    this.apercuPhoto = '';
+  }
+
+  agrandir(url: string | null | undefined): void {
+    if (url) this.visionneuse = url;
+  }
+
   envoyer(): void {
     const texte = this.texte.trim();
-    if (!texte || !this.active || this.envoiEnCours) return;
+    const photo = this.photo;
+    if ((!texte && !photo) || !this.active || this.envoiEnCours) return;
 
     this.envoiEnCours = true;
     this.erreur = '';
     const conversation = this.active;
 
-    this.messagerie.envoyer(conversation._id, texte).subscribe({
+    this.messagerie.envoyer(conversation._id, texte, photo).subscribe({
       next: r => {
         this.envoiEnCours = false;
         this.texte = '';
+        this.retirerPhoto();
         if (!this.messages.some(m => m._id === r.message._id)) {
           this.messages = [...this.messages, r.message];
         }
-        conversation.dernierMessage = { texte, auteur: 'admin', date: r.message.createdAt };
+        const apercu = photo ? (texte ? `📷 Photo · ${texte}` : '📷 Photo') : texte;
+        conversation.dernierMessage = { texte: apercu, auteur: 'admin', date: r.message.createdAt };
         // La conversation remonte en tête de liste
         this.conversations = [conversation, ...this.conversations.filter(c => c._id !== conversation._id)];
         this.defilerEnBas();

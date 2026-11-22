@@ -134,6 +134,11 @@
                   <td>Quand vous envoyez une requête</td>
                 </tr>
                 <tr>
+                  <td>Messagerie</td>
+                  <td>Messages et photos échangés avec un pasteur ou un responsable, date d'envoi et de lecture</td>
+                  <td>Quand vous utilisez la messagerie</td>
+                </tr>
+                <tr>
                   <td>Activité du compte</td>
                   <td>Date de création du compte, date de dernière connexion, dates de mise à jour du profil</td>
                   <td>Automatiquement</td>
@@ -141,7 +146,7 @@
               </tbody>
             </table>
           </div>
-          <div class="note"><strong>Ce que nous ne recueillons pas.</strong> Nous n'avons accès ni à votre code PIN Mobile Money, ni à vos contacts, ni à vos photos en dehors de celle que vous choisissez pour votre profil.</div>
+          <div class="note"><strong>Ce que nous ne recueillons pas.</strong> Nous n'avons accès ni à votre code PIN Mobile Money, ni à vos contacts, ni à vos photos en dehors de celle que vous choisissez pour votre profil et de celles que vous envoyez dans la messagerie.</div>
         </section>
 
         <section id="utilisation">
@@ -152,6 +157,7 @@
             <li><strong>Personnaliser l'application</strong> : afficher les contenus dans votre langue et mettre en avant les thèmes que vous avez choisis.</li>
             <li><strong>Traiter vos dons</strong> : lancer le paiement auprès de votre opérateur, vous confirmer le résultat et tenir la comptabilité de l'église.</li>
             <li><strong>Répondre à vos requêtes</strong> : l'équipe pastorale lit votre message et peut vous répondre par e-mail.</li>
+            <li><strong>Vous permettre d'échanger avec l'église</strong> : acheminer vos messages privés et ceux de vos pasteurs, et vous prévenir quand vous en recevez un.</li>
             <li><strong>Vous informer</strong> : vous envoyer des notifications sur les cultes en direct et les événements, uniquement si vous les avez activées.</li>
             <li><strong>Améliorer le service</strong> : suivre des statistiques globales (nombre d'inscrits, répartition par langue ou par ville) pour mieux organiser les contenus.</li>
           </ul>
@@ -176,6 +182,14 @@
               <span>Diffuse les cultes en direct et les vidéos. Quand vous regardez une vidéo, YouTube applique sa propre politique.</span>
             </div>
             <div class="partner">
+              <strong>Cloudflare</strong>
+              <span>Stocke les photos (profil, publications, messagerie). Les photos de la messagerie sont effacées chaque mois.</span>
+            </div>
+            <div class="partner">
+              <strong>Firebase (Google)</strong>
+              <span>Achemine les notifications vers votre téléphone, dont le nom de l'expéditeur et le début d'un message reçu.</span>
+            </div>
+            <div class="partner">
               <strong>OpenStreetMap</strong>
               <span>Affiche la carte qui situe l'église. Aucune donnée de votre compte ne lui est transmise.</span>
             </div>
@@ -189,6 +203,7 @@
           <ul class="list">
             <li><strong>Compte et profil</strong> : tant que votre compte existe. Ils sont effacés quand vous supprimez votre compte.</li>
             <li><strong>Requêtes</strong> : le temps de les traiter, puis elles peuvent être supprimées par l'équipe.</li>
+            <li><strong>Messagerie</strong> : les conversations et leurs photos sont effacées automatiquement le 1<sup>er</sup> de chaque mois, et dès la suppression de votre compte.</li>
             <li><strong>Dons</strong> : les traces des transactions sont conservées aussi longtemps que l'exigent les obligations comptables, même après la suppression du compte. Elles ne sont alors plus rattachées à votre profil.</li>
           </ul>
         </section>
@@ -200,14 +215,32 @@
           <p>Aucun système n'est parfaitement sûr. Si une fuite touchait vos données, nous vous préviendrions dans les meilleurs délais.</p>
         </section>
 
-        <section id="droits">
+        <section id="messagerie">
           <span class="num">07</span>
+          <h2 class="sec">Vos conversations privées</h2>
+          <p>La messagerie vous permet d'écrire directement à un pasteur ou à un responsable de l'église. Voici comment vos échanges sont protégés.</p>
+          <ul class="list">
+            <li><strong>Deux personnes seulement</strong> : une conversation n'est visible que par vous et le pasteur ou le responsable à qui vous écrivez. Les autres utilisateurs et les autres administrateurs n'y ont pas accès.</li>
+            <li><strong>Accès vérifié à chaque fois</strong> : pour lire ou envoyer un message, il faut être connecté au compte concerné. Le serveur vérifie à chaque demande que vous faites bien partie de la conversation.</li>
+            <li><strong>Transport chiffré</strong> : les messages et les photos circulent en HTTPS entre l'application et notre serveur. Ils sont ensuite enregistrés sur notre serveur, qui n'est pas accessible au public. La messagerie n'est pas chiffrée de bout en bout : évitez d'y écrire des informations très sensibles.</li>
+            <li><strong>Photos</strong> : elles sont réduites sur votre téléphone avant l'envoi, puis stockées chez Cloudflare sous un nom aléatoire impossible à deviner. Elles ne sont ni publiées ni répertoriées.</li>
+            <li><strong>Notifications</strong> : quand vous recevez un message, la notification affiche le nom de l'expéditeur et le début du message. Vous pouvez masquer cet aperçu dans les réglages de notifications de votre téléphone.</li>
+            <li><strong>Effacement automatique</strong> : toutes les conversations, leurs photos et les notifications qui y sont liées sont effacées définitivement le 1<sup>er</sup> de chaque mois.</li>
+            <li><strong>Supprimer une discussion</strong> : vous pouvez supprimer une discussion à tout moment. Elle disparaît de votre application ; votre interlocuteur garde sa copie jusqu'à ce qu'il la supprime aussi ou jusqu'à l'effacement du mois. Quand les deux l'ont supprimée, les messages et les photos sont effacés pour de bon.</li>
+            <li><strong>Fond d'écran</strong> : le fond que vous choisissez pour vos conversations reste sur votre téléphone. Il n'est jamais envoyé à notre serveur.</li>
+          </ul>
+          <div class="note"><strong>Restez prudent.</strong> Fléchissons ne vous demandera jamais votre code PIN Mobile Money ni votre mot de passe dans la messagerie. Ne les communiquez à personne.</div>
+        </section>
+
+        <section id="droits">
+          <span class="num">08</span>
           <h2 class="sec">Vos droits</h2>
           <p>À tout moment, vous pouvez :</p>
           <ul class="list">
             <li><strong>Consulter</strong> les données que nous avons sur vous.</li>
             <li><strong>Corriger</strong> votre profil directement dans l'application.</li>
-            <li><strong>Supprimer votre compte</strong> et les données qui y sont liées.</li>
+            <li><strong>Supprimer une discussion</strong> de la messagerie, par un appui long dans la liste ou depuis le menu de la conversation.</li>
+            <li><strong>Supprimer votre compte</strong> et les données qui y sont liées, y compris vos conversations.</li>
             <li><strong>Désactiver les notifications</strong> dans les réglages de l'application ou de votre téléphone.</li>
             <li><strong>Retirer votre consentement</strong> pour les informations facultatives, en les effaçant de votre profil.</li>
           </ul>
@@ -216,19 +249,19 @@
         </section>
 
         <section id="enfants">
-          <span class="num">08</span>
+          <span class="num">09</span>
           <h2 class="sec">Enfants</h2>
           <p>L'application ne s'adresse pas aux enfants de moins de 13 ans sans l'accord d'un parent. Si vous pensez qu'un enfant nous a donné des informations sans cet accord, contactez-nous et nous les supprimerons.</p>
         </section>
 
         <section id="modifications">
-          <span class="num">09</span>
+          <span class="num">10</span>
           <h2 class="sec">Modifications de cette politique</h2>
           <p>Nous pouvons mettre à jour cette page, par exemple quand une nouvelle fonction arrive dans l'application. La date de mise à jour en haut de la page change alors. Si le changement est important, nous vous prévenons dans l'application.</p>
         </section>
 
         <section id="contact">
-          <span class="num">10</span>
+          <span class="num">11</span>
           <h2 class="sec">Contact</h2>
           <div class="contact">
             <div class="contact-texte">

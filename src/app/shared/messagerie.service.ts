@@ -28,6 +28,7 @@ export interface MessageChat {
   conversation: string;
   auteur: 'utilisateur' | 'admin';
   texte: string;
+  image?: { url: string | null } | null;
   luLe: string | null;
   createdAt: string;
 }
@@ -69,21 +70,56 @@ export class MessagerieService {
     return new HttpHeaders(token ? { Authorization: `Bearer ${token}` } : {});
   }
 
+  /** Dernier total connu (null = premier chargement : pas de notification) */
+  private dernierTotal: number | null = null;
+
   /** Actualise le badge toutes les 20 secondes */
   demarrerSurveillance(): void {
     if (this.surveillance || !peutUtiliserMessagerie()) return;
+    // Notifications de bureau (Windows / navigateur) pour les nouveaux messages
+    if ('Notification' in window && Notification.permission === 'default') {
+      void Notification.requestPermission();
+    }
     this.surveillance = timer(0, 20000).subscribe(() => this.rafraichirNonLus());
   }
 
   arreterSurveillance(): void {
     this.surveillance?.unsubscribe();
     this.surveillance = undefined;
+    this.dernierTotal = null;
     this.nonLusSujet.next(0);
   }
 
   rafraichirNonLus(): void {
     this.http.get<{ nonLus: number }>(`${URL_MESSAGERIE}/non-lus`, { headers: this.headers })
-      .subscribe({ next: r => this.nonLusSujet.next(r.nonLus || 0), error: () => {} });
+      .subscribe({
+        next: r => {
+          const total = r.nonLus || 0;
+          if (this.dernierTotal !== null && total > this.dernierTotal) {
+            this.notifierBureau(total - this.dernierTotal);
+          }
+          this.dernierTotal = total;
+          this.nonLusSujet.next(total);
+        },
+        error: () => {}
+      });
+  }
+
+  /** Notification Windows / navigateur, sauf si la page Messagerie est déjà sous les yeux */
+  private notifierBureau(nouveaux: number): void {
+    if (!('Notification' in window) || Notification.permission !== 'granted') return;
+    if (document.visibilityState === 'visible' && location.pathname.includes('/admin/messagerie')) return;
+    const notification = new Notification('Fléchissons — Messagerie', {
+      body: nouveaux > 1 ? `${nouveaux} nouveaux messages d'utilisateurs` : "Nouveau message d'un utilisateur",
+      icon: '/images/logo.png',
+      tag: 'flechissons-messagerie'
+    });
+    notification.onclick = () => {
+      window.focus();
+      // Écouté par AdminComponent, qui ouvre la page Messagerie
+      window.dispatchEvent(new CustomEvent('ouvrir-messagerie'));
+      notification.close();
+    };
   }
 
   conversations(): Observable<{ conversations: ConversationAdmin[] }> {
@@ -106,11 +142,15 @@ export class MessagerieService {
     return this.http.get<PageMessages>(`${URL_MESSAGERIE}/conversations/${conversationId}/messages`, { headers: this.headers, params });
   }
 
-  envoyer(conversationId: string, texte: string): Observable<{ message: MessageChat }> {
-    return this.http.post<{ message: MessageChat }>(
-      `${URL_MESSAGERIE}/conversations/${conversationId}/messages`,
-      { texte },
-      { headers: this.headers }
-    );
+  /** Texte seul en JSON ; avec une photo, envoi multipart (légende facultative) */
+  envoyer(conversationId: string, texte: string, photo?: File | null): Observable<{ message: MessageChat }> {
+    const url = `${URL_MESSAGERIE}/conversations/${conversationId}/messages`;
+    if (!photo) {
+      return this.http.post<{ message: MessageChat }>(url, { texte }, { headers: this.headers });
+    }
+    const donnees = new FormData();
+    donnees.append('photo', photo, photo.name);
+    if (texte) donnees.append('texte', texte);
+    return this.http.post<{ message: MessageChat }>(url, donnees, { headers: this.headers });
   }
 }

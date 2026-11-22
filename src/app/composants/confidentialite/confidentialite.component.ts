@@ -11,7 +11,7 @@ import { ThemeService } from '../../shared/theme.service';
 })
 export class ConfidentialiteComponent implements AfterViewInit, OnDestroy {
 
-  readonly dateMiseAJour = '12 octobre 2026';
+  readonly dateMiseAJour = '22 novembre 2026';
   readonly annee = new Date().getFullYear();
 
   readonly sections = [
@@ -21,6 +21,7 @@ export class ConfidentialiteComponent implements AfterViewInit, OnDestroy {
     { id: 'partage', titre: 'Partage' },
     { id: 'conservation', titre: 'Durée de conservation' },
     { id: 'securite', titre: 'Sécurité' },
+    { id: 'messagerie', titre: 'Messagerie privée' },
     { id: 'droits', titre: 'Vos droits' },
     { id: 'enfants', titre: 'Enfants' },
     { id: 'modifications', titre: 'Modifications' },

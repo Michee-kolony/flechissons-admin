@@ -2,7 +2,7 @@
 import { Component, OnInit } from '@angular/core';
 import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
 import { Router } from '@angular/router';
-import { isSuperAdmin } from '../../shared/auth.util';
+import { isSuperAdmin, isTresorier } from '../../shared/auth.util';
 import { Paiement, OperateurPaiement, OPERATEURS } from '../../shared/paiement.util';
 
 export interface Requete {
@@ -81,6 +81,8 @@ export class DashboardComponent implements OnInit {
 
   // Les requêtes de prière sont réservées au superadmin
   estSuperAdmin: boolean = false;
+  /** Le trésorier voit les chiffres, sans liens vers les pages qui lui sont fermées */
+  estTresorier: boolean = false;
 
   // Indicateurs de chargement
   chargement: boolean = false;
@@ -92,6 +94,7 @@ export class DashboardComponent implements OnInit {
     this.dateAujourdhui = this.formaterDate(new Date());
     this.bannerOuverte = localStorage.getItem('dashboardBannerFerme') !== 'true';
     this.estSuperAdmin = isSuperAdmin();
+    this.estTresorier = isTresorier();
     this.chargerToutesLesDonnees();
   }
 

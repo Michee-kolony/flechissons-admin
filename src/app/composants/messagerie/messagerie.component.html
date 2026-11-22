@@ -6,7 +6,7 @@
     <p class="text-sm font-medium text-orange-600">Administration</p>
     <h1 class="text-2xl sm:text-3xl font-bold text-gray-900 mt-1">Messagerie</h1>
     <p class="text-sm text-gray-500 mt-1">
-      Échangez en privé avec les utilisateurs de l'application. Vous seul voyez vos conversations.
+      Échangez en privé avec les utilisateurs de l'application. Vous seul voyez vos conversations. Elles sont effacées automatiquement, avec leurs photos, le 1<sup>er</sup> de chaque mois.
     </p>
   </div>
 
@@ -178,7 +178,13 @@
                 [ngClass]="m.auteur === 'admin'
                   ? 'bg-orange-600 text-white rounded-br-md'
                   : 'bg-white text-gray-800 border border-gray-100 rounded-bl-md'">
-                {{ m.texte }}
+                <img
+                  *ngIf="m.image?.url"
+                  [src]="m.image?.url"
+                  (click)="agrandir(m.image?.url)"
+                  alt="Photo"
+                  loading="lazy"
+                  class="block w-64 max-w-full max-h-80 object-cover rounded-xl cursor-zoom-in -mx-1 mb-1">{{ m.texte }}
                 <div class="mt-1 text-[10px] text-right"
                   [ngClass]="m.auteur === 'admin' ? 'text-white/75' : 'text-gray-400'">
                   {{ m.createdAt | date:'HH:mm' }}
@@ -197,8 +203,26 @@
           {{ erreur }}
         </p>
 
+        <!-- APERÇU DE LA PHOTO À ENVOYER -->
+        <div *ngIf="apercuPhoto" class="px-3 pt-3 flex items-start gap-3 border-t border-gray-100">
+          <div class="relative">
+            <img [src]="apercuPhoto" alt="Photo à envoyer" class="h-24 w-24 object-cover rounded-xl border border-gray-200">
+            <button type="button" (click)="retirerPhoto()" aria-label="Retirer la photo"
+              class="absolute -top-2 -right-2 w-6 h-6 rounded-full bg-gray-800 text-white text-xs flex items-center justify-center">
+              <i class="fa-solid fa-xmark"></i>
+            </button>
+          </div>
+          <p class="text-xs text-gray-500 mt-1">Ajoutez une légende si vous le souhaitez, puis cliquez sur « Envoyer ».</p>
+        </div>
+
         <!-- SAISIE -->
         <div class="p-3 border-t border-gray-100 flex items-end gap-2" *ngIf="active.interlocuteur; else compteSupprime">
+          <label
+            class="h-11 w-11 flex-shrink-0 rounded-xl border border-gray-200 bg-gray-50 hover:bg-orange-50 text-orange-600 flex items-center justify-center cursor-pointer transition"
+            title="Envoyer une photo">
+            <i class="fa-solid fa-image"></i>
+            <input type="file" accept="image/jpeg,image/png,image/webp,image/heic,image/heif" class="hidden" (change)="choisirPhoto($event)" [disabled]="envoiEnCours">
+          </label>
           <textarea
             name="texte"
             [(ngModel)]="texte"
@@ -210,7 +234,7 @@
           <button
             type="button"
             (click)="envoyer()"
-            [disabled]="!texte.trim() || envoiEnCours"
+            [disabled]="(!texte.trim() && !photo) || envoiEnCours"
             class="h-11 px-4 rounded-xl bg-orange-600 hover:bg-orange-700 text-white text-sm font-semibold flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed transition"
             aria-label="Envoyer">
             <i class="fa-solid" [ngClass]="envoiEnCours ? 'fa-spinner fa-spin' : 'fa-paper-plane'"></i>
@@ -226,6 +250,16 @@
       </ng-container>
     </section>
   </div>
+</div>
+
+
+<!-- PHOTO EN GRAND -->
+<div *ngIf="visionneuse" (click)="visionneuse = null"
+  class="fixed inset-0 z-50 bg-black/85 flex items-center justify-center p-6 cursor-zoom-out">
+  <img [src]="visionneuse" alt="Photo" class="max-w-full max-h-full rounded-lg shadow-2xl">
+  <button type="button" class="absolute top-5 right-5 w-10 h-10 rounded-full bg-white/15 text-white text-lg" aria-label="Fermer">
+    <i class="fa-solid fa-xmark"></i>
+  </button>
 </div>
 
 

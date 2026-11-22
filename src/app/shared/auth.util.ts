@@ -26,6 +26,14 @@ export function isTresorier(): boolean {
   return getAdminRole() === 'tresorier';
 }
 
+// Le trésorier n'a accès qu'au tableau de bord, à la trésorerie et à son profil
+export const PAGES_TRESORIER = ['/admin/dashboard', '/admin/tresorerie', '/admin/profil'];
+
+export function pageAutoriseeTresorier(url: string): boolean {
+  const chemin = (url || '').split(/[?#]/)[0];
+  return PAGES_TRESORIER.some(p => chemin === p || chemin.startsWith(p + '/'));
+}
+
 // Le superadmin consulte la trésorerie en lecture seule
 export function peutVoirTresorerie(): boolean {
   return isTresorier() || isSuperAdmin();

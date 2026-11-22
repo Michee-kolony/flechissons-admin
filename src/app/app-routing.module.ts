@@ -19,6 +19,7 @@ import { DetailsutilisateurComponent } from './composants/detailsutilisateur/det
 import { ConfidentialiteComponent } from './composants/confidentialite/confidentialite.component';
 import { superAdminGuard } from './guards/super-admin.guard';
 import { tresorierGuard } from './guards/tresorier.guard';
+import { pasTresorierGuard } from './guards/pas-tresorier.guard';
 import { MessagerieComponent } from './composants/messagerie/messagerie.component';
 import { peutUtiliserMessagerie } from './shared/messagerie.service';
 import { ProfilComponent } from './composants/profil/profil.component';
@@ -33,18 +34,19 @@ const routes: Routes = [
     children:[
       {path:'', redirectTo: 'dashboard', pathMatch:'full'},
       {path:'dashboard', component: DashboardComponent},
-      {path:'publier', component: PublierComponent},
-      {path:'gestion', component: GestionComponent},
+      // Le trésorier ne voit que le tableau de bord, la trésorerie et son profil
+      {path:'publier', component: PublierComponent, canActivate: [pasTresorierGuard]},
+      {path:'gestion', component: GestionComponent, canActivate: [pasTresorierGuard]},
       {path:'requetes-de-priere', component: RequetesComponent, canActivate: [superAdminGuard]},
-      {path:'detailsarticles/:id', component: DetailsarticlesComponent},
-      {path:'audios', component: AudioComponent},
-      {path:'lives', component: LivesComponent},
-      {path:'eglise', component: EgliseComponent},
-      {path:'evenements', component: EvenementsComponent},
-      {path:'donations', component: DonationsComponent},
-      {path:'donations/:id', component: DetailspaiementComponent},
-      {path:'utilisateurs', component: UtilisateursComponent},
-      {path:'utilisateurs/:id', component: DetailsutilisateurComponent},
+      {path:'detailsarticles/:id', component: DetailsarticlesComponent, canActivate: [pasTresorierGuard]},
+      {path:'audios', component: AudioComponent, canActivate: [pasTresorierGuard]},
+      {path:'lives', component: LivesComponent, canActivate: [pasTresorierGuard]},
+      {path:'eglise', component: EgliseComponent, canActivate: [pasTresorierGuard]},
+      {path:'evenements', component: EvenementsComponent, canActivate: [pasTresorierGuard]},
+      {path:'donations', component: DonationsComponent, canActivate: [pasTresorierGuard]},
+      {path:'donations/:id', component: DetailspaiementComponent, canActivate: [pasTresorierGuard]},
+      {path:'utilisateurs', component: UtilisateursComponent, canActivate: [pasTresorierGuard]},
+      {path:'utilisateurs/:id', component: DetailsutilisateurComponent, canActivate: [pasTresorierGuard]},
       // Trésorerie : gérée par le trésorier, consultée par le superadmin (vérifié aussi par le backend)
       {path:'tresorerie', component: TresorerieComponent, canActivate: [tresorierGuard]},
       {path:'messagerie', component: MessagerieComponent, canActivate: [() => peutUtiliserMessagerie()]},

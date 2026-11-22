@@ -90,6 +90,7 @@
       </p>
 
       <button
+        *ngIf="!estTresorier"
         type="button"
         routerLink="/admin/publier"
         class="mt-5 inline-flex items-center gap-2 px-5 py-3 bg-white text-orange-700 font-semibold rounded-xl shadow-lg hover:bg-orange-50 transition">
@@ -199,7 +200,8 @@
   </div>
 
   <!-- DONATIONS -->
-  <a routerLink="/admin/donations"
+  <a [routerLink]="estTresorier ? null : '/admin/donations'"
+     [class.pointer-events-none]="estTresorier"
      class="bg-white rounded-xl border border-gray-100 shadow-sm p-4 flex items-center gap-3 hover:shadow-md transition-shadow duration-200">
     <div class="w-12 h-12 rounded-full bg-orange-50 border-4 border-orange-400 flex items-center justify-center flex-shrink-0">
       <i class="fa-solid fa-hand-holding-heart text-orange-500 text-sm"></i>
