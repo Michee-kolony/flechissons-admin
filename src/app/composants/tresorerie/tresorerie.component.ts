@@ -12,6 +12,7 @@ import {
   ResumeTresorerie,
   TypeOperation,
   URL_TRESORERIE,
+  categoriesFormulaire,
   depuisAAAAMMJJ,
   libelleCategorie,
   libelleMode,
@@ -32,6 +33,7 @@ export class TresorerieComponent implements OnInit {
   readonly modesPaiement = MODES_PAIEMENT;
   readonly formatMontant = formatMontant;
   readonly libelleCategorie = libelleCategorie;
+  readonly categoriesFormulaire = categoriesFormulaire;
   readonly libelleMode = libelleMode;
   readonly versDate = depuisAAAAMMJJ;
 
@@ -64,6 +66,7 @@ export class TresorerieComponent implements OnInit {
 
   filtreType: '' | TypeOperation = '';
   filtreDevise: '' | Devise = '';
+  filtreCategorie = '';
   recherche = '';
   private rechercheTimer: any;
 
@@ -104,7 +107,7 @@ export class TresorerieComponent implements OnInit {
   private formulaireVide() {
     return {
       type: 'entree' as TypeOperation,
-      categorie: 'offrande',
+      categorie: 'offrande_adoration',
       libelle: '',
       montant: null as number | null,
       devise: 'USD' as Devise,
@@ -180,6 +183,7 @@ export class TresorerieComponent implements OnInit {
     let params = this.parametresPeriode();
     if (this.filtreType) params = params.set('type', this.filtreType);
     if (this.filtreDevise) params = params.set('devise', this.filtreDevise);
+    if (this.filtreCategorie) params = params.set('categorie', this.filtreCategorie);
     if (this.recherche.trim()) params = params.set('recherche', this.recherche.trim());
     return params;
   }
@@ -262,7 +266,21 @@ export class TresorerieComponent implements OnInit {
   }
 
 
+  // Catégories proposées dans le filtre de la liste (selon le type choisi)
+  get categoriesFiltre(): { valeur: string; libelle: string }[] {
+    if (this.filtreType) return CATEGORIES[this.filtreType];
+    return [
+      ...CATEGORIES.entree.map(c => ({ ...c, libelle: `Entrée · ${c.libelle}` })),
+      ...CATEGORIES.sortie.map(c => ({ ...c, libelle: `Sortie · ${c.libelle}` }))
+    ];
+  }
+
+
   filtrer(): void {
+    // La catégorie filtrée doit exister pour le type choisi
+    if (this.filtreCategorie && !this.categoriesFiltre.some(c => c.valeur === this.filtreCategorie)) {
+      this.filtreCategorie = '';
+    }
     this.page = 1;
     this.getOperations();
   }

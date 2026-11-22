@@ -44,14 +44,15 @@ export const URL_TRESORERIE = 'https://flechissons.com/tresorerie';
 export const DEVISES: Devise[] = ['USD', 'CDF'];
 
 export const CATEGORIES: Record<TypeOperation, { valeur: string; libelle: string }[]> = {
+  // Types de contribution définis par le pasteur
   entree: [
-    { valeur: 'offrande', libelle: 'Offrande' },
-    { valeur: 'dime', libelle: 'Dîme' },
-    { valeur: 'don', libelle: 'Don' },
-    { valeur: 'action_de_graces', libelle: 'Action de grâces' },
-    { valeur: 'mission', libelle: 'Mission' },
-    { valeur: 'cotisation', libelle: 'Cotisation' },
-    { valeur: 'vente', libelle: 'Vente' },
+    { valeur: 'offrande_adoration', libelle: "Offrande d'adoration" },
+    { valeur: 'offrande_prophete', libelle: 'Offrande du prophète' },
+    { valeur: 'dime_action_graces', libelle: 'Dîme et action de grâces' },
+    { valeur: 'dime_des_dimes', libelle: 'Dîme des dîmes' },
+    { valeur: 'loyer_ouvriers', libelle: 'Loyer des ouvriers' },
+    { valeur: 'loyer_partenaires', libelle: 'Loyer des partenaires' },
+    { valeur: 'contribution', libelle: 'Contribution' },
     { valeur: 'autre_entree', libelle: 'Autre entrée' }
   ],
   sortie: [
@@ -68,6 +69,20 @@ export const CATEGORIES: Record<TypeOperation, { valeur: string; libelle: string
   ]
 };
 
+// Anciennes catégories : plus proposées, mais encore affichées pour les opérations déjà saisies
+export const CATEGORIES_ANCIENNES: Record<TypeOperation, { valeur: string; libelle: string }[]> = {
+  entree: [
+    { valeur: 'offrande', libelle: 'Offrande (ancienne catégorie)' },
+    { valeur: 'dime', libelle: 'Dîme (ancienne catégorie)' },
+    { valeur: 'don', libelle: 'Don (ancienne catégorie)' },
+    { valeur: 'action_de_graces', libelle: 'Action de grâces (ancienne catégorie)' },
+    { valeur: 'mission', libelle: 'Mission (ancienne catégorie)' },
+    { valeur: 'cotisation', libelle: 'Cotisation (ancienne catégorie)' },
+    { valeur: 'vente', libelle: 'Vente (ancienne catégorie)' }
+  ],
+  sortie: []
+};
+
 export const MODES_PAIEMENT: { valeur: ModePaiement; libelle: string }[] = [
   { valeur: 'especes', libelle: 'Espèces' },
   { valeur: 'mobile_money', libelle: 'Mobile Money' },
@@ -76,7 +91,16 @@ export const MODES_PAIEMENT: { valeur: ModePaiement; libelle: string }[] = [
 ];
 
 export function libelleCategorie(type: TypeOperation, categorie: string): string {
-  return CATEGORIES[type]?.find(c => c.valeur === categorie)?.libelle || categorie;
+  return CATEGORIES[type]?.find(c => c.valeur === categorie)?.libelle
+    || CATEGORIES_ANCIENNES[type]?.find(c => c.valeur === categorie)?.libelle
+    || categorie;
+}
+
+// Catégories proposées dans le formulaire : on garde l'ancienne catégorie
+// d'une opération en cours de modification pour ne pas la changer à son insu.
+export function categoriesFormulaire(type: TypeOperation, categorieActuelle: string) {
+  const ancienne = CATEGORIES_ANCIENNES[type]?.find(c => c.valeur === categorieActuelle);
+  return ancienne ? [...CATEGORIES[type], ancienne] : CATEGORIES[type];
 }
 
 export function libelleMode(mode: ModePaiement): string {

@@ -254,7 +254,7 @@
         name="categorie"
         [(ngModel)]="formData.categorie"
         class="mb-5 w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none transition focus:border-orange-500 focus:ring-2 focus:ring-orange-100">
-        <option *ngFor="let c of categories[formData.type]" [value]="c.valeur">{{ c.libelle }}</option>
+        <option *ngFor="let c of categoriesFormulaire(formData.type, formData.categorie)" [value]="c.valeur">{{ c.libelle }}</option>
       </select>
 
 
@@ -411,6 +411,14 @@
           class="rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm outline-none focus:border-orange-500">
           <option value="">USD et CDF</option>
           <option *ngFor="let d of devises" [value]="d">{{ d }}</option>
+        </select>
+        <select
+          name="filtreCategorie"
+          [(ngModel)]="filtreCategorie"
+          (ngModelChange)="filtrer()"
+          class="rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm outline-none focus:border-orange-500">
+          <option value="">Toutes les catégories</option>
+          <option *ngFor="let c of categoriesFiltre" [value]="c.valeur">{{ c.libelle }}</option>
         </select>
       </div>
 
