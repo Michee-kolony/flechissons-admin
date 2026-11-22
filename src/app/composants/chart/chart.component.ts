@@ -26,7 +26,7 @@ export class ChartComponent implements AfterViewInit, OnDestroy {
   // Statistiques des utilisateurs
   hommes: number = 0;
   femmes: number = 0;
-  nonPrecise: number = 0;
+  /** Hommes + femmes : seuls ces deux sexes existent dans Fléchissons */
   total: number = 0;
 
   constructor(private http: HttpClient, private themeService: ThemeService) {}
@@ -68,7 +68,6 @@ export class ChartComponent implements AfterViewInit, OnDestroy {
         // Utiliser des données par défaut en cas d'erreur
         this.hommes = 0;
         this.femmes = 0;
-        this.nonPrecise = 0;
         this.total = 0;
         this.creerGraphique();
       }
@@ -81,7 +80,6 @@ export class ChartComponent implements AfterViewInit, OnDestroy {
   compterParSexe(utilisateurs: User[]): void {
     this.hommes = 0;
     this.femmes = 0;
-    this.nonPrecise = 0;
 
     utilisateurs.forEach(user => {
       const sexe = user.sexe?.toLowerCase() || '';
@@ -90,12 +88,11 @@ export class ChartComponent implements AfterViewInit, OnDestroy {
         this.hommes++;
       } else if (sexe === 'femme' || sexe === 'feminin' || sexe === 'female') {
         this.femmes++;
-      } else {
-        this.nonPrecise++;
       }
+      // Sexe absent (anciens comptes) : non compté dans le graphique
     });
 
-    this.total = utilisateurs.length;
+    this.total = this.hommes + this.femmes;
   }
 
   /**
@@ -132,14 +129,6 @@ export class ChartComponent implements AfterViewInit, OnDestroy {
       data.push(this.femmes);
       backgroundColors.push('#FDBA74');
       hoverBackgroundColors.push('#FB923C');
-    }
-
-    // Ajouter "Non précisé" si > 0
-    if (this.nonPrecise > 0) {
-      labels.push('Non précisé');
-      data.push(this.nonPrecise);
-      backgroundColors.push('#94A3B8');
-      hoverBackgroundColors.push('#64748B');
     }
 
     // Si aucune donnée, afficher un anneau gris (la valeur 1 sert uniquement au dessin)
