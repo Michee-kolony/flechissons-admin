@@ -62,12 +62,22 @@
        class="bg-white rounded-2xl border border-gray-100 shadow-sm p-4 sm:p-5
               flex items-center gap-4">
 
-    <div class="w-12 h-12 min-w-[48px] rounded-full
-                bg-gradient-to-br from-orange-500 to-orange-800
-                text-white flex items-center justify-center
-                font-semibold">
-      {{ getInitials(admin.nom) }}
-    </div>
+    <!-- Photo de profil, ou initiales si l'admin n'en a pas (ou si elle ne charge pas) -->
+    <img *ngIf="admin.photo && !photosEnErreur.has(admin._id || admin.email); else initiales"
+         [src]="admin.photo"
+         [alt]="'Photo de ' + admin.nom"
+         (error)="photosEnErreur.add(admin._id || admin.email)"
+         loading="lazy"
+         class="w-12 h-12 min-w-[48px] rounded-full object-cover border border-gray-100">
+
+    <ng-template #initiales>
+      <div class="w-12 h-12 min-w-[48px] rounded-full
+                  bg-gradient-to-br from-orange-500 to-orange-800
+                  text-white flex items-center justify-center
+                  font-semibold">
+        {{ getInitials(admin.nom) }}
+      </div>
+    </ng-template>
 
     <div class="flex-1 min-w-0">
       <div class="flex items-center gap-2 flex-wrap">

@@ -9,6 +9,8 @@ export interface Admin {
   email: string;
   role?: RoleAdmin;
   date?: string;
+  /** Photo de profil (URL Cloudflare R2), absente si l'admin n'en a pas mis */
+  photo?: string | null;
 }
 
 @Component({
@@ -22,6 +24,8 @@ export class AdministrateursComponent implements OnInit {
   private UrlRegister = "https://flechissons.com/auth/register";
 
   admins: Admin[] = [];
+  /** Photos qui n'ont pas pu se charger : on affiche les initiales à la place */
+  photosEnErreur = new Set<string>();
   isLoading: boolean = true;
   currentAdminEmail: string = '';
 
