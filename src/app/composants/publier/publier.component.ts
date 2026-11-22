@@ -33,8 +33,6 @@ export class PublierComponent {
   @ViewChild(TeleversementMediaComponent) televersementMedia?: TeleversementMediaComponent;
   media: ResultatTeleversement | null = null;
   televersementEnCours: boolean = false;
-  // Prédication : coller un lien existant au lieu de téléverser un fichier
-  utiliserLienManuel: boolean = false;
 
   // Toast
   toastMessage: string = '';
@@ -99,9 +97,19 @@ export class PublierComponent {
     return this.articleData.type === 'predications';
   }
 
-  /** Le téléversement direct est utilisé (et non un lien collé à la main) */
-  get modeTeleversement(): boolean {
-    return this.estPredication && !this.utiliserLienManuel;
+  /**
+   * Le fichier téléversé est utilisé : le champ vidéo contient encore son lien.
+   * Si l'administrateur a remplacé ce lien par un autre (YouTube…), c'est ce lien qui est publié.
+   */
+  get fichierTeleverseUtilise(): boolean {
+    return this.estPredication
+      && !!this.media
+      && (this.articleData.youtube || '').trim() === this.media.url;
+  }
+
+  /** Un fichier de prédication est encore en cours d'envoi */
+  get televersementBloquant(): boolean {
+    return this.estPredication && this.televersementEnCours;
   }
 
   onMediaTermine(resultat: ResultatTeleversement): void {
@@ -121,14 +129,6 @@ export class PublierComponent {
     this.televersementEnCours = occupe;
   }
 
-  basculerLienManuel(): void {
-    this.utiliserLienManuel = !this.utiliserLienManuel;
-    if (this.utiliserLienManuel && this.media && this.articleData.youtube === this.media.url) {
-      this.articleData.youtube = '';
-    } else if (!this.utiliserLienManuel && this.media) {
-      this.articleData.youtube = this.media.url;
-    }
-  }
 
   private entetesAuth(): HttpHeaders {
     const token = localStorage.getItem('adminToken');
@@ -148,7 +148,7 @@ export class PublierComponent {
     }
 
     // Jamais de publication avant la finalisation réussie du téléversement
-    if (this.modeTeleversement && this.televersementEnCours) {
+    if (this.televersementBloquant) {
       this.showToastMessage("Patientez jusqu'à la fin du téléversement du fichier avant de publier.", 'error');
       return;
     }
@@ -162,7 +162,7 @@ export class PublierComponent {
     formData.append('theme', this.articleData.theme);
     
     // Prédication téléversée : le serveur vérifie le fichier et renseigne lui-même le lien
-    if (this.modeTeleversement && this.media) {
+    if (this.fichierTeleverseUtilise && this.media) {
       formData.append('televersementId', this.media.televersementId);
     }
     // YouTube est facultatif - on l'envoie seulement s'il est rempli
@@ -186,7 +186,7 @@ export class PublierComponent {
       type: this.articleData.type,
       theme: this.articleData.theme,
       youtube: this.articleData.youtube || '(vide)',
-      televersementId: this.modeTeleversement && this.media ? this.media.televersementId : '(aucun)',
+      televersementId: this.fichierTeleverseUtilise && this.media ? this.media.televersementId : '(aucun)',
       lien: this.articleData.lien || '(vide)',
       images: this.selectedFiles.length
     });
@@ -260,7 +260,6 @@ export class PublierComponent {
     this.isSubmitting = false;
     this.media = null;
     this.televersementEnCours = false;
-    this.utiliserLienManuel = false;
     
     const fileInput = document.getElementById('fileInput') as HTMLInputElement;
     if (fileInput) {
