@@ -19,6 +19,9 @@ import { DetailsutilisateurComponent } from './composants/detailsutilisateur/det
 import { ConfidentialiteComponent } from './composants/confidentialite/confidentialite.component';
 import { superAdminGuard } from './guards/super-admin.guard';
 import { tresorierGuard } from './guards/tresorier.guard';
+import { MessagerieComponent } from './composants/messagerie/messagerie.component';
+import { peutUtiliserMessagerie } from './shared/messagerie.service';
+import { ProfilComponent } from './composants/profil/profil.component';
 import { TresorerieComponent } from './composants/tresorerie/tresorerie.component';
 
 const routes: Routes = [
@@ -44,6 +47,8 @@ const routes: Routes = [
       {path:'utilisateurs/:id', component: DetailsutilisateurComponent},
       // Trésorerie : gérée par le trésorier, consultée par le superadmin (vérifié aussi par le backend)
       {path:'tresorerie', component: TresorerieComponent, canActivate: [tresorierGuard]},
+      {path:'messagerie', component: MessagerieComponent, canActivate: [() => peutUtiliserMessagerie()]},
+      {path:'profil', component: ProfilComponent},
       {path:'administrateurs', component: AdministrateursComponent, canActivate: [superAdminGuard]}
     ]
   }

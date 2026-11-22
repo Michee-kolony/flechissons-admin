@@ -204,6 +204,45 @@
 
 
     <!-- ===================================================== -->
+    <!-- MESSAGERIE (ADMIN ET SUPERADMIN)                        -->
+    <!-- ===================================================== -->
+
+    <a
+      *ngIf="voitMessagerie"
+      routerLink="/admin/messagerie"
+      (click)="closeMobileMenu()"
+      routerLinkActive
+      #rlaMessagerie="routerLinkActive"
+      [ngClass]="rlaMessagerie.isActive ? 'bg-white text-orange-600 font-semibold' : 'text-white/90 hover:bg-white/10'"
+      class="relative flex items-center gap-3
+             px-3 py-2.5 mb-1
+             rounded-lg
+             text-decoration-none
+             text-sm
+             transition-all duration-150">
+
+      <i class="fa-solid fa-comments text-[15px] w-5 text-center flex-shrink-0"></i>
+
+      <span
+        *ngIf="afficherLabels"
+        class="whitespace-nowrap flex-1">
+
+        Messagerie
+
+      </span>
+
+      <span
+        *ngIf="messagesNonLus > 0"
+        class="min-w-[20px] h-5 px-1.5 rounded-full bg-red-500 text-white text-[11px] font-bold flex items-center justify-center"
+        [ngClass]="afficherLabels ? '' : 'absolute -top-1 -right-1'">
+        {{ messagesNonLus > 99 ? '99+' : messagesNonLus }}
+      </span>
+
+    </a>
+
+
+
+    <!-- ===================================================== -->
     <!-- ARTICLES                                                -->
     <!-- ===================================================== -->
 
@@ -525,24 +564,29 @@
            border-t border-white/15
            flex-shrink-0">
 
-    <div
+    <a
+      routerLink="/admin/profil"
+      (click)="closeMobileMenu()"
+      title="Mon profil"
       class="flex items-center gap-2.5
              px-2 py-2 rounded-lg
              hover:bg-white/10
-             transition cursor-default">
+             transition cursor-pointer">
 
       <!-- AVATAR -->
 
       <div
         class="w-8 h-8 min-w-[32px]
                rounded-full
+               overflow-hidden
                bg-white
                flex items-center
                justify-center
                text-orange-600
                text-xs">
 
-        <i class="fa-solid fa-user"></i>
+        <img *ngIf="adminPhoto; else iconeProfil" [src]="adminPhoto" alt="" class="w-full h-full object-cover">
+        <ng-template #iconeProfil><i class="fa-solid fa-user"></i></ng-template>
 
       </div>
 
@@ -563,7 +607,7 @@
 
       </div>
 
-    </div>
+    </a>
 
 
 
@@ -697,15 +741,19 @@
       <!-- PROFIL                                                -->
       <!-- =================================================== -->
 
-      <div
+      <a
+        routerLink="/admin/profil"
+        title="Mon profil"
         class="hidden sm:flex
                items-center gap-3
                pl-3
-               border-l border-gray-200">
+               border-l border-gray-200
+               cursor-pointer">
 
         <div
           class="w-10 h-10
                  rounded-full
+                 overflow-hidden
                  bg-gradient-to-br from-orange-500 to-orange-700
                  shadow-md shadow-orange-600/30
                  ring-2 ring-white/80
@@ -713,7 +761,8 @@
                  flex items-center
                  justify-center">
 
-          <i class="fa-solid fa-user"></i>
+          <img *ngIf="adminPhoto; else iconeEntete" [src]="adminPhoto" alt="" class="w-full h-full object-cover">
+          <ng-template #iconeEntete><i class="fa-solid fa-user"></i></ng-template>
 
         </div>
 
@@ -730,7 +779,7 @@
 
         </div>
 
-      </div>
+      </a>
 
     </div>
 

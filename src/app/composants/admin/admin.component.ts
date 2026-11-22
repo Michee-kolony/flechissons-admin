@@ -1,16 +1,19 @@
 // admin.component.ts
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Subscription } from 'rxjs';
 import { Router } from '@angular/router';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { isSuperAdmin, peutVoirTresorerie } from '../../shared/auth.util';
 import { ThemeService } from '../../shared/theme.service';
+import { MessagerieService, peutUtiliserMessagerie } from '../../shared/messagerie.service';
+import { EVENEMENT_PROFIL_MAJ } from '../profil/profil.component';
 
 @Component({
   selector: 'app-admin',
   templateUrl: './admin.component.html',
   styleUrl: './admin.component.css'
 })
-export class AdminComponent implements OnInit {
+export class AdminComponent implements OnInit, OnDestroy {
 
   // Desktop : sidebar étendue (icônes + libellés) ou repliée (icônes seules)
   sidebarExpanded = true;
@@ -23,11 +26,19 @@ export class AdminComponent implements OnInit {
   adminEmail: string = '';
   estSuperAdmin: boolean = false;
   voitTresorerie: boolean = false;
+  voitMessagerie: boolean = false;
+  adminPhoto: string = '';
+  messagesNonLus = 0;
+
+  private nonLusSub?: Subscription;
+  // Profil modifié depuis la page « Mon profil » : nom et photo mis à jour tout de suite
+  private readonly surProfilMaj = () => this.loadAdminData();
 
   constructor(
     private router: Router,
     private themeService: ThemeService,
-    private http: HttpClient
+    private http: HttpClient,
+    private messagerie: MessagerieService
   ) {}
 
   get estSombre(): boolean {
@@ -46,11 +57,26 @@ export class AdminComponent implements OnInit {
     this.loadAdminData();
     this.appliquerRole();
     this.rafraichirRole();
+
+    window.addEventListener(EVENEMENT_PROFIL_MAJ, this.surProfilMaj);
+    this.nonLusSub = this.messagerie.nonLus$.subscribe(n => this.messagesNonLus = n);
+  }
+
+  ngOnDestroy(): void {
+    window.removeEventListener(EVENEMENT_PROFIL_MAJ, this.surProfilMaj);
+    this.nonLusSub?.unsubscribe();
+    this.messagerie.arreterSurveillance();
   }
 
   private appliquerRole(): void {
     this.estSuperAdmin = isSuperAdmin();
     this.voitTresorerie = peutVoirTresorerie();
+    this.voitMessagerie = peutUtiliserMessagerie();
+    if (this.voitMessagerie) {
+      this.messagerie.demarrerSurveillance();
+    } else {
+      this.messagerie.arreterSurveillance();
+    }
   }
 
   /**
@@ -83,6 +109,7 @@ export class AdminComponent implements OnInit {
         this.adminData = JSON.parse(adminDataString);
         this.adminName = this.adminData.nom || 'Administrateur';
         this.adminEmail = this.adminData.email || 'admin@example.com';
+        this.adminPhoto = this.adminData.photo || '';
       } catch (error) {
         console.error('Erreur lors du chargement des données admin:', error);
         this.adminName = 'Administrateur';
@@ -130,6 +157,7 @@ export class AdminComponent implements OnInit {
     localStorage.removeItem('adminData');
     localStorage.removeItem('rememberMe');
     localStorage.removeItem('adminEmail');
+    this.messagerie.arreterSurveillance();
 
     // Rediriger vers la page de connexion
     this.router.navigate(['/login']);

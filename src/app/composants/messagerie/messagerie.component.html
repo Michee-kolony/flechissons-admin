@@ -1,0 +1,238 @@
+<!-- messagerie.component.html -->
+<div class="w-full max-w-6xl mx-auto">
+
+  <!-- EN-TÊTE -->
+  <div class="mb-5">
+    <p class="text-sm font-medium text-orange-600">Administration</p>
+    <h1 class="text-2xl sm:text-3xl font-bold text-gray-900 mt-1">Messagerie</h1>
+    <p class="text-sm text-gray-500 mt-1">
+      Échangez en privé avec les utilisateurs de l'application. Vous seul voyez vos conversations.
+    </p>
+  </div>
+
+  <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden flex h-[calc(100vh-14rem)] min-h-[480px]">
+
+    <!-- ================================================= -->
+    <!-- COLONNE GAUCHE : CONVERSATIONS                      -->
+    <!-- ================================================= -->
+
+    <aside
+      class="w-full md:w-80 md:min-w-[20rem] border-r border-gray-100 flex-col"
+      [ngClass]="active ? 'hidden md:flex' : 'flex'">
+
+      <div class="p-4 border-b border-gray-100 space-y-3">
+        <button
+          type="button"
+          (click)="basculerNouvelle()"
+          class="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold text-white bg-orange-600 hover:bg-orange-700 transition">
+          <i class="fa-solid" [ngClass]="modeNouvelle ? 'fa-arrow-left' : 'fa-pen-to-square'"></i>
+          {{ modeNouvelle ? 'Retour aux conversations' : 'Nouvelle conversation' }}
+        </button>
+
+        <div class="relative" *ngIf="!modeNouvelle">
+          <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-xs text-gray-400"></i>
+          <input
+            type="text"
+            name="filtre"
+            [(ngModel)]="filtre"
+            placeholder="Rechercher une conversation"
+            class="w-full rounded-xl border border-gray-200 bg-gray-50 py-2.5 pl-9 pr-3 text-sm outline-none focus:border-orange-500 focus:bg-white">
+        </div>
+
+        <div class="relative" *ngIf="modeNouvelle">
+          <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-xs text-gray-400"></i>
+          <input
+            type="text"
+            name="recherche"
+            [(ngModel)]="recherche"
+            (ngModelChange)="rechercher()"
+            placeholder="Nom, prénom ou e-mail de l'utilisateur"
+            class="w-full rounded-xl border border-gray-200 bg-gray-50 py-2.5 pl-9 pr-3 text-sm outline-none focus:border-orange-500 focus:bg-white">
+        </div>
+      </div>
+
+      <!-- RÉSULTATS DE RECHERCHE (NOUVELLE CONVERSATION) -->
+      <div *ngIf="modeNouvelle" class="flex-1 overflow-y-auto">
+        <p *ngIf="rechercheEnCours" class="p-4 text-sm text-gray-400">
+          <i class="fa-solid fa-spinner fa-spin mr-1"></i> Recherche…
+        </p>
+        <p *ngIf="!rechercheEnCours && resultats.length === 0" class="p-4 text-sm text-gray-400">
+          Aucun utilisateur trouvé.
+        </p>
+        <button
+          *ngFor="let u of resultats"
+          type="button"
+          (click)="demarrerAvec(u)"
+          class="w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-orange-50 transition">
+          <ng-container *ngTemplateOutlet="avatar; context: { $implicit: u }"></ng-container>
+          <div class="min-w-0">
+            <p class="text-sm font-semibold text-gray-800 truncate">{{ nomComplet(u) }}</p>
+            <p class="text-xs text-gray-400 truncate">{{ u.email }}</p>
+          </div>
+        </button>
+      </div>
+
+      <!-- LISTE DES CONVERSATIONS -->
+      <div *ngIf="!modeNouvelle" class="flex-1 overflow-y-auto">
+
+        <p *ngIf="chargementListe" class="p-4 text-sm text-gray-400">
+          <i class="fa-solid fa-spinner fa-spin mr-1"></i> Chargement…
+        </p>
+
+        <div *ngIf="!chargementListe && conversationsFiltrees.length === 0" class="p-6 text-center">
+          <i class="fa-regular fa-comments text-3xl text-gray-300"></i>
+          <p class="mt-2 text-sm text-gray-500">Aucune conversation pour le moment.</p>
+          <p class="text-xs text-gray-400 mt-1">Les messages des utilisateurs apparaîtront ici.</p>
+        </div>
+
+        <button
+          *ngFor="let c of conversationsFiltrees; trackBy: trackById"
+          type="button"
+          (click)="ouvrir(c)"
+          class="w-full flex items-center gap-3 px-4 py-3 text-left border-b border-gray-50 transition"
+          [ngClass]="active?._id === c._id ? 'bg-orange-50' : 'hover:bg-gray-50'">
+
+          <ng-container *ngTemplateOutlet="avatar; context: { $implicit: c.interlocuteur }"></ng-container>
+
+          <div class="min-w-0 flex-1">
+            <div class="flex items-center justify-between gap-2">
+              <p class="text-sm truncate" [ngClass]="c.nonLus ? 'font-bold text-gray-900' : 'font-semibold text-gray-800'">
+                {{ nomComplet(c.interlocuteur) }}
+              </p>
+              <span class="text-[11px] text-gray-400 flex-shrink-0">{{ heureListe(c.dernierMessage?.date) }}</span>
+            </div>
+            <div class="flex items-center justify-between gap-2">
+              <p class="text-xs truncate" [ngClass]="c.nonLus ? 'text-gray-800 font-medium' : 'text-gray-500'">
+                <span *ngIf="c.dernierMessage?.auteur === 'admin'" class="text-gray-400">Vous : </span>{{ c.dernierMessage?.texte }}
+              </p>
+              <span
+                *ngIf="c.nonLus"
+                class="min-w-[20px] h-5 px-1.5 rounded-full bg-orange-600 text-white text-[11px] font-bold flex items-center justify-center flex-shrink-0">
+                {{ c.nonLus > 99 ? '99+' : c.nonLus }}
+              </span>
+            </div>
+          </div>
+        </button>
+      </div>
+    </aside>
+
+
+    <!-- ================================================= -->
+    <!-- COLONNE DROITE : CONVERSATION OUVERTE               -->
+    <!-- ================================================= -->
+
+    <section class="flex-1 flex-col min-w-0" [ngClass]="active ? 'flex' : 'hidden md:flex'">
+
+      <!-- AUCUNE CONVERSATION -->
+      <div *ngIf="!active" class="flex-1 flex flex-col items-center justify-center text-center p-8">
+        <div class="w-16 h-16 rounded-2xl bg-orange-50 flex items-center justify-center">
+          <i class="fa-regular fa-comments text-2xl text-orange-500"></i>
+        </div>
+        <p class="mt-4 font-semibold text-gray-800">Sélectionnez une conversation</p>
+        <p class="text-sm text-gray-500 mt-1">ou démarrez-en une nouvelle avec un utilisateur.</p>
+      </div>
+
+      <ng-container *ngIf="active">
+
+        <!-- EN-TÊTE DE LA CONVERSATION -->
+        <div class="flex items-center gap-3 px-4 py-3 border-b border-gray-100">
+          <button type="button" (click)="fermer()" class="md:hidden w-9 h-9 rounded-lg hover:bg-gray-100 flex items-center justify-center" aria-label="Retour">
+            <i class="fa-solid fa-arrow-left text-gray-600"></i>
+          </button>
+          <ng-container *ngTemplateOutlet="avatar; context: { $implicit: active.interlocuteur }"></ng-container>
+          <div class="min-w-0">
+            <p class="text-sm font-semibold text-gray-900 truncate">{{ nomComplet(active.interlocuteur) }}</p>
+            <p class="text-xs text-gray-400 truncate">{{ active.interlocuteur?.email || 'Utilisateur de l’application' }}</p>
+          </div>
+        </div>
+
+        <!-- FIL DES MESSAGES -->
+        <div #fil class="flex-1 overflow-y-auto px-4 py-4 bg-gray-50/60">
+
+          <div *ngIf="chargementMessages" class="text-center text-sm text-gray-400 py-10">
+            <i class="fa-solid fa-spinner fa-spin mr-1"></i> Chargement des messages…
+          </div>
+
+          <div *ngIf="!chargementMessages && !complet" class="text-center mb-3">
+            <button type="button" (click)="chargerAnciens()" [disabled]="chargementAnciens"
+              class="text-xs font-medium text-orange-600 hover:text-orange-700 disabled:opacity-50">
+              {{ chargementAnciens ? 'Chargement…' : 'Afficher les messages précédents' }}
+            </button>
+          </div>
+
+          <p *ngIf="!chargementMessages && messages.length === 0" class="text-center text-sm text-gray-400 py-10">
+            Aucun message. Écrivez le premier message ci-dessous.
+          </p>
+
+          <ng-container *ngFor="let m of messages; let i = index; trackBy: trackById">
+
+            <div *ngIf="nouveauJour(i)" class="flex justify-center my-3">
+              <span class="px-3 py-1 rounded-full bg-white border border-gray-100 text-[11px] text-gray-500 first-letter:uppercase">
+                {{ libelleJour(m.createdAt) }}
+              </span>
+            </div>
+
+            <div class="flex mb-2" [ngClass]="m.auteur === 'admin' ? 'justify-end' : 'justify-start'">
+              <div
+                class="max-w-[78%] px-3.5 py-2 rounded-2xl text-sm whitespace-pre-wrap break-words shadow-sm"
+                [ngClass]="m.auteur === 'admin'
+                  ? 'bg-orange-600 text-white rounded-br-md'
+                  : 'bg-white text-gray-800 border border-gray-100 rounded-bl-md'">
+                {{ m.texte }}
+                <div class="mt-1 text-[10px] text-right"
+                  [ngClass]="m.auteur === 'admin' ? 'text-white/75' : 'text-gray-400'">
+                  {{ m.createdAt | date:'HH:mm' }}
+                  <ng-container *ngIf="m.auteur === 'admin'">
+                    · <i class="fa-solid" [ngClass]="estLu(m) ? 'fa-check-double' : 'fa-check'"></i>
+                    {{ estLu(m) ? 'Vu' : 'Envoyé' }}
+                  </ng-container>
+                </div>
+              </div>
+            </div>
+          </ng-container>
+        </div>
+
+        <!-- ERREUR -->
+        <p *ngIf="erreur" class="px-4 py-2 text-xs font-medium text-red-600 bg-red-50 border-t border-red-100">
+          {{ erreur }}
+        </p>
+
+        <!-- SAISIE -->
+        <div class="p-3 border-t border-gray-100 flex items-end gap-2" *ngIf="active.interlocuteur; else compteSupprime">
+          <textarea
+            name="texte"
+            [(ngModel)]="texte"
+            (keydown)="touche($event)"
+            rows="1"
+            maxlength="2000"
+            placeholder="Écrire un message… (Entrée pour envoyer, Maj + Entrée pour aller à la ligne)"
+            class="flex-1 max-h-40 min-h-[44px] resize-y rounded-xl border border-gray-200 bg-gray-50 px-4 py-2.5 text-sm outline-none focus:border-orange-500 focus:bg-white"></textarea>
+          <button
+            type="button"
+            (click)="envoyer()"
+            [disabled]="!texte.trim() || envoiEnCours"
+            class="h-11 px-4 rounded-xl bg-orange-600 hover:bg-orange-700 text-white text-sm font-semibold flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed transition"
+            aria-label="Envoyer">
+            <i class="fa-solid" [ngClass]="envoiEnCours ? 'fa-spinner fa-spin' : 'fa-paper-plane'"></i>
+            <span class="hidden sm:inline">Envoyer</span>
+          </button>
+        </div>
+        <ng-template #compteSupprime>
+          <p class="p-4 text-center text-sm text-gray-400 border-t border-gray-100">
+            Ce compte utilisateur a été supprimé : vous ne pouvez plus lui écrire.
+          </p>
+        </ng-template>
+
+      </ng-container>
+    </section>
+  </div>
+</div>
+
+
+<!-- AVATAR D'UN UTILISATEUR (photo ou initiales) -->
+<ng-template #avatar let-u>
+  <div class="w-10 h-10 min-w-[40px] rounded-full overflow-hidden bg-orange-100 text-orange-700 flex items-center justify-center text-sm font-bold">
+    <img *ngIf="u?.photo; else lettres" [src]="u.photo" [alt]="nomComplet(u)" class="w-full h-full object-cover">
+    <ng-template #lettres>{{ initiales(u) }}</ng-template>
+  </div>
+</ng-template>

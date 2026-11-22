@@ -1,0 +1,157 @@
+<!-- profil.component.html -->
+<div class="w-full max-w-4xl mx-auto">
+
+  <!-- EN-TÊTE -->
+  <div class="mb-6">
+    <p class="text-sm font-medium text-orange-600">Administration</p>
+    <h1 class="text-2xl sm:text-3xl font-bold text-gray-900 mt-1">Mon profil</h1>
+    <p class="text-sm text-gray-500 mt-1">
+      Ces informations (nom, titre, photo) sont visibles par les utilisateurs quand vous échangez avec eux.
+    </p>
+  </div>
+
+  <div *ngIf="chargement" class="flex items-center justify-center gap-2 py-16 text-sm text-gray-400">
+    <i class="fa-solid fa-spinner fa-spin"></i> Chargement du profil…
+  </div>
+
+  <ng-container *ngIf="!chargement">
+
+    <!-- ================================================= -->
+    <!-- INFORMATIONS                                        -->
+    <!-- ================================================= -->
+
+    <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 sm:p-7 mb-6">
+
+      <!-- PHOTO -->
+      <div class="flex flex-col sm:flex-row sm:items-center gap-5 mb-7">
+        <div class="w-24 h-24 min-w-[96px] rounded-full overflow-hidden bg-orange-100 text-orange-700 flex items-center justify-center text-2xl font-bold ring-4 ring-orange-50">
+          <img *ngIf="photoAffichee; else lettres" [src]="photoAffichee" alt="Photo de profil" class="w-full h-full object-cover">
+          <ng-template #lettres>{{ initiales }}</ng-template>
+        </div>
+
+        <div>
+          <p class="font-semibold text-gray-900">{{ formulaire.nom || 'Administrateur' }}</p>
+          <p class="text-sm text-gray-500">
+            {{ formulaire.titre || libelleRole }}
+            <span class="ml-2 inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-gray-100 text-gray-600 text-xs">
+              <i class="fa-solid fa-lock text-[10px]"></i> Rôle : {{ libelleRole }}
+            </span>
+          </p>
+
+          <div class="flex flex-wrap gap-2 mt-3">
+            <label class="cursor-pointer px-4 py-2 rounded-xl text-sm font-medium text-white bg-orange-600 hover:bg-orange-700 transition">
+              <i class="fa-solid fa-camera mr-1"></i> {{ photoAffichee ? 'Changer la photo' : 'Ajouter une photo' }}
+              <input type="file" accept="image/*,.heic,.heif" class="hidden" (change)="choisirPhoto($event)" [disabled]="enregistrement">
+            </label>
+            <button
+              *ngIf="photoAffichee"
+              type="button"
+              (click)="retirerPhoto()"
+              [disabled]="enregistrement"
+              class="px-4 py-2 rounded-xl text-sm font-medium text-gray-600 bg-white border border-gray-200 hover:bg-gray-100 transition">
+              Retirer
+            </button>
+          </div>
+          <p *ngIf="nouvellePhoto || supprimerPhoto" class="text-xs text-amber-600 mt-2">
+            Cliquez sur « Enregistrer » pour appliquer le changement de photo.
+          </p>
+        </div>
+      </div>
+
+      <!-- CHAMPS -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+
+        <div>
+          <label for="nom" class="block text-sm font-medium text-gray-700 mb-2">Nom complet <span class="text-red-500">*</span></label>
+          <input id="nom" name="nom" type="text" [(ngModel)]="formulaire.nom" maxlength="80"
+            class="w-full h-11 px-4 rounded-xl border border-gray-200 bg-gray-50 text-sm outline-none focus:bg-white focus:border-orange-500 focus:ring-4 focus:ring-orange-500/10">
+        </div>
+
+        <div>
+          <label for="email" class="block text-sm font-medium text-gray-700 mb-2">E-mail de connexion <span class="text-red-500">*</span></label>
+          <input id="email" name="email" type="email" [(ngModel)]="formulaire.email"
+            class="w-full h-11 px-4 rounded-xl border border-gray-200 bg-gray-50 text-sm outline-none focus:bg-white focus:border-orange-500 focus:ring-4 focus:ring-orange-500/10">
+        </div>
+
+        <div>
+          <label for="titre" class="block text-sm font-medium text-gray-700 mb-2">Titre affiché</label>
+          <input id="titre" name="titre" type="text" [(ngModel)]="formulaire.titre" maxlength="60"
+            placeholder="Ex : Pasteur, Diacre, Responsable jeunesse"
+            class="w-full h-11 px-4 rounded-xl border border-gray-200 bg-gray-50 text-sm outline-none focus:bg-white focus:border-orange-500 focus:ring-4 focus:ring-orange-500/10">
+          <p class="text-xs text-gray-400 mt-1">Vide : « Pasteur » pour un superadmin, « Administrateur » sinon.</p>
+        </div>
+
+        <div>
+          <label for="telephone" class="block text-sm font-medium text-gray-700 mb-2">Téléphone</label>
+          <input id="telephone" name="telephone" type="tel" [(ngModel)]="formulaire.telephone" maxlength="30"
+            placeholder="+243 …"
+            class="w-full h-11 px-4 rounded-xl border border-gray-200 bg-gray-50 text-sm outline-none focus:bg-white focus:border-orange-500 focus:ring-4 focus:ring-orange-500/10">
+        </div>
+
+        <div class="sm:col-span-2">
+          <label for="bio" class="block text-sm font-medium text-gray-700 mb-2">Présentation</label>
+          <textarea id="bio" name="bio" rows="3" [(ngModel)]="formulaire.bio" maxlength="500"
+            placeholder="Quelques mots sur vous (visibles par les utilisateurs dans la messagerie)"
+            class="w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 text-sm outline-none resize-none focus:bg-white focus:border-orange-500 focus:ring-4 focus:ring-orange-500/10"></textarea>
+          <p class="text-xs text-gray-400 mt-1 text-right">{{ formulaire.bio.length }}/500</p>
+        </div>
+      </div>
+
+      <p *ngIf="message" class="mt-4 text-sm font-medium text-green-600"><i class="fa-solid fa-circle-check mr-1"></i>{{ message }}</p>
+      <p *ngIf="erreur" class="mt-4 text-sm font-medium text-red-600"><i class="fa-solid fa-circle-exclamation mr-1"></i>{{ erreur }}</p>
+
+      <div class="flex justify-end mt-6">
+        <button type="button" (click)="enregistrer()" [disabled]="enregistrement"
+          class="px-6 py-2.5 rounded-xl text-sm font-semibold text-white bg-orange-600 hover:bg-orange-700 transition flex items-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed">
+          <i class="fa-solid" [ngClass]="enregistrement ? 'fa-spinner fa-spin' : 'fa-floppy-disk'"></i>
+          {{ enregistrement ? 'Enregistrement…' : 'Enregistrer' }}
+        </button>
+      </div>
+    </div>
+
+
+    <!-- ================================================= -->
+    <!-- MOT DE PASSE                                        -->
+    <!-- ================================================= -->
+
+    <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 sm:p-7">
+      <div class="flex items-center justify-between mb-5">
+        <h2 class="text-lg font-semibold text-gray-800">Mot de passe</h2>
+        <button type="button" (click)="afficherMdp = !afficherMdp" class="text-xs font-medium text-orange-600 hover:text-orange-700">
+          <i class="fa-solid" [ngClass]="afficherMdp ? 'fa-eye-slash' : 'fa-eye'"></i>
+          {{ afficherMdp ? 'Masquer' : 'Afficher' }}
+        </button>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-5">
+        <div>
+          <label for="mdpActuel" class="block text-sm font-medium text-gray-700 mb-2">Mot de passe actuel</label>
+          <input id="mdpActuel" name="mdpActuel" [type]="afficherMdp ? 'text' : 'password'" [(ngModel)]="mdp.actuel" autocomplete="current-password"
+            class="w-full h-11 px-4 rounded-xl border border-gray-200 bg-gray-50 text-sm outline-none focus:bg-white focus:border-orange-500">
+        </div>
+        <div>
+          <label for="mdpNouveau" class="block text-sm font-medium text-gray-700 mb-2">Nouveau (8 caractères min.)</label>
+          <input id="mdpNouveau" name="mdpNouveau" [type]="afficherMdp ? 'text' : 'password'" [(ngModel)]="mdp.nouveau" autocomplete="new-password"
+            class="w-full h-11 px-4 rounded-xl border border-gray-200 bg-gray-50 text-sm outline-none focus:bg-white focus:border-orange-500">
+        </div>
+        <div>
+          <label for="mdpConfirmation" class="block text-sm font-medium text-gray-700 mb-2">Confirmation</label>
+          <input id="mdpConfirmation" name="mdpConfirmation" [type]="afficherMdp ? 'text' : 'password'" [(ngModel)]="mdp.confirmation" autocomplete="new-password"
+            class="w-full h-11 px-4 rounded-xl border border-gray-200 bg-gray-50 text-sm outline-none focus:bg-white focus:border-orange-500">
+        </div>
+      </div>
+
+      <p *ngIf="mdpMessage" class="mt-4 text-sm font-medium text-green-600"><i class="fa-solid fa-circle-check mr-1"></i>{{ mdpMessage }}</p>
+      <p *ngIf="mdpErreur" class="mt-4 text-sm font-medium text-red-600"><i class="fa-solid fa-circle-exclamation mr-1"></i>{{ mdpErreur }}</p>
+
+      <div class="flex justify-end mt-6">
+        <button type="button" (click)="changerMotDePasse()" [disabled]="mdpEnCours"
+          class="px-6 py-2.5 rounded-xl text-sm font-semibold text-orange-700 bg-orange-50 hover:bg-orange-100 transition flex items-center gap-2 disabled:opacity-70">
+          <i class="fa-solid" [ngClass]="mdpEnCours ? 'fa-spinner fa-spin' : 'fa-key'"></i>
+          Changer le mot de passe
+        </button>
+      </div>
+    </div>
+
+  </ng-container>
+</div>
